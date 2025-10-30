@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Doctor Dashboard - CKD Diagnostic System{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+    <h2>Doctor Dashboard</h2>
+    <div class="dashboard-actions">
+        <a href="{{ url_for('add_patient') }}" class="btn btn-primary">Add New Patient</a>
+        <button onclick="document.getElementById('csvUpload').click()" class="btn btn-secondary">Upload CSV</button>
+        <input type="file" id="csvUpload" accept=".csv" style="display: none;" onchange="uploadCSV(this)">
+    </div>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <h3>Total Patients</h3>
+        <p class="stat-number">{{ patients|length }}</p>
+    </div>
+    <div class="stat-card high-risk">
+        <h3>High Risk Patients</h3>
+        <p class="stat-number">{{ patients|selectattr('risk_level', 'in', ['High', 'Critical'])|list|length }}</p>
+    </div>
+    <div class="stat-card stage-5">
+        <h3>Stage 5 CKD</h3>
+        <p class="stat-number">{{ patients|selectattr('stage', 'equalto', 5)|list|length }}</p>
+    </div>
+</div>
+
+<div class="patients-section">
+    <h3>Patient List</h3>
+    
+    {% if patients %}
+    <table class="patients-table">
+        <thead>
+            <tr>
+                <th>Patient ID</th>
+                <th>Name</th>
+                <th>Risk Level</th>
+                <th>Risk %</th>
+                <th>CKD Stage</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for patient in patients %}
+            <tr>
+                <td>{{ patient.patient_id }}</td>
+                <td>{{ patient.name }}</td>
+                <td>
+                    <span class="badge badge-{{ patient.risk_level.lower() }}">
+                        {{ patient.risk_level }}
+                    </span>
+                </td>
+                <td>{{ patient.risk_percentage }}%</td>
+                <td>Stage {{ patient.stage }}</td>
+                <td>
+                    <a href="{{ url_for('results', patient_id=patient.patient_id) }}" class="btn btn-sm">View Details</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+        <p>No patients added yet. Click "Add New Patient" to get started.</p>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+function uploadCSV(input) {
+    const file = input.files[0];
+    if (!file) return;
+    
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    fetch('{{ url_for("upload_csv") }}', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(`Successfully processed ${data.count} patients`);
+            location.reload();
+        } else {
+            alert('Error: ' + data.error);
+        }
+    })
+    .catch(error => {
+        alert('Error uploading file: ' + error);
+    });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+
+{% block title %}Add Patient - CKD Diagnostic System{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h2>Add New Patient</h2>
+    <p class="subtitle">Enter patient information and lab results for CKD risk assessment</p>
+    
+    <form method="POST" action="{{ url_for('add_patient') }}">
+        <div class="form-section">
+            <h3>Patient Information</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="patient_id">Patient ID *</label>
+                    <input type="text" id="patient_id" name="patient_id" required>
+                </div>
+                <div class="form-group">
+                    <label for="patient_name">Patient Name *</label>
+                    <input type="text" id="patient_name" name="patient_name" required>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="age">Age *</label>
+                    <input type="number" id="age" name="age" min="1" max="120" required>
+                </div>
+                <div class="form-group">
+                    <label for="gender">Gender *</label>
+                    <select id="gender" name="gender" required>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3>Vital Signs</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="bp_systolic">Blood Pressure Systolic (mmHg) *</label>
+                    <input type="number" id="bp_systolic" name="bp_systolic" step="0.1" required>
+                </div>
+                <div class="form-group">
+                    <label for="bp_diastolic">Blood Pressure Diastolic (mmHg) *</label>
+                    <input type="number" id="bp_diastolic" name="bp_diastolic" step="0.1" required>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3>Lab Results - Blood Tests</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="serum_creatinine">Serum Creatinine (mg/dL) *</label>
+                    <input type="number" id="serum_creatinine" name="serum_creatinine" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="blood_urea">Blood Urea (mg/dL) *</label>
+                    <input type="number" id="blood_urea" name="blood_urea" step="0.1" required>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="hemoglobin">Hemoglobin (g/dL) *</label>
+                    <input type="number" id="hemoglobin" name="hemoglobin" step="0.1" required>
+                </div>
+                <div class="form-group">
+                    <label for="blood_glucose">Blood Glucose (mg/dL)</label>
+                    <input type="number" id="blood_glucose" name="blood_glucose" step="0.1" value="100">
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="sodium">Sodium (mEq/L)</label>
+                    <input type="number" id="sodium" name="sodium" step="0.1" value="140">
+                </div>
+                <div class="form-group">
+                    <label for="potassium">Potassium (mEq/L)</label>
+                    <input type="number" id="potassium" name="potassium" step="0.1" value="4.5">
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="red_blood_cell_count">RBC Count (millions/cmm)</label>
+                    <input type="number" id="red_blood_cell_count" name="red_blood_cell_count" step="0.1" value="5">
+                </div>
+                <div class="form-group">
+                    <label for="white_blood_cell_count">WBC Count (cells/cmm)</label>
+                    <input type="number" id="white_blood_cell_count" name="white_blood_cell_count" step="1" value="8000">
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="packed_cell_volume">Packed Cell Volume (%)</label>
+                    <input type="number" id="packed_cell_volume" name="packed_cell_volume" step="0.1" value="44">
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3>Medical Conditions</h3>
+            <div class="form-row">
+                <div class="form-group checkbox-group">
+                    <label>
+                        <input type="checkbox" name="hypertension" value="1">
+                        Hypertension
+                    </label>
+                </div>
+                <div class="form-group checkbox-group">
+                    <label>
+                        <input type="checkbox" name="diabetes_mellitus" value="1">
+                        Diabetes Mellitus
+                    </label>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group checkbox-group">
+                    <label>
+                        <input type="checkbox" name="coronary_artery_disease" value="1">
+                        Coronary Artery Disease
+                    </label>
+                </div>
+                <div class="form-group checkbox-group">
+                    <label>
+                        <input type="checkbox" name="anemia" value="1">
+                        Anemia
+                    </label>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group checkbox-group">
+                    <label>
+                        <input type="checkbox" name="pedal_edema" value="1">
+                        Pedal Edema
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3>Urine Test Results</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="specific_gravity">Specific Gravity</label>
+                    <input type="number" id="specific_gravity" name="specific_gravity" step="0.001" value="1.020">
+                </div>
+                <div class="form-group">
+                    <label for="albumin">Albumin (0-5)</label>
+                    <input type="number" id="albumin" name="albumin" min="0" max="5" value="0">
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="sugar">Sugar (0-5)</label>
+                    <input type="number" id="sugar" name="sugar" min="0" max="5" value="0">
+                </div>
+            </div>
+        </div>
+
+        <input type="hidden" name="red_blood_cells" value="1">
+        <input type="hidden" name="pus_cell" value="0">
+        <input type="hidden" name="bacteria" value="0">
+        <input type="hidden" name="appetite" value="1">
+
+        <div class="form-actions">
+            <a href="{{ url_for('doctor_dashboard') }}" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">Analyze Patient Data</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

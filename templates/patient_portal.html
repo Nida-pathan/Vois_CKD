@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block title %}Patient Portal - CKD Diagnostic System{% endblock %}
+
+{% block content %}
+<div class="patient-portal">
+    <h2>Your Kidney Health Dashboard</h2>
+    <p class="subtitle">Monitor your kidney function and health metrics</p>
+    
+    {% if patient and patient.name %}
+    <div class="patient-info-card">
+        <h3>Patient Information</h3>
+        <div class="info-grid">
+            <div class="info-item">
+                <span class="label">Name:</span>
+                <span class="value">{{ patient.name }}</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Patient ID:</span>
+                <span class="value">{{ patient.patient_id }}</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Age:</span>
+                <span class="value">{{ patient.age }} years</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Gender:</span>
+                <span class="value">{{ patient.gender|capitalize }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="health-status-card">
+        <h3>Current Health Status</h3>
+        <div class="risk-display risk-{{ patient.risk_level.lower() if patient.risk_level else 'low' }}">
+            <div class="risk-circle">
+                <span class="risk-percentage">{{ patient.risk_percentage if patient.risk_percentage else 0 }}%</span>
+                <span class="risk-label">CKD Risk</span>
+            </div>
+            <div class="risk-details">
+                <h4>Risk Level: {{ patient.risk_level if patient.risk_level else 'Low' }}</h4>
+                <p class="ckd-stage">CKD Stage: {{ patient.stage if patient.stage else 'N/A' }}</p>
+                <p class="egfr-value">eGFR: {{ patient.egfr if patient.egfr else 'N/A' }} mL/min/1.73m²</p>
+            </div>
+        </div>
+    </div>
+
+    {% if patient.history %}
+    <div class="trends-card">
+        <h3>Your Health Trends</h3>
+        <div class="chart-container">
+            <canvas id="trendsChart"></canvas>
+        </div>
+    </div>
+
+    <div class="latest-results">
+        <h3>Latest Lab Results</h3>
+        <div class="results-grid">
+            <div class="result-item">
+                <span class="result-name">Serum Creatinine</span>
+                <span class="result-value">{{ patient.history[0].serum_creatinine }} mg/dL</span>
+            </div>
+            <div class="result-item">
+                <span class="result-name">Blood Urea</span>
+                <span class="result-value">{{ patient.history[0].blood_urea }} mg/dL</span>
+            </div>
+            <div class="result-item">
+                <span class="result-name">eGFR</span>
+                <span class="result-value">{{ patient.history[0].egfr }} mL/min/1.73m²</span>
+            </div>
+            <div class="result-item">
+                <span class="result-name">Hemoglobin</span>
+                <span class="result-value">{{ patient.history[0].hemoglobin }} g/dL</span>
+            </div>
+            <div class="result-item">
+                <span class="result-name">Blood Pressure</span>
+                <span class="result-value">{{ patient.history[0].bp_systolic }}/{{ patient.history[0].bp_diastolic }} mmHg</span>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="lifestyle-tips">
+        <h3>Lifestyle Recommendations</h3>
+        <div class="tips-grid">
+            <div class="tip-card">
+                <h4>Diet</h4>
+                <p>Maintain a kidney-friendly diet low in sodium, phosphorus, and potassium. Consult with a dietitian for personalized recommendations.</p>
+            </div>
+            <div class="tip-card">
+                <h4>Hydration</h4>
+                <p>Stay properly hydrated. Drink adequate water daily unless your doctor advises fluid restriction.</p>
+            </div>
+            <div class="tip-card">
+                <h4>Exercise</h4>
+                <p>Engage in regular physical activity as recommended by your healthcare provider. Aim for at least 30 minutes of moderate exercise most days.</p>
+            </div>
+            <div class="tip-card">
+                <h4>Monitoring</h4>
+                <p>Keep regular appointments with your healthcare team and monitor your blood pressure at home if advised.</p>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <p>No health data available yet. Please contact your doctor to have your information added to the system.</p>
+    </div>
+    {% endif %}
+</div>
+
+{% if patient and patient.history %}
+<script>
+fetch('{{ url_for("patient_trends", username=current_user.username) }}')
+    .then(response => response.json())
+    .then(data => {
+        const ctx = document.getElementById('trendsChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: data.dates,
+                datasets: [{
+                    label: 'Serum Creatinine (mg/dL)',
+                    data: data.creatinine,
+                    borderColor: 'rgb(239, 68, 68)',
+                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                    tension: 0.4
+                }, {
+                    label: 'eGFR (mL/min/1.73m²)',
+                    data: data.egfr,
+                    borderColor: 'rgb(34, 197, 94)',
+                    backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                    tension: 0.4
+                }, {
+                    label: 'Hemoglobin (g/dL)',
+                    data: data.hemoglobin,
+                    borderColor: 'rgb(59, 130, 246)',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    },
+                    title: {
+                        display: true,
+                        text: 'Kidney Function Trends Over Time'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,5 @@
+patient_id,patient_name,age,gender,bp_systolic,bp_diastolic,serum_creatinine,blood_urea,hemoglobin,blood_glucose,sodium,potassium,red_blood_cell_count,white_blood_cell_count,packed_cell_volume,specific_gravity,albumin,sugar,red_blood_cells,pus_cell,bacteria,hypertension,diabetes_mellitus,coronary_artery_disease,appetite,pedal_edema,anemia
+P002,Jane Smith,62,female,155,95,2.1,65,10.5,110,138,4.8,4.2,9500,38,1.015,2,0,1,1,0,1,0,0,1,1,1
+P003,Robert Johnson,48,male,125,82,1.1,35,14.2,95,142,4.4,5.1,7800,46,1.022,0,0,1,0,0,0,0,0,1,0,0
+P004,Maria Garcia,70,female,168,98,3.5,95,9.2,140,135,5.2,3.8,11000,35,1.012,3,1,1,2,1,1,1,0,0,1,1
+P005,Michael Brown,55,male,142,88,1.8,52,11.8,105,139,4.7,4.5,8200,42,1.018,1,0,1,0,0,1,0,0,1,0,0

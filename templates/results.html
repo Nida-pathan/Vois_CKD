@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block title %}Analysis Results - CKD Diagnostic System{% endblock %}
+
+{% block content %}
+<div class="results-container">
+    <div class="results-header">
+        <h2>CKD Risk Assessment Results</h2>
+        {% if current_user.is_doctor() %}
+        <a href="{{ url_for('doctor_dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+        {% else %}
+        <a href="{{ url_for('patient_portal') }}" class="btn btn-secondary">Back to Portal</a>
+        {% endif %}
+    </div>
+
+    <div class="patient-summary">
+        <h3>Patient: {{ patient.patient_name if patient.patient_name else patient.name }}</h3>
+        <p>Patient ID: {{ patient.patient_id }}</p>
+    </div>
+
+    <div class="results-grid">
+        <div class="result-card risk-card risk-{{ patient.risk_level.lower() }}">
+            <h3>CKD Risk Assessment</h3>
+            <div class="risk-meter">
+                <div class="risk-percentage-large">{{ patient.risk_percentage }}%</div>
+                <div class="risk-level-badge">{{ patient.risk_level }} Risk</div>
+            </div>
+            <div class="risk-bar">
+                <div class="risk-fill" style="width: {{ patient.risk_percentage }}%"></div>
+            </div>
+        </div>
+
+        <div class="result-card stage-card">
+            <h3>CKD Stage Classification</h3>
+            <div class="stage-display">
+                <div class="stage-number">Stage {{ patient.stage }}</div>
+                <div class="stage-description">
+                    {% if patient.stage == 1 %}
+                    Normal or high GFR (≥90 mL/min/1.73m²)
+                    {% elif patient.stage == 2 %}
+                    Mild decrease in GFR (60-89 mL/min/1.73m²)
+                    {% elif patient.stage == 3 %}
+                    Moderate decrease in GFR (30-59 mL/min/1.73m²)
+                    {% elif patient.stage == 4 %}
+                    Severe decrease in GFR (15-29 mL/min/1.73m²)
+                    {% elif patient.stage == 5 %}
+                    Kidney failure (GFR <15 mL/min/1.73m²)
+                    {% endif %}
+                </div>
+                <div class="egfr-display">
+                    <span class="label">eGFR:</span>
+                    <span class="value">{{ patient.egfr }} mL/min/1.73m²</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if patient.feature_importance %}
+    <div class="factors-card">
+        <h3>Key Contributing Factors</h3>
+        <p class="subtitle">These factors had the most significant impact on the risk assessment</p>
+        
+        <div class="factors-list">
+            {% for factor in patient.feature_importance %}
+            <div class="factor-item">
+                <div class="factor-info">
+                    <span class="factor-name">{{ factor.name }}</span>
+                    <span class="factor-value">Value: {{ factor.value }}</span>
+                </div>
+                <div class="factor-importance">
+                    <div class="importance-bar">
+                        <div class="importance-fill" style="width: {{ factor.importance }}%"></div>
+                    </div>
+                    <span class="importance-label">{{ factor.importance }}% importance</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% if current_user.is_doctor() %}
+    <div class="recommendations-card">
+        <h3>Clinical Recommendations</h3>
+        <div class="recommendations-list">
+            {% if patient.risk_level == 'Critical' or patient.stage >= 4 %}
+            <div class="recommendation urgent">
+                <h4>URGENT ACTION REQUIRED</h4>
+                <ul>
+                    <li>Immediate nephrology consultation recommended</li>
+                    <li>Consider dialysis evaluation if Stage 5</li>
+                    <li>Strict monitoring of kidney function parameters</li>
+                    <li>Review and adjust all medications for renal dosing</li>
+                </ul>
+            </div>
+            {% elif patient.risk_level == 'High' or patient.stage == 3 %}
+            <div class="recommendation high">
+                <h4>High Priority Actions</h4>
+                <ul>
+                    <li>Refer to nephrologist for specialized care</li>
+                    <li>Intensify blood pressure and diabetes management</li>
+                    <li>Schedule follow-up labs in 3 months</li>
+                    <li>Implement dietary modifications (low protein, sodium restriction)</li>
+                </ul>
+            </div>
+            {% elif patient.risk_level == 'Moderate' %}
+            <div class="recommendation moderate">
+                <h4>Preventive Measures</h4>
+                <ul>
+                    <li>Monitor kidney function every 6 months</li>
+                    <li>Optimize management of hypertension and diabetes</li>
+                    <li>Encourage healthy lifestyle modifications</li>
+                    <li>Patient education on CKD risk factors</li>
+                </ul>
+            </div>
+            {% else %}
+            <div class="recommendation low">
+                <h4>General Health Maintenance</h4>
+                <ul>
+                    <li>Annual kidney function screening</li>
+                    <li>Maintain healthy blood pressure and glucose levels</li>
+                    <li>Encourage regular exercise and balanced diet</li>
+                    <li>Monitor for new risk factors</li>
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
