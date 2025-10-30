@@ -12,6 +12,7 @@ MVP implementation with core features:
 - Trend visualization for kidney function metrics
 
 ## Recent Changes
+- **2025-10-30**: Added separate login pages for doctors and patients with landing page
 - **2025-10-30**: Initial project setup with Flask, authentication system, ML model, and dashboards
 
 ## Project Architecture
@@ -32,9 +33,12 @@ MVP implementation with core features:
 │   └── user.py              # User authentication models
 ├── templates/
 │   ├── base.html            # Base template
-│   ├── login.html           # Login page
+│   ├── landing.html         # Landing page with login options
+│   ├── doctor_login.html    # Doctor-specific login page
+│   ├── patient_login.html   # Patient-specific login page
 │   ├── doctor_dashboard.html
 │   ├── patient_portal.html
+│   ├── add_patient.html
 │   └── results.html
 ├── static/
 │   ├── css/
@@ -46,11 +50,16 @@ MVP implementation with core features:
 ```
 
 ### Key Features
-1. **Authentication**: Role-based access control for doctors and patients
-2. **AI Prediction**: Scikit-learn model predicting CKD risk (0-100%) and stage (1-5)
-3. **Doctor Dashboard**: Patient management, data input, batch CSV upload
-4. **Patient Portal**: Health status display with color-coded risk levels
-5. **Visualizations**: Trend charts for creatinine, eGFR, and other metrics
+1. **Separate Login System**: 
+   - Landing page with two login options
+   - Doctor login (teal/green theme) for healthcare professionals
+   - Patient login (blue theme) for patients
+   - Role-based validation preventing cross-role authentication
+2. **Authentication**: Secure password hashing with role-based access control
+3. **AI Prediction**: Scikit-learn Random Forest model predicting CKD risk (0-100%) and stage (1-5)
+4. **Doctor Dashboard**: Patient management, data input, batch CSV upload
+5. **Patient Portal**: Health status display with color-coded risk levels and historical trends
+6. **Visualizations**: Interactive trend charts for creatinine, eGFR, and other metrics using Chart.js
 
 ### Clinical Parameters Used
 - Age, Gender, Blood Pressure (systolic/diastolic)
@@ -58,6 +67,22 @@ MVP implementation with core features:
 - Hemoglobin, Red Blood Cell Count, White Blood Cell Count
 - Albumin, Sugar levels
 - Specific Gravity, Diabetes Mellitus, Hypertension status
+
+## Access URLs
+- **Landing Page**: `/` or `/landing` - Choose between doctor or patient login
+- **Doctor Login**: `/doctor/login` - Healthcare professional access
+- **Patient Login**: `/patient/login` - Patient portal access
+- **Doctor Dashboard**: `/doctor/dashboard` (requires doctor authentication)
+- **Patient Portal**: `/patient/portal` (requires patient authentication)
+
+## Demo Credentials
+**Doctor Account:**
+- Username: doctor1
+- Password: doctor123
+
+**Patient Account:**
+- Username: patient1
+- Password: patient123
 
 ## User Preferences
 None specified yet.
