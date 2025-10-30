@@ -286,3 +286,7 @@ def patient_trends(username):
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
+
+def main():
+    """Entry point for the application."""
+    app.run(host='0.0.0.0', port=5000, debug=True)
