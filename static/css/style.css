@@ -78,6 +78,12 @@ body {
     border: 1px solid #60a5fa;
 }
 
+.alert-warning {
+    background: #fef3c7;
+    color: #92400e;
+    border: 1px solid #fbbf24;
+}
+
 .btn {
     padding: 0.75rem 1.5rem;
     border: none;
@@ -126,6 +132,138 @@ body {
     min-height: 70vh;
 }
 
+.landing-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 0;
+}
+
+.landing-hero {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.landing-hero h2 {
+    color: #0d9488;
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.hero-subtitle {
+    color: #64748b;
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+}
+
+.hero-description {
+    color: #475569;
+    font-size: 1rem;
+    max-width: 700px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+.login-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.login-option-card {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.login-option-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 50px rgba(0,0,0,0.15);
+}
+
+.card-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.doctor-icon {
+    background: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%);
+    color: white;
+}
+
+.patient-icon {
+    background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+    color: white;
+}
+
+.login-option-card h3 {
+    color: #1e293b;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}
+
+.login-option-card p {
+    color: #64748b;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+}
+
+.demo-info {
+    margin-top: 1rem;
+    padding: 0.75rem;
+    background: #f8fafc;
+    border-radius: 8px;
+}
+
+.demo-info small {
+    color: #475569;
+    font-size: 0.875rem;
+}
+
+.features-section {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+}
+
+.features-section h3 {
+    color: #0d9488;
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 1.75rem;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+}
+
+.feature-item {
+    text-align: center;
+    padding: 1.5rem;
+}
+
+.feature-item h4 {
+    color: #0d9488;
+    margin-bottom: 0.75rem;
+}
+
+.feature-item p {
+    color: #64748b;
+    font-size: 0.875rem;
+    line-height: 1.6;
+}
+
 .login-card {
     background: white;
     padding: 3rem;
@@ -135,10 +273,39 @@ body {
     max-width: 500px;
 }
 
+.login-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.login-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 1rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.doctor-login-card .login-icon {
+    background: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%);
+    color: white;
+}
+
+.patient-login-card .login-icon {
+    background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+    color: white;
+}
+
 .login-card h2 {
     color: #0d9488;
     margin-bottom: 0.5rem;
     font-size: 2rem;
+}
+
+.patient-login-card h2 {
+    color: #3b82f6;
 }
 
 .subtitle {
@@ -173,6 +340,22 @@ body {
     border-color: #14b8a6;
 }
 
+.login-footer {
+    margin-top: 1.5rem;
+    text-align: center;
+}
+
+.back-link {
+    color: #64748b;
+    text-decoration: none;
+    font-size: 0.875rem;
+    transition: color 0.3s;
+}
+
+.back-link:hover {
+    color: #0d9488;
+}
+
 .demo-credentials {
     margin-top: 2rem;
     padding: 1rem;
@@ -189,6 +372,10 @@ body {
     font-size: 0.875rem;
     color: #475569;
     margin: 0.25rem 0;
+}
+
+.patient-login-card .demo-credentials h4 {
+    color: #3b82f6;
 }
 
 .dashboard-header {

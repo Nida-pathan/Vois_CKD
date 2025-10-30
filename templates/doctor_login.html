@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Doctor Login - CKD Diagnostic System{% endblock %}
+
+{% block content %}
+<div class="login-container">
+    <div class="login-card doctor-login-card">
+        <div class="login-header">
+            <div class="login-icon doctor-icon">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="8.5" cy="7" r="4"></circle>
+                    <polyline points="17 11 19 13 23 9"></polyline>
+                </svg>
+            </div>
+            <h2>Doctor Login</h2>
+            <p class="subtitle">Healthcare Professional Portal</p>
+        </div>
+        
+        <form method="POST" action="{{ url_for('doctor_login') }}">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" placeholder="Enter your username" required autofocus>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Enter your password" required>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-block">Login to Dashboard</button>
+        </form>
+        
+        <div class="login-footer">
+            <a href="{{ url_for('landing') }}" class="back-link">← Back to Home</a>
+        </div>
+
+        <div class="demo-credentials">
+            <h4>Demo Credentials:</h4>
+            <p><strong>Username:</strong> doctor1</p>
+            <p><strong>Password:</strong> doctor123</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

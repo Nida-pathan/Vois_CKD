@@ -12,7 +12,7 @@ app.config['SECRET_KEY'] = os.environ.get('SESSION_SECRET', 'ckd-diagnostic-syst
 
 login_manager = LoginManager()
 login_manager.init_app(app)
-login_manager.login_view = 'login'
+login_manager.login_view = 'landing'
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -28,12 +28,26 @@ def index():
             return redirect(url_for('doctor_dashboard'))
         else:
             return redirect(url_for('patient_portal'))
-    return redirect(url_for('login'))
+    return redirect(url_for('landing'))
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
+@app.route('/landing')
+def landing():
     if current_user.is_authenticated:
         return redirect(url_for('index'))
+    return render_template('landing.html')
+
+@app.route('/login')
+def login():
+    return redirect(url_for('landing'))
+
+@app.route('/doctor/login', methods=['GET', 'POST'])
+def doctor_login():
+    if current_user.is_authenticated:
+        if current_user.is_doctor():
+            return redirect(url_for('doctor_dashboard'))
+        else:
+            flash('You are logged in as a patient. Please logout first.', 'warning')
+            return redirect(url_for('patient_portal'))
     
     if request.method == 'POST':
         username = request.form.get('username')
@@ -42,24 +56,50 @@ def login():
         user = users_db.get(username)
         
         if user and check_password_hash(user.password_hash, password):
-            login_user(user)
-            flash(f'Welcome, {user.username}!', 'success')
-            
             if user.is_doctor():
+                login_user(user)
+                flash(f'Welcome, Dr. {user.username}!', 'success')
                 return redirect(url_for('doctor_dashboard'))
             else:
-                return redirect(url_for('patient_portal'))
+                flash('This login is for healthcare professionals only. Please use the Patient Login.', 'danger')
         else:
             flash('Invalid username or password', 'danger')
     
-    return render_template('login.html')
+    return render_template('doctor_login.html')
+
+@app.route('/patient/login', methods=['GET', 'POST'])
+def patient_login():
+    if current_user.is_authenticated:
+        if current_user.is_patient():
+            return redirect(url_for('patient_portal'))
+        else:
+            flash('You are logged in as a doctor. Please logout first.', 'warning')
+            return redirect(url_for('doctor_dashboard'))
+    
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        
+        user = users_db.get(username)
+        
+        if user and check_password_hash(user.password_hash, password):
+            if user.is_patient():
+                login_user(user)
+                flash(f'Welcome, {user.username}!', 'success')
+                return redirect(url_for('patient_portal'))
+            else:
+                flash('This login is for patients only. Please use the Doctor Login.', 'danger')
+        else:
+            flash('Invalid username or password', 'danger')
+    
+    return render_template('patient_login.html')
 
 @app.route('/logout')
 @login_required
 def logout():
     logout_user()
     flash('You have been logged out successfully.', 'info')
-    return redirect(url_for('login'))
+    return redirect(url_for('landing'))
 
 @app.route('/doctor/dashboard')
 @login_required

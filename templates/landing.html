@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CKD Diagnostic System - Welcome</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <h1>CKD Diagnostic System</h1>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="landing-container">
+            <div class="landing-hero">
+                <h2>Welcome to CKD Diagnostic System</h2>
+                <p class="hero-subtitle">AI-Powered Early Detection & Prediction</p>
+                <p class="hero-description">
+                    An advanced diagnostic platform designed to detect Chronic Kidney Disease (CKD) 
+                    and estimate its progression stages early using clinical and laboratory data.
+                </p>
+            </div>
+
+            <div class="login-options">
+                <div class="login-option-card doctor-card">
+                    <div class="card-icon doctor-icon">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="8.5" cy="7" r="4"></circle>
+                            <polyline points="17 11 19 13 23 9"></polyline>
+                        </svg>
+                    </div>
+                    <h3>Healthcare Professional</h3>
+                    <p>Access patient records, manage diagnoses, and view comprehensive analytics</p>
+                    <a href="{{ url_for('doctor_login') }}" class="btn btn-primary btn-block">Doctor Login</a>
+                    <div class="demo-info">
+                        <small>Demo: username: <strong>doctor1</strong>, password: <strong>doctor123</strong></small>
+                    </div>
+                </div>
+
+                <div class="login-option-card patient-card">
+                    <div class="card-icon patient-icon">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                    </div>
+                    <h3>Patient Portal</h3>
+                    <p>View your health status, track kidney function trends, and access personalized recommendations</p>
+                    <a href="{{ url_for('patient_login') }}" class="btn btn-secondary btn-block">Patient Login</a>
+                    <div class="demo-info">
+                        <small>Demo: username: <strong>patient1</strong>, password: <strong>patient123</strong></small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="features-section">
+                <h3>Key Features</h3>
+                <div class="features-grid">
+                    <div class="feature-item">
+                        <h4>Early Detection</h4>
+                        <p>AI-powered risk assessment predicts CKD before critical stages</p>
+                    </div>
+                    <div class="feature-item">
+                        <h4>Stage Classification</h4>
+                        <p>Accurate CKD stage identification (1-5) for clinical planning</p>
+                    </div>
+                    <div class="feature-item">
+                        <h4>Trend Visualization</h4>
+                        <p>Track creatinine, eGFR, and other key metrics over time</p>
+                    </div>
+                    <div class="feature-item">
+                        <h4>Explainable AI</h4>
+                        <p>Understand which factors contribute most to risk scores</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 CKD Diagnostic System - AI-Powered Healthcare</p>
+    </footer>
+</body>
+</html>
