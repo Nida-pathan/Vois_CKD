@@ -1,0 +1,62 @@
+Brief DescriptionAn AI-driven diagnostic and prediction system designed to detect Chronic Kidney Disease (CKD) and estimate its progression stages early using clinical and laboratory data. The system combines artificial intelligence with healthcare diagnostics to analyze patient information such as blood test results, demographics, and lifestyle habits. It predicts CKD risk levels and stages, supporting doctors with insights while providing patients with understandable reports and recommendations. Accessible through web and mobile apps, the system ensures scalability and accessibility in under-resourced regions.
+Features  
+
+Early CKD Risk Detection: Predicts chances of kidney disease before it becomes critical.
+CKD Stage Classification: Identifies disease stage (1–5) for clinical planning.
+AI-Powered Decision Support: Provides actionable suggestions for doctors, such as recommending nephrology consultations.
+EHR & Lab Data Integration: Automatically imports lab results and EHR data for real-time analysis.
+Trend Visualization: Displays changes in creatinine, eGFR, and other metrics over time.
+Prediction Explanation: Shows contributing factors to the risk score.
+Batch and Single Predictions: Facilitates multiple patient record uploads via CSV or single-patient JSON input.
+Doctor Dashboard: Risk scores, patient list, stage classification, and recommendations.
+Patient Portal: Color-coded results with lifestyle tips.
+Real-time Alerts: Triggers warnings for abnormal lab results or sudden health deterioration.
+Cloud Integration: Accessible from anywhere; scalable for large hospitals.
+Data Security & Privacy: Compliant with HIPAA and GDPR standards.
+Cross-Platform Access: Web app (React.js) and mobile app (Flutter/React Native).
+Containerized Deployment: Using Docker and Kubernetes for scalability.
+API Availability: REST APIs for integration with other medical platforms.
+Explainable AI Support: Feature importance/SHAP values for transparency.
+
+User Flow  
+
+Users (doctors or patients) access the landing page.
+Healthcare professionals log in securely or register for an account.
+Doctors navigate to the dashboard to view patient lists, risk scores, and recommendations.
+Patients log in to their portal to view their health status and lifestyle advice.
+Doctors can upload lab results via CSV or input single patient data for analysis.
+The AI processes the data and generates risk scores and CKD stage classifications.
+Users receive real-time alerts for critical lab results.
+Doctors can access detailed insights and explanations for the predictions.
+Patients can monitor their kidney health over time with visual trends.
+
+Technical Stack  
+
+Frontend: React.js for the web app; Flutter/React Native for mobile app development.
+Backend: Node.js with Express for server management and REST API development.
+Database: PostgreSQL for data storage, handling patient records, and lab results.
+AI/ML Framework: TensorFlow or PyTorch for building and deploying predictive models.
+Cloud Provider: AWS or Azure for cloud deployment and scalability.
+Containerization: Docker for packaging applications and Kubernetes for orchestration.
+
+Design Guidelines  
+
+Styling Guidelines: Use a calm color palette (greens and blues) to promote trust and clarity, with clear typography for readability.
+Page Layout: Intuitive dashboards featuring patient metrics, risk scores, and actionable insights prominently displayed.
+Navigation Structure: Streamlined navigation with distinct sections for doctors, patients, and administrative functions.
+
+Backend Structure  
+
+Database Architecture: Design schema for storing user profiles, patient data, lab results, and AI model outputs.
+API Endpoints: Define endpoints for patient data submission, risk score retrieval, and integration with EHR systems.
+Security Measures: Implement authentication protocols, encryption for data storage and transit, and regular security audits to ensure compliance.
+
+In-Scope and Out-of-Scope ItemsIn-Scope:  
+
+Core features as listed above, including risk detection, stage classification, and integration capabilities.
+
+Out-of-Scope:  
+
+Advanced machine learning model tuning beyond initial deployment.
+Integration with all external medical platforms; only necessary integrations will be prioritized.
+
