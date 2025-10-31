@@ -8,6 +8,7 @@
     <div class="dashboard-actions">
         <a href="{{ url_for('add_patient') }}" class="btn btn-primary">Add New Patient</a>
         <button onclick="document.getElementById('csvUpload').click()" class="btn btn-secondary">Upload CSV</button>
+        <a href="{{ url_for('modern_dashboard') }}" class="btn btn-secondary" target="_blank">Modern Dashboard</a>
         <input type="file" id="csvUpload" accept=".csv" style="display: none;" onchange="uploadCSV(this)">
     </div>
 </div>

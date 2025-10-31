@@ -3,8 +3,611 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CKD Diagnostic System - Welcome</title>
+    <title>CKD Diagnostic System - Comprehensive Care for Chronic Kidney Disease</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --clinical-teal: #4baea0;
+            --soft-blue: #a3c4bc;
+            --slate-gray: #7a8c99;
+            --warm-beige: #f5f0e6;
+            --light-teal: #e0f2f1;
+            --dark-text: #333333;
+            --light-text: #666666;
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --border-radius-sm: 8px;
+            --border-radius-md: 16px;
+            --border-radius-lg: 24px;
+            --shadow-light: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --shadow-medium: 0 8px 24px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            color: var(--dark-text);
+            line-height: 1.6;
+        }
+
+        .navbar {
+            background: white;
+            box-shadow: var(--shadow-light);
+            padding: 1rem 0;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand h1 {
+            color: var(--clinical-teal);
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Hero Section */
+        .hero {
+            display: flex;
+            align-items: center;
+            padding: 4rem 0;
+            gap: 3rem;
+        }
+
+        .hero-content {
+            flex: 1;
+        }
+
+        .hero-image {
+            flex: 1;
+            border-radius: var(--border-radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-medium);
+            background: linear-gradient(45deg, var(--clinical-teal), var(--soft-blue));
+            height: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            color: var(--dark-text);
+        }
+
+        .hero p.subtitle {
+            font-size: 1.25rem;
+            color: var(--slate-gray);
+            margin-bottom: 2rem;
+            max-width: 600px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--clinical-teal);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #3d8e82;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(75, 174, 160, 0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--clinical-teal);
+            border: 2px solid var(--clinical-teal);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(75, 174, 160, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .micro-metrics {
+            display: flex;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .metric {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+        }
+
+        .metric i {
+            color: var(--clinical-teal);
+        }
+
+        /* Trust Strip */
+        .trust-strip {
+            background: white;
+            padding: 2rem 0;
+            border-top: 1px solid #eee;
+            border-bottom: 1px solid #eee;
+        }
+
+        .stats-container {
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--clinical-teal);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            color: var(--light-text);
+            max-width: 200px;
+        }
+
+        /* Services Grid */
+        .section {
+            padding: 4rem 0;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            color: var(--dark-text);
+            margin-bottom: 1rem;
+        }
+
+        .section-header p {
+            font-size: 1.25rem;
+            color: var(--slate-gray);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .service-card {
+            background: var(--glass-bg);
+            border-radius: var(--border-radius-md);
+            padding: 2rem;
+            box-shadow: var(--shadow-light);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .service-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--light-teal), #b2dfdb);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            color: var(--clinical-teal);
+            font-size: 1.8rem;
+        }
+
+        .service-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--dark-text);
+        }
+
+        .service-card p {
+            color: var(--light-text);
+            margin-bottom: 1.5rem;
+        }
+
+        .learn-more {
+            color: var(--clinical-teal);
+            font-weight: 600;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .learn-more:hover {
+            text-decoration: underline;
+        }
+
+        /* Experts Carousel */
+        .experts-carousel {
+            display: flex;
+            gap: 2rem;
+            overflow-x: auto;
+            padding: 1rem 0;
+        }
+
+        .expert-card {
+            min-width: 300px;
+            background: var(--glass-bg);
+            border-radius: var(--border-radius-md);
+            padding: 2rem;
+            box-shadow: var(--shadow-light);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .expert-header {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .expert-photo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--clinical-teal), var(--soft-blue));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .expert-info h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .expert-info p.specialty {
+            color: var(--clinical-teal);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .expert-info p {
+            color: var(--light-text);
+            font-size: 0.9rem;
+        }
+
+        .appointment-badge {
+            background: rgba(75, 174, 160, 0.1);
+            color: var(--clinical-teal);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 0.5rem;
+        }
+
+        /* Patient Journey */
+        .journey {
+            background: white;
+            padding: 3rem;
+            border-radius: var(--border-radius-md);
+            box-shadow: var(--shadow-light);
+            margin: 3rem 0;
+        }
+
+        .journey-steps {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .journey-steps::before {
+            content: '';
+            position: absolute;
+            top: 40px;
+            left: 10%;
+            right: 10%;
+            height: 3px;
+            background: var(--clinical-teal);
+            z-index: 1;
+        }
+
+        .step {
+            text-align: center;
+            position: relative;
+            z-index: 2;
+            flex: 1;
+        }
+
+        .step-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid var(--clinical-teal);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            color: var(--clinical-teal);
+            font-size: 2rem;
+        }
+
+        .step h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+        }
+
+        .step p {
+            color: var(--light-text);
+            max-width: 250px;
+            margin: 0 auto;
+        }
+
+        /* Testimonial */
+        .testimonial {
+            background: linear-gradient(135deg, var(--light-teal), #e0f7fa);
+            padding: 4rem 2rem;
+            border-radius: var(--border-radius-md);
+            text-align: center;
+            margin: 4rem 0;
+            position: relative;
+        }
+
+        .testimonial::before {
+            content: "\"";
+            position: absolute;
+            top: -1rem;
+            left: 2rem;
+            font-size: 8rem;
+            color: rgba(75, 174, 160, 0.1);
+            font-family: serif;
+            line-height: 1;
+        }
+
+        .testimonial-content {
+            max-width: 800px;
+            margin: 0 auto;
+            font-size: 1.4rem;
+            font-style: italic;
+            color: var(--dark-text);
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .testimonial-author {
+            font-weight: 600;
+            color: var(--clinical-teal);
+        }
+
+        .testimonial-tag {
+            color: var(--light-text);
+            font-size: 0.9rem;
+        }
+
+        /* Final CTA */
+        .final-cta {
+            background: linear-gradient(135deg, var(--clinical-teal), #3d8e82);
+            padding: 4rem 2rem;
+            border-radius: var(--border-radius-md);
+            text-align: center;
+            color: white;
+            margin: 4rem 0;
+        }
+
+        .final-cta h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .final-cta p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+            opacity: 0.9;
+        }
+
+        .final-cta .btn-primary {
+            background: white;
+            color: var(--clinical-teal);
+            font-size: 1.2rem;
+            padding: 1.2rem 3rem;
+        }
+
+        .final-cta .btn-primary:hover {
+            background: #f0f0f0;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .cta-note {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-top: 1rem;
+        }
+
+        /* Footer */
+        footer {
+            background: #333;
+            color: white;
+            padding: 3rem 0 2rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-logo h3 {
+            color: white;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .footer-links h4 {
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+        }
+
+        .footer-links ul {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-links a {
+            color: #ccc;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .social-icons a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            transition: all 0.3s;
+        }
+
+        .social-icons a:hover {
+            background: var(--clinical-teal);
+            transform: translateY(-3px);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 2rem;
+            text-align: center;
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+
+        .accessibility-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .accessibility-links a {
+            color: #aaa;
+            text-decoration: none;
+        }
+
+        .accessibility-links a:hover {
+            color: white;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .hero {
+                flex-direction: column;
+            }
+            
+            .hero-image {
+                width: 100%;
+            }
+            
+            .journey-steps {
+                flex-direction: column;
+                gap: 2rem;
+            }
+            
+            .journey-steps::before {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .micro-metrics {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .stats-container {
+                flex-direction: column;
+                gap: 2rem;
+            }
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar">
@@ -16,75 +619,247 @@
     </nav>
 
     <main class="container">
-        <div class="landing-container">
-            <div class="landing-hero">
-                <h2>Welcome to CKD Diagnostic System</h2>
-                <p class="hero-subtitle">AI-Powered Early Detection & Prediction</p>
-                <p class="hero-description">
-                    An advanced diagnostic platform designed to detect Chronic Kidney Disease (CKD) 
-                    and estimate its progression stages early using clinical and laboratory data.
-                </p>
-            </div>
-
-            <div class="login-options">
-                <div class="login-option-card doctor-card">
-                    <div class="card-icon doctor-icon">
-                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="8.5" cy="7" r="4"></circle>
-                            <polyline points="17 11 19 13 23 9"></polyline>
-                        </svg>
-                    </div>
-                    <h3>Healthcare Professional</h3>
-                    <p>Access patient records, manage diagnoses, and view comprehensive analytics</p>
-                    <a href="{{ url_for('doctor_login') }}" class="btn btn-primary btn-block">Doctor Login</a>
-                    <div class="demo-info">
-                        <small>Demo: username: <strong>doctor1</strong>, password: <strong>doctor123</strong></small>
-                    </div>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-content">
+                <h1>Comprehensive care for chronic kidney disease</h1>
+                <p class="subtitle">Personalized monitoring, treatment guidance, and support for every stage of kidney health.</p>
+                <div class="hero-buttons">
+                    <a href="{{ url_for('login') }}" class="btn btn-primary">Get in Touch</a>
+                    <a href="#" class="btn btn-secondary">Book via WhatsApp</a>
                 </div>
-
-                <div class="login-option-card patient-card">
-                    <div class="card-icon patient-icon">
-                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="12" cy="7" r="4"></circle>
-                        </svg>
+                <div class="micro-metrics">
+                    <div class="metric">
+                        <i class="fas fa-users"></i>
+                        <span>Trusted by 50k+ patients</span>
                     </div>
-                    <h3>Patient Portal</h3>
-                    <p>View your health status, track kidney function trends, and access personalized recommendations</p>
-                    <a href="{{ url_for('patient_login') }}" class="btn btn-secondary btn-block">Patient Login</a>
-                    <div class="demo-info">
-                        <small>Demo: username: <strong>patient1</strong>, password: <strong>patient123</strong></small>
+                    <div class="metric">
+                        <i class="fas fa-user-md"></i>
+                        <span>Multi-disciplinary specialists</span>
+                    </div>
+                    <div class="metric">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>Available nationwide</span>
                     </div>
                 </div>
             </div>
+            <div class="hero-image">
+                Compassionate Care for Kidney Health
+            </div>
+        </section>
 
-            <div class="features-section">
-                <h3>Key Features</h3>
-                <div class="features-grid">
-                    <div class="feature-item">
-                        <h4>Early Detection</h4>
-                        <p>AI-powered risk assessment predicts CKD before critical stages</p>
+        <!-- Trust Strip -->
+        <section class="trust-strip">
+            <div class="stats-container">
+                <div class="stat-item">
+                    <div class="stat-number">88%</div>
+                    <div class="stat-label">Improved adherence</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">120+</div>
+                    <div class="stat-label">Nephrologists network</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">95%</div>
+                    <div class="stat-label">Patient satisfaction</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Services Grid -->
+        <section class="section">
+            <div class="section-header">
+                <h2>How We Help</h2>
+                <p>Our comprehensive approach to CKD care covers all aspects of your kidney health journey</p>
+            </div>
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-heartbeat"></i>
                     </div>
-                    <div class="feature-item">
-                        <h4>Stage Classification</h4>
-                        <p>Accurate CKD stage identification (1-5) for clinical planning</p>
+                    <h3>Kidney Function Monitoring</h3>
+                    <p>Labs, eGFR tracking, mobile lab bookings.</p>
+                    <a href="#" class="learn-more">Learn More <i class="fas fa-arrow-right"></i></a>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-tint"></i>
                     </div>
-                    <div class="feature-item">
-                        <h4>Trend Visualization</h4>
-                        <p>Track creatinine, eGFR, and other key metrics over time</p>
+                    <h3>Dialysis Support & Scheduling</h3>
+                    <p>Education, center coordination.</p>
+                    <a href="#" class="learn-more">Learn More <i class="fas fa-arrow-right"></i></a>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-pills"></i>
                     </div>
-                    <div class="feature-item">
-                        <h4>Explainable AI</h4>
-                        <p>Understand which factors contribute most to risk scores</p>
+                    <h3>Medication Management</h3>
+                    <p>Pill reminders, drug interaction checks.</p>
+                    <a href="#" class="learn-more">Learn More <i class="fas fa-arrow-right"></i></a>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-utensils"></i>
                     </div>
+                    <h3>Diet & Lifestyle</h3>
+                    <p>Renal-friendly nutrition and exercise plans.</p>
+                    <a href="#" class="learn-more">Learn More <i class="fas fa-arrow-right"></i></a>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <h3>Mental & Emotional Support</h3>
+                    <p>Counseling & caregiver resources.</p>
+                    <a href="#" class="learn-more">Learn More <i class="fas fa-arrow-right"></i></a>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-file-medical"></i>
+                    </div>
+                    <h3>Care Plans & Remote Consults</h3>
+                    <p>Personalized care pathways.</p>
+                    <a href="#" class="learn-more">Learn More <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Experts Carousel -->
+        <section class="section">
+            <div class="section-header">
+                <h2>Our Medical Experts</h2>
+                <p>Meet our team of dedicated nephrologists and renal care specialists</p>
+            </div>
+            <div class="experts-carousel">
+                <div class="expert-card">
+                    <div class="expert-header">
+                        <div class="expert-photo">DR</div>
+                        <div class="expert-info">
+                            <h3>Dr. Sarah Johnson</h3>
+                            <p class="specialty">Nephrologist</p>
+                            <p>15+ years experience</p>
+                            <div class="appointment-badge">Next: Tomorrow 2:30 PM</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="expert-card">
+                    <div class="expert-header">
+                        <div class="expert-photo">MR</div>
+                        <div class="expert-info">
+                            <h3>Dr. Michael Roberts</h3>
+                            <p class="specialty">Renal Dietitian</p>
+                            <p>12+ years experience</p>
+                            <div class="appointment-badge">Next: Today 4:00 PM</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="expert-card">
+                    <div class="expert-header">
+                        <div class="expert-photo">EP</div>
+                        <div class="expert-info">
+                            <h3>Dr. Emily Parker</h3>
+                            <p class="specialty">Nephrologist</p>
+                            <p>10+ years experience</p>
+                            <div class="appointment-badge">Next: Fri 10:00 AM</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Patient Journey -->
+        <section class="section">
+            <div class="section-header">
+                <h2>Your Care Journey</h2>
+                <p>A simple, structured approach to managing your kidney health</p>
+            </div>
+            <div class="journey">
+                <div class="journey-steps">
+                    <div class="step">
+                        <div class="step-icon">
+                            <i class="fas fa-stethoscope"></i>
+                        </div>
+                        <h3>Assess</h3>
+                        <p>Initial evaluation and risk assessment</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h3>Monitor</h3>
+                        <p>Ongoing tracking and lab reviews</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-icon">
+                            <i class="fas fa-tasks"></i>
+                        </div>
+                        <h3>Manage</h3>
+                        <p>Personalized treatment plans</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Testimonial -->
+        <section class="section">
+            <div class="testimonial">
+                <p class="testimonial-content">"The CKD Diagnostic System gave me confidence in managing my condition. The personalized insights and regular monitoring made me feel safer and more in control of my health journey."</p>
+                <div class="testimonial-author">- Jennifer K.</div>
+                <div class="testimonial-tag">CKD Stage 3 Patient</div>
+            </div>
+        </section>
+
+        <!-- Final CTA -->
+        <section class="final-cta">
+            <h2>Ready to take control of your kidney health?</h2>
+            <p>Join thousands of patients who trust our platform for comprehensive CKD care and management</p>
+            <a href="{{ url_for('login') }}" class="btn btn-primary">Get in Touch</a>
+            <p class="cta-note">Get directed to secure login to access personalized care.</p>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <h3>CKD Diagnostic System</h3>
+                    <p>AI-Powered Chronic Kidney Disease Detection & Management</p>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Our Services</a></li>
+                        <li><a href="#">Patient Resources</a></li>
+                        <li><a href="#">FAQs</a></li>
+                        <li><a href="#">Blog</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Contact Us</h4>
+                    <ul>
+                        <li><i class="fas fa-envelope"></i> care@ckdsystem.com</li>
+                        <li><i class="fas fa-phone"></i> +1 (800) 555-0123</li>
+                        <li><i class="fas fa-map-marker-alt"></i> Nationwide Service</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 CKD Diagnostic System. All rights reserved.</p>
+                <div class="accessibility-links">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Accessibility</a>
                 </div>
             </div>
         </div>
-    </main>
-
-    <footer>
-        <p>&copy; 2025 CKD Diagnostic System - AI-Powered Healthcare</p>
     </footer>
 </body>
 </html>

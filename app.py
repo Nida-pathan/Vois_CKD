@@ -12,7 +12,7 @@ app.config['SECRET_KEY'] = os.environ.get('SESSION_SECRET', 'ckd-diagnostic-syst
 
 login_manager = LoginManager()
 login_manager.init_app(app)
-login_manager.login_view = 'landing'
+login_manager.login_view = 'landing'  # type: ignore
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -50,12 +50,12 @@ def doctor_login():
             return redirect(url_for('patient_portal'))
     
     if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
+        username = request.form.get('username') or ''
+        password = request.form.get('password') or ''
         
         user = users_db.get(username)
         
-        if user and check_password_hash(user.password_hash, password):
+        if user and password and check_password_hash(user.password_hash, password):
             if user.is_doctor():
                 login_user(user)
                 flash(f'Welcome, Dr. {user.username}!', 'success')
@@ -77,12 +77,15 @@ def patient_login():
             return redirect(url_for('doctor_dashboard'))
     
     if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
+        username = request.form.get('username') or ''
+        password = request.form.get('password') or ''
         
-        user = users_db.get(username)
+        if username:
+            user = users_db.get(username)
+        else:
+            user = None
         
-        if user and check_password_hash(user.password_hash, password):
+        if user and password and check_password_hash(user.password_hash, password):
             if user.is_patient():
                 login_user(user)
                 flash(f'Welcome, {user.username}!', 'success')
@@ -182,7 +185,7 @@ def upload_csv():
     if file.filename == '':
         return jsonify({'error': 'No file selected'}), 400
     
-    if file and file.filename.endswith('.csv'):
+    if file and file.filename and file.filename.endswith('.csv'):
         try:
             df = pd.read_csv(io.StringIO(file.stream.read().decode('utf-8')))
             
@@ -256,6 +259,10 @@ def patient_portal():
         patient_data.update(prediction)
     
     return render_template('patient_portal.html', patient=patient_data)
+
+@app.route('/modern-dashboard')
+def modern_dashboard():
+    return render_template('modern_dashboard.html')
 
 @app.route('/api/patient-trends/<username>')
 @login_required
