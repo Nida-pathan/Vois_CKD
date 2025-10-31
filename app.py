@@ -292,8 +292,13 @@ def patient_trends(username):
     })
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=True)
 
+# Vercel requires this for the serverless function
 def main():
     """Entry point for the application."""
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    return app
+
+# For local development
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=True)

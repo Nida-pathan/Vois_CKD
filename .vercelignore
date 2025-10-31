@@ -1,0 +1,13 @@
+.git/
+.gitignore
+.replit
+*.md
+__pycache__/
+*.pyc
+.pytest_cache/
+.coverage
+.pytest_cache/
+build/
+.local/
+vois_ckd.egg-info/
+*.egg-info/
