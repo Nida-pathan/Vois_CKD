@@ -9,10 +9,11 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
         :root {
-            --primary-gradient: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
-            --pink-orange-gradient: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
-            --blue-purple-gradient: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
-            --glass-bg: rgba(255, 255, 255, 0.7);
+            --primary-gradient: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%);
+            --risk-high-gradient: linear-gradient(135deg, #ef4444 0%, #f87171 100%);
+            --risk-moderate-gradient: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+            --risk-low-gradient: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+            --glass-bg: rgba(255, 255, 255, 0.85);
             --glass-border: rgba(255, 255, 255, 0.18);
             --text-primary: #333333;
             --text-secondary: #666666;
@@ -31,7 +32,7 @@
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            background: linear-gradient(135deg, #f0fdfa 0%, #e0f2fe 100%);
             min-height: 100vh;
             color: var(--text-primary);
             padding: 20px;
@@ -81,7 +82,7 @@
         }
 
         .welcome-text span {
-            color: #6d67e4;
+            color: #0d9488;
         }
 
         .top-bar-right {
@@ -106,8 +107,8 @@
         }
 
         .search-bar input:focus {
-            border-color: #6d67e4;
-            box-shadow: 0 0 0 3px rgba(109, 103, 228, 0.1);
+            border-color: #0d9488;
+            box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
         }
 
         .search-bar i {
@@ -127,6 +128,51 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius-md);
+            padding: 20px;
+            box-shadow: var(--shadow-light);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-card.high-risk {
+            background: var(--risk-high-gradient);
+            color: white;
+        }
+
+        .stat-card.stage-5 {
+            background: var(--risk-moderate-gradient);
+            color: white;
+        }
+
+        .stat-card h3 {
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .stat-card.high-risk .stat-number,
+        .stat-card.stage-5 .stat-number {
+            color: white;
         }
 
         /* Main Content Grid */
@@ -240,12 +286,12 @@
             color: white;
         }
 
-        .tasks-icon {
-            background: var(--pink-orange-gradient);
+        .patients-icon {
+            background: var(--primary-gradient);
         }
 
-        .additional-icon {
-            background: var(--blue-purple-gradient);
+        .reports-icon {
+            background: var(--risk-moderate-gradient);
         }
 
         .progress-container {
@@ -271,14 +317,14 @@
             border-radius: 5px;
         }
 
-        .prioritized .progress-fill {
-            background: var(--pink-orange-gradient);
-            width: 83%;
+        .patients .progress-fill {
+            background: var(--primary-gradient);
+            width: 85%;
         }
 
-        .additional .progress-fill {
-            background: var(--blue-purple-gradient);
-            width: 56%;
+        .reports .progress-fill {
+            background: var(--risk-moderate-gradient);
+            width: 62%;
         }
 
         /* Connection Widget */
@@ -304,8 +350,8 @@
         }
 
         .connection-count {
-            background: rgba(109, 103, 228, 0.1);
-            color: #6d67e4;
+            background: rgba(13, 148, 136, 0.1);
+            color: #0d9488;
             padding: 3px 10px;
             border-radius: 20px;
             font-size: 0.85rem;
@@ -327,16 +373,16 @@
             font-size: 1.2rem;
         }
 
-        .slack {
-            background: linear-gradient(135deg, #6cc644 0%, #4c963e 100%);
+        .csv {
+            background: linear-gradient(135deg, #10b981 0%, #047857 100%);
         }
 
-        .google {
-            background: linear-gradient(135deg, #4285f4 0%, #2863e6 100%);
+        .pdf {
+            background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
         }
 
-        .microsoft {
-            background: linear-gradient(135deg, #f25022 0%, #c63b1d 100%);
+        .excel {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
         }
 
         /* Line Chart Section */
@@ -368,8 +414,8 @@
         }
 
         .week-label {
-            background: rgba(109, 103, 228, 0.1);
-            color: #6d67e4;
+            background: rgba(13, 148, 136, 0.1);
+            color: #0d9488;
             padding: 5px 15px;
             border-radius: 20px;
             font-size: 0.9rem;
@@ -439,16 +485,16 @@
             flex-shrink: 0;
         }
 
-        .zoom {
-            background: linear-gradient(135deg, #2d8cff 0%, #1a6fdb 100%);
+        .critical {
+            background: linear-gradient(135deg, #7f1d1d 0%, #b91c1c 100%);
         }
 
-        .meet {
-            background: linear-gradient(135deg, #0d9d58 0%, #087d45 100%);
+        .high {
+            background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
         }
 
-        .teams {
-            background: linear-gradient(135deg, #6264a7 0%, #4a4c8a 100%);
+        .moderate {
+            background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
         }
 
         .meeting-info {
@@ -495,28 +541,28 @@
             border-radius: 5px;
         }
 
-        .sport .skill-fill {
-            background: linear-gradient(90deg, #ff9a9e 0%, #fad0c4 100%);
+        .ckd-stages .skill-fill {
+            background: linear-gradient(90deg, #10b981 0%, #34d399 100%);
             width: 71%;
         }
 
-        .blogging .skill-fill {
-            background: linear-gradient(90deg, #a1c4fd 0%, #c2e9fb 100%);
+        .risk-assessment .skill-fill {
+            background: linear-gradient(90deg, #0d9488 0%, #14b8a6 100%);
             width: 92%;
         }
 
-        .leadership .skill-fill {
-            background: linear-gradient(90deg, #d4fc79 0%, #96e6a1 100%);
+        .treatment-plans .skill-fill {
+            background: linear-gradient(90deg, #f59e0b 0%, #fbbf24 100%);
             width: 33%;
         }
 
-        .meditation .skill-fill {
-            background: linear-gradient(90deg, #f6d365 0%, #fda085 100%);
+        .patient-monitoring .skill-fill {
+            background: linear-gradient(90deg, #ef4444 0%, #f87171 100%);
             width: 56%;
         }
 
-        .philosophy .skill-fill {
-            background: linear-gradient(90deg, #84fab0 0%, #8fd3f4 100%);
+        .research .skill-fill {
+            background: linear-gradient(90deg, #8b5cf6 0%, #a78bfa 100%);
             width: 79%;
         }
 
@@ -549,6 +595,16 @@
             .search-bar input {
                 width: 100%;
             }
+            
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -560,19 +616,39 @@
                 <div class="logo-icon">
                     <i class="fas fa-heartbeat"></i>
                 </div>
-                <span>CKD System</span>
+                <span>CKD Diagnostic System</span>
             </div>
             
-            <div class="welcome-text">Welcome, <span>Kristin</span></div>
+            <div class="welcome-text">Welcome, <span>Dr. Smith</span></div>
             
             <div class="top-bar-right">
                 <div class="search-bar">
                     <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Search...">
+                    <input type="text" placeholder="Search patients...">
                 </div>
                 <div class="profile-icon">
-                    <i class="fas fa-user"></i>
+                    <i class="fas fa-user-md"></i>
                 </div>
+            </div>
+        </div>
+        
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Total Patients</h3>
+                <p class="stat-number">142</p>
+            </div>
+            <div class="stat-card high-risk">
+                <h3>High Risk Patients</h3>
+                <p class="stat-number">28</p>
+            </div>
+            <div class="stat-card stage-5">
+                <h3>Stage 5 CKD</h3>
+                <p class="stat-number">12</p>
+            </div>
+            <div class="stat-card">
+                <h3>Avg Risk %</h3>
+                <p class="stat-number">42.3%</p>
             </div>
         </div>
         
@@ -581,22 +657,22 @@
                 <!-- Profile Card -->
                 <div class="profile-card">
                     <div class="profile-header">
-                        <div class="profile-photo">KW</div>
+                        <div class="profile-photo">DS</div>
                         <div class="profile-info">
-                            <h2>Kristin Watson</h2>
-                            <p>Design Manager</p>
+                            <h2>Dr. Smith</h2>
+                            <p>Nephrologist</p>
                             <div class="stats-pills">
                                 <div class="stat-pill">
                                     <i class="fas fa-users"></i>
-                                    <span>1.2k followers</span>
+                                    <span>142 patients</span>
                                 </div>
                                 <div class="stat-pill">
-                                    <i class="fas fa-tasks"></i>
-                                    <span>87 tasks</span>
+                                    <i class="fas fa-file-medical"></i>
+                                    <span>87 reports</span>
                                 </div>
                                 <div class="stat-pill">
                                     <i class="fas fa-award"></i>
-                                    <span>24 achievements</span>
+                                    <span>15 years experience</span>
                                 </div>
                             </div>
                         </div>
@@ -605,17 +681,17 @@
                 
                 <!-- Gradient Cards -->
                 <div class="gradient-cards">
-                    <div class="gradient-card prioritized">
+                    <div class="gradient-card patients">
                         <div class="card-header">
-                            <div class="card-title">Prioritized Tasks</div>
-                            <div class="card-icon tasks-icon">
-                                <i class="fas fa-tasks"></i>
+                            <div class="card-title">Patient Management</div>
+                            <div class="card-icon patients-icon">
+                                <i class="fas fa-user-injured"></i>
                             </div>
                         </div>
                         <div class="progress-container">
                             <div class="progress-header">
-                                <span>Completed</span>
-                                <span>83%</span>
+                                <span>Active Patients</span>
+                                <span>85%</span>
                             </div>
                             <div class="progress-bar">
                                 <div class="progress-fill"></div>
@@ -623,17 +699,17 @@
                         </div>
                     </div>
                     
-                    <div class="gradient-card additional">
+                    <div class="gradient-card reports">
                         <div class="card-header">
-                            <div class="card-title">Additional Tasks</div>
-                            <div class="card-icon additional-icon">
-                                <i class="fas fa-list"></i>
+                            <div class="card-title">Reports Processed</div>
+                            <div class="card-icon reports-icon">
+                                <i class="fas fa-file-medical"></i>
                             </div>
                         </div>
                         <div class="progress-container">
                             <div class="progress-header">
                                 <span>Completed</span>
-                                <span>56%</span>
+                                <span>62%</span>
                             </div>
                             <div class="progress-bar">
                                 <div class="progress-fill"></div>
@@ -645,18 +721,18 @@
                 <!-- Connection Widget -->
                 <div class="connection-widget">
                     <div class="connection-header">
-                        <div class="connection-title">Trackers Connected</div>
-                        <div class="connection-count">3 active connections</div>
+                        <div class="connection-title">File Upload Options</div>
+                        <div class="connection-count">3 formats supported</div>
                     </div>
                     <div class="app-icons">
-                        <div class="app-icon slack">
-                            <i class="fab fa-slack"></i>
+                        <div class="app-icon csv">
+                            <i class="fas fa-file-csv"></i>
                         </div>
-                        <div class="app-icon google">
-                            <i class="fab fa-google"></i>
+                        <div class="app-icon pdf">
+                            <i class="fas fa-file-pdf"></i>
                         </div>
-                        <div class="app-icon microsoft">
-                            <i class="fab fa-microsoft"></i>
+                        <div class="app-icon excel">
+                            <i class="fas fa-file-excel"></i>
                         </div>
                     </div>
                 </div>
@@ -664,54 +740,54 @@
                 <!-- Line Chart Section -->
                 <div class="chart-section">
                     <div class="chart-header">
-                        <div class="chart-title">Focusing – Productivity Analytics</div>
+                        <div class="chart-title">CKD Patient Trends</div>
                         <div class="chart-stats">
-                            <div class="week-label">Week 8 – Unbalanced</div>
-                            <div class="concentration">41% Average Concentration</div>
+                            <div class="week-label">Last 30 Days</div>
+                            <div class="concentration">+12% New Diagnoses</div>
                         </div>
                     </div>
                     <div class="chart-container">
-                        <canvas id="productivityChart"></canvas>
+                        <canvas id="ckdTrendsChart"></canvas>
                     </div>
                 </div>
             </div>
             
             <!-- Right Sidebar -->
             <div class="sidebar">
-                <!-- Meetings Card -->
+                <!-- High Risk Patients Card -->
                 <div class="meetings-card">
-                    <div class="sidebar-title">My Meetings</div>
+                    <div class="sidebar-title">High Risk Patients</div>
                     <div class="meeting-list">
                         <div class="meeting-item">
-                            <div class="meeting-icon zoom">
-                                <i class="fab fa-zoom"></i>
+                            <div class="meeting-icon critical">
+                                <i class="fas fa-exclamation-triangle"></i>
                             </div>
                             <div class="meeting-info">
-                                <div class="meeting-name">Team Standup</div>
-                                <div class="meeting-time">10:00 AM - 10:30 AM</div>
-                                <div class="meeting-date">Today, Oct 31</div>
+                                <div class="meeting-name">John Smith</div>
+                                <div class="meeting-time">Critical Risk - 87%</div>
+                                <div class="meeting-date">Stage 5</div>
                             </div>
                         </div>
                         
                         <div class="meeting-item">
-                            <div class="meeting-icon meet">
-                                <i class="fab fa-google"></i>
+                            <div class="meeting-icon high">
+                                <i class="fas fa-exclamation-circle"></i>
                             </div>
                             <div class="meeting-info">
-                                <div class="meeting-name">Client Review</div>
-                                <div class="meeting-time">2:00 PM - 3:00 PM</div>
-                                <div class="meeting-date">Today, Oct 31</div>
+                                <div class="meeting-name">Mary Johnson</div>
+                                <div class="meeting-time">High Risk - 76%</div>
+                                <div class="meeting-date">Stage 4</div>
                             </div>
                         </div>
                         
                         <div class="meeting-item">
-                            <div class="meeting-icon teams">
-                                <i class="fab fa-microsoft"></i>
+                            <div class="meeting-icon moderate">
+                                <i class="fas fa-exclamation"></i>
                             </div>
                             <div class="meeting-info">
-                                <div class="meeting-name">Project Planning</div>
-                                <div class="meeting-time">11:00 AM - 12:00 PM</div>
-                                <div class="meeting-date">Nov 1</div>
+                                <div class="meeting-name">Robert Davis</div>
+                                <div class="meeting-time">Moderate Risk - 54%</div>
+                                <div class="meeting-date">Stage 3</div>
                             </div>
                         </div>
                     </div>
@@ -719,10 +795,10 @@
                 
                 <!-- Skills Card -->
                 <div class="skills-card">
-                    <div class="sidebar-title">Developed Areas</div>
-                    <div class="skill-item sport">
+                    <div class="sidebar-title">Specialization Areas</div>
+                    <div class="skill-item ckd-stages">
                         <div class="skill-header">
-                            <span>Sport Skills</span>
+                            <span>CKD Stages</span>
                             <span>71%</span>
                         </div>
                         <div class="skill-bar">
@@ -730,9 +806,9 @@
                         </div>
                     </div>
                     
-                    <div class="skill-item blogging">
+                    <div class="skill-item risk-assessment">
                         <div class="skill-header">
-                            <span>Blogging</span>
+                            <span>Risk Assessment</span>
                             <span>92%</span>
                         </div>
                         <div class="skill-bar">
@@ -740,9 +816,9 @@
                         </div>
                     </div>
                     
-                    <div class="skill-item leadership">
+                    <div class="skill-item treatment-plans">
                         <div class="skill-header">
-                            <span>Leadership</span>
+                            <span>Treatment Plans</span>
                             <span>33%</span>
                         </div>
                         <div class="skill-bar">
@@ -750,9 +826,9 @@
                         </div>
                     </div>
                     
-                    <div class="skill-item meditation">
+                    <div class="skill-item patient-monitoring">
                         <div class="skill-header">
-                            <span>Meditation</span>
+                            <span>Patient Monitoring</span>
                             <span>56%</span>
                         </div>
                         <div class="skill-bar">
@@ -760,9 +836,9 @@
                         </div>
                     </div>
                     
-                    <div class="skill-item philosophy">
+                    <div class="skill-item research">
                         <div class="skill-header">
-                            <span>Philosophy</span>
+                            <span>Research</span>
                             <span>79%</span>
                         </div>
                         <div class="skill-bar">
@@ -775,36 +851,49 @@
     </div>
 
     <script>
-        // Initialize the productivity chart
+        // Initialize the CKD trends chart
         document.addEventListener('DOMContentLoaded', function() {
-            const ctx = document.getElementById('productivityChart').getContext('2d');
+            const ctx = document.getElementById('ckdTrendsChart').getContext('2d');
             
             // Sample data for the chart
             const data = {
-                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
                 datasets: [
                     {
-                        label: 'Maximum of focus',
-                        data: [65, 78, 66, 44, 58, 32, 48],
-                        borderColor: '#ff6b6b',
-                        backgroundColor: 'rgba(255, 107, 107, 0.1)',
+                        label: 'New Diagnoses',
+                        data: [8, 12, 15, 17],
+                        borderColor: '#0d9488',
+                        backgroundColor: 'rgba(13, 148, 136, 0.1)',
                         borderWidth: 3,
                         pointRadius: 4,
                         pointBackgroundColor: '#fff',
-                        pointBorderColor: '#ff6b6b',
+                        pointBorderColor: '#0d9488',
                         pointBorderWidth: 2,
                         tension: 0.4,
                         fill: true
                     },
                     {
-                        label: 'Minimum or lack of focus',
-                        data: [22, 34, 28, 55, 42, 68, 52],
-                        borderColor: '#4d79ff',
-                        backgroundColor: 'rgba(77, 121, 255, 0.1)',
+                        label: 'High Risk Patients',
+                        data: [5, 7, 9, 12],
+                        borderColor: '#ef4444',
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
                         borderWidth: 3,
                         pointRadius: 4,
                         pointBackgroundColor: '#fff',
-                        pointBorderColor: '#4d79ff',
+                        pointBorderColor: '#ef4444',
+                        pointBorderWidth: 2,
+                        tension: 0.4,
+                        fill: true
+                    },
+                    {
+                        label: 'Stage 5 CKD',
+                        data: [2, 3, 4, 6],
+                        borderColor: '#f59e0b',
+                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                        borderWidth: 3,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#f59e0b',
                         pointBorderWidth: 2,
                         tension: 0.4,
                         fill: true
@@ -849,7 +938,16 @@
                             },
                             ticks: {
                                 color: '#666',
-                                stepSize: 20
+                                stepSize: 5
+                            },
+                            title: {
+                                display: true,
+                                text: 'Number of Patients',
+                                color: '#0d9488',
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                }
                             }
                         },
                         x: {
@@ -858,6 +956,15 @@
                             },
                             ticks: {
                                 color: '#666'
+                            },
+                            title: {
+                                display: true,
+                                text: 'Time Period',
+                                color: '#0d9488',
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                }
                             }
                         }
                     },
@@ -869,7 +976,7 @@
             };
             
             // Create the chart
-            const productivityChart = new Chart(ctx, config);
+            const ckdTrendsChart = new Chart(ctx, config);
         });
     </script>
 </body>

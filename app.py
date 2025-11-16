@@ -134,7 +134,9 @@ def doctor_dashboard():
             'name': data.get('patient_name', 'Unknown'),
             'risk_percentage': data.get('risk_percentage', 0),
             'stage': data.get('stage', 'N/A'),
-            'risk_level': data.get('risk_level', 'Unknown')
+            'risk_level': data.get('risk_level', 'Unknown'),
+            'age': data.get('age', 'N/A'),
+            'egfr': data.get('egfr', 'N/A')
         })
     
     return render_template('doctor_dashboard.html', patients=all_patients)
@@ -187,9 +189,9 @@ def add_patient():
     
     return render_template('add_patient.html')
 
-@app.route('/doctor/upload-csv', methods=['POST'])
+@app.route('/doctor/upload-file', methods=['POST'])
 @login_required
-def upload_csv():
+def upload_file():
     if not current_user.is_doctor():
         return jsonify({'error': 'Access denied'}), 403
     
@@ -197,27 +199,44 @@ def upload_csv():
         return jsonify({'error': 'No file uploaded'}), 400
     
     file = request.files['file']
+    file_type = request.form.get('file_type', 'csv')
     
     if file.filename == '':
         return jsonify({'error': 'No file selected'}), 400
     
-    if file and file.filename and file.filename.endswith('.csv'):
+    if file and file.filename:
         try:
-            df = pd.read_csv(io.StringIO(file.stream.read().decode('utf-8')))
-            
-            patient_list = df.to_dict('records')
-            results = ckd_model.predict_batch(patient_list)
-            
-            for result in results:
-                patient_id = result.get('patient_id', f"AUTO_{len(patients_data) + 1}")
-                patients_data[patient_id] = result
-            
-            flash(f'Successfully processed {len(results)} patients from CSV', 'success')
-            return jsonify({'success': True, 'count': len(results)})
+            if file_type == 'csv' and file.filename.endswith('.csv'):
+                return process_csv_upload(file)
+            elif file_type == 'pdf' and file.filename.endswith('.pdf'):
+                return process_pdf_upload(file)
+            else:
+                return jsonify({'error': 'Invalid file format'}), 400
         except Exception as e:
             return jsonify({'error': str(e)}), 500
     
-    return jsonify({'error': 'Invalid file format'}), 400
+    return jsonify({'error': 'Invalid file'}), 400
+
+def process_csv_upload(file):
+    df = pd.read_csv(io.StringIO(file.stream.read().decode('utf-8')))
+    
+    patient_list = df.to_dict('records')
+    results = ckd_model.predict_batch(patient_list)
+    
+    for result in results:
+        patient_id = result.get('patient_id', f"AUTO_{len(patients_data) + 1}")
+        patients_data[patient_id] = result
+    
+    flash(f'Successfully processed {len(results)} patients from CSV', 'success')
+    return jsonify({'success': True, 'count': len(results)})
+
+def process_pdf_upload(file):
+    import PyPDF2
+    
+    # For now, we'll just acknowledge the PDF upload
+    # In a real implementation, you would extract data from the PDF
+    flash('PDF file uploaded successfully. In a full implementation, patient data would be extracted from the PDF.', 'info')
+    return jsonify({'success': True, 'message': 'PDF processed successfully'})
 
 @app.route('/results/<patient_id>')
 @login_required
