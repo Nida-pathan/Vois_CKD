@@ -34,11 +34,27 @@ def index():
 def landing():
     if current_user.is_authenticated:
         return redirect(url_for('index'))
-    return render_template('landing.html')
+    return render_template('kidneycompanion_landing.html')
 
-@app.route('/login')
+@app.route('/login', methods=['GET', 'POST'])
 def login():
-    return redirect(url_for('landing'))
+    if request.method == 'POST':
+        username = request.form.get('username') or ''
+        password = request.form.get('password') or ''
+        
+        user = users_db.get(username)
+        
+        if user and password and check_password_hash(user.password_hash, password):
+            login_user(user)
+            flash(f'Welcome, {user.username}!', 'success')
+            if user.is_doctor():
+                return redirect(url_for('doctor_dashboard'))
+            else:
+                return redirect(url_for('patient_portal'))
+        else:
+            flash('Invalid username or password', 'danger')
+    
+    return render_template('login.html')
 
 @app.route('/doctor/login', methods=['GET', 'POST'])
 def doctor_login():
@@ -263,6 +279,10 @@ def patient_portal():
 @app.route('/modern-dashboard')
 def modern_dashboard():
     return render_template('modern_dashboard.html')
+
+@app.route('/kidneycompanion')
+def kidneycompanion_landing():
+    return render_template('kidneycompanion_landing.html')
 
 @app.route('/api/patient-trends/<username>')
 @login_required

@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KidneyCompanion - Your Partner for Integrated Kidney Care</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-green: #4BAEA0;
+            --light-green: #A3C4BC;
+            --accent-green: #7ABCA0;
+            --soft-white: #F8F9FA;
+            --dark-text: #333333;
+            --light-text: #666666;
+            --border-radius-sm: 8px;
+            --border-radius-md: 16px;
+            --border-radius-lg: 24px;
+            --shadow-light: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --shadow-medium: 0 8px 24px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            color: var(--dark-text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Sticky Header */
+        .navbar {
+            position: sticky;
+            top: 0;
+            background: white;
+            box-shadow: var(--shadow-light);
+            padding: 1rem 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand h1 {
+            color: var(--primary-green);
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-menu a {
+            text-decoration: none;
+            color: var(--dark-text);
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-menu a:hover {
+            color: var(--primary-green);
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--primary-green);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #3d8e82;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(75, 174, 160, 0.3);
+        }
+
+        .phone-number {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--light-text);
+            font-weight: 500;
+        }
+
+        /* Hero Section */
+        .hero {
+            display: flex;
+            align-items: center;
+            padding: 4rem 0;
+            gap: 3rem;
+        }
+
+        .hero-content {
+            flex: 1;
+        }
+
+        .hero-image {
+            flex: 1;
+            overflow: visible;
+            background: transparent;
+            height: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            position: relative;
+        }
+        
+        .hero-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            object-position: center;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: var(--border-radius-lg);
+        }
+        
+        .hero-image:hover img {
+            transform: scale(1.05);
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            color: var(--dark-text);
+        }
+
+        .hero p.subtitle {
+            font-size: 1.25rem;
+            color: var(--light-text);
+            margin-bottom: 2rem;
+            max-width: 600px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Diseases We Treat Section */
+        .section {
+            padding: 5rem 0;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            color: var(--dark-text);
+            margin-bottom: 1rem;
+        }
+
+        .section-header p {
+            font-size: 1.25rem;
+            color: var(--light-text);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .diseases-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .disease-card {
+            background: white;
+            border-radius: var(--border-radius-md);
+            padding: 2rem;
+            box-shadow: var(--shadow-light);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+
+        .disease-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .disease-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(75, 174, 160, 0.1), rgba(163, 196, 188, 0.1));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            color: var(--primary-green);
+            font-size: 1.8rem;
+        }
+
+        .disease-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: var(--dark-text);
+        }
+
+        .disease-card p {
+            color: var(--light-text);
+        }
+
+        /* Why Choose Us Section */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: var(--border-radius-md);
+            padding: 2rem;
+            box-shadow: var(--shadow-light);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .feature-image {
+            height: 150px;
+            border-radius: var(--border-radius-md);
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--primary-green), var(--light-green));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .feature-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: var(--dark-text);
+        }
+
+        .feature-card p {
+            color: var(--light-text);
+        }
+
+        /* How We Treat Section */
+        .treatments-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .treatment-card {
+            background: white;
+            border-radius: var(--border-radius-md);
+            padding: 2rem;
+            box-shadow: var(--shadow-light);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+
+        .treatment-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .treatment-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(75, 174, 160, 0.1), rgba(163, 196, 188, 0.1));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            color: var(--primary-green);
+            font-size: 1.8rem;
+        }
+
+        .treatment-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: var(--dark-text);
+        }
+
+        .treatment-card p {
+            color: var(--light-text);
+        }
+
+        /* Contact Form Section */
+        .contact-container {
+            background: white;
+            border-radius: var(--border-radius-md);
+            box-shadow: var(--shadow-light);
+            padding: 3rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--dark-text);
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius-sm);
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+        }
+
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .submit-btn {
+            background: var(--primary-green);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .submit-btn:hover {
+            background: #3d8e82;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(75, 174, 160, 0.3);
+        }
+
+        /* Footer */
+        footer {
+            background: #333;
+            color: white;
+            padding: 3rem 0 2rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-logo h3 {
+            color: white;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .footer-logo p {
+            color: #ccc;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links h4 {
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+        }
+
+        .footer-links ul {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-links a {
+            color: #ccc;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .social-icons a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            transition: all 0.3s;
+        }
+
+        .social-icons a:hover {
+            background: var(--primary-green);
+            transform: translateY(-3px);
+        }
+
+        .footer-contact p {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            color: #ccc;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 2rem;
+            text-align: center;
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .hero {
+                flex-direction: column;
+            }
+            
+            .hero-image {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+            
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .contact-container {
+                padding: 2rem 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sticky Header -->
+    <nav class="navbar">
+        <div class="container nav-container">
+            <div class="nav-brand">
+                <h1>KidneyCompanion</h1>
+            </div>
+            <div class="nav-menu">
+                <a href="#">Home</a>
+                <a href="#">Services</a>
+                <a href="#">Diseases</a>
+                <a href="#">About Us</a>
+                <a href="#">Hospitals</a>
+                <a href="#">Contact</a>
+            </div>
+            <div class="nav-buttons">
+                <a href="#" class="btn btn-primary">Book Appointment</a>
+                <div class="phone-number">
+                    <i class="fas fa-phone"></i>
+                    <span>+1 (800) 555-0123</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-content">
+                <h1>KidneyCompanion: Your Partner for Integrated Kidney Care.</h1>
+                <p class="subtitle">Combining advanced medical expertise with natural healing approaches to support your kidney health journey. Personalized care for every stage of kidney wellness.</p>
+                <div class="hero-buttons">
+                    <a href="{{ url_for('login') }}" class="btn btn-primary">Get Started</a>
+                    <a href="#" class="btn btn-secondary">Learn More</a>
+                </div>
+            </div>
+            <div class="hero-image">
+                <img src="{{ url_for('static', filename='images/kidney-illustration.png') }}" alt="Kidney Illustration">
+            </div>
+        </section>
+
+        <!-- Diseases We Treat Section -->
+        <section class="section">
+            <div class="section-header">
+                <h2>Diseases and Conditions We Treat</h2>
+                <p>Comprehensive care for all stages of kidney-related conditions</p>
+            </div>
+            <div class="diseases-grid">
+                <div class="disease-card">
+                    <div class="disease-icon">
+                        <i class="fas fa-heartbeat"></i>
+                    </div>
+                    <h3>Chronic Kidney Disease</h3>
+                    <p>Monitoring and management for all stages of CKD</p>
+                </div>
+                <div class="disease-card">
+                    <div class="disease-icon">
+                        <i class="fas fa-gem"></i>
+                    </div>
+                    <h3>Kidney Stones</h3>
+                    <p>Prevention and treatment strategies</p>
+                </div>
+                <div class="disease-card">
+                    <div class="disease-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>High Creatinine</h3>
+                    <p>Natural and medical approaches to reduce creatinine levels</p>
+                </div>
+                <div class="disease-card">
+                    <div class="disease-icon">
+                        <i class="fas fa-tachometer-alt"></i>
+                    </div>
+                    <h3>Blood Pressure</h3>
+                    <p>Hypertension management for kidney protection</p>
+                </div>
+                <div class="disease-card">
+                    <div class="disease-icon">
+                        <i class="fas fa-syringe"></i>
+                    </div>
+                    <h3>Diabetes-related Kidney Issues</h3>
+                    <p>Specialized diabetic nephropathy care</p>
+                </div>
+                <div class="disease-card">
+                    <div class="disease-icon">
+                        <i class="fas fa-restroom"></i>
+                    </div>
+                    <h3>Urinary Disorders</h3>
+                    <p>Treatment for various urinary tract conditions</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Why Choose Us Section -->
+        <section class="section">
+            <div class="section-header">
+                <h2>Why Choose KidneyCompanion</h2>
+                <p>Our unique approach combines modern medicine with holistic healing</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-image">
+                        Free Analysis
+                    </div>
+                    <h3>Free Kidney Report Analysis</h3>
+                    <p>Upload your lab reports for instant expert analysis</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-image">
+                        24/7 Support
+                    </div>
+                    <h3>24x7 Support</h3>
+                    <p>Round-the-clock assistance for urgent concerns</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-image">
+                        Diet Plans
+                    </div>
+                    <h3>Personalized Diet Plans</h3>
+                    <p>Customized nutrition based on your condition</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-image">
+                        Nationwide
+                    </div>
+                    <h3>Trusted Nationwide</h3>
+                    <p>Network of kidney specialists across the country</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- How We Treat Section -->
+        <section class="section">
+            <div class="section-header">
+                <h2>How We Treat</h2>
+                <p>Integrative approach combining traditional and alternative therapies</p>
+            </div>
+            <div class="treatments-grid">
+                <div class="treatment-card">
+                    <div class="treatment-icon">
+                        <i class="fas fa-leaf"></i>
+                    </div>
+                    <h3>Ayurveda</h3>
+                    <p>Ancient wisdom for modern kidney health</p>
+                </div>
+                <div class="treatment-card">
+                    <div class="treatment-icon">
+                        <i class="fas fa-spa"></i>
+                    </div>
+                    <h3>Panchakarma Therapies</h3>
+                    <p>Detoxification and rejuvenation treatments</p>
+                </div>
+                <div class="treatment-card">
+                    <div class="treatment-icon">
+                        <i class="fas fa-utensils"></i>
+                    </div>
+                    <h3>Diet & Lifestyle</h3>
+                    <p>Holistic nutrition and wellness guidance</p>
+                </div>
+                <div class="treatment-card">
+                    <div class="treatment-icon">
+                        <i class="fas fa-seedling"></i>
+                    </div>
+                    <h3>Naturopathy</h3>
+                    <p>Natural healing approaches to support kidney function</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Form Section -->
+        <section class="section">
+            <div class="section-header">
+                <h2>Have a Question? We're Here to Help.</h2>
+                <p>Reach out to our kidney care specialists for personalized guidance</p>
+            </div>
+            <div class="contact-container">
+                <form>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="name">Name</label>
+                            <input type="text" id="name" placeholder="Your full name">
+                        </div>
+                        <div class="form-group">
+                            <label for="age">Age</label>
+                            <input type="number" id="age" placeholder="Your age">
+                        </div>
+                        <div class="form-group">
+                            <label for="gender">Gender</label>
+                            <select id="gender">
+                                <option value="">Select gender</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" placeholder="Your email address">
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone</label>
+                            <input type="tel" id="phone" placeholder="Your phone number">
+                        </div>
+                        <div class="form-group">
+                            <label for="location">Location</label>
+                            <input type="text" id="location" placeholder="City, State">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="enquiry">Enquiry</label>
+                        <textarea id="enquiry" placeholder="How can we help you?"></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn">Request a Call Back</button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <h3>KidneyCompanion</h3>
+                    <p>Your trusted partner for integrated kidney care and wellness.</p>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Services</a></li>
+                        <li><a href="#">Diseases</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Our Services</h4>
+                    <ul>
+                        <li><a href="#">CKD Management</a></li>
+                        <li><a href="#">Diet & Nutrition</a></li>
+                        <li><a href="#">Ayurvedic Treatment</a></li>
+                        <li><a href="#">Lab Analysis</a></li>
+                        <li><a href="#">Teleconsultation</a></li>
+                    </ul>
+                </div>
+                <div class="footer-contact">
+                    <h4>Contact Us</h4>
+                    <p><i class="fas fa-map-marker-alt"></i> Nationwide Service</p>
+                    <p><i class="fas fa-phone"></i> +1 (800) 555-0123</p>
+                    <p><i class="fas fa-envelope"></i> care@kidneycompanion.com</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 KidneyCompanion. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
