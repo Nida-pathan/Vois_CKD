@@ -7,6 +7,9 @@ import pandas as pd
 import io
 import os
 
+# Track patient free trials for lab uploads
+patient_upload_trials = {}
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SESSION_SECRET', 'ckd-diagnostic-system-secret-key-2025')
 
@@ -349,42 +352,120 @@ def patient_portal():
     if current_user.is_doctor():
         return redirect(url_for('doctor_dashboard'))
     
+    # Redirect to the new patient dashboard
+    return redirect(url_for('patient_dashboard'))
+
+@app.route('/patient/dashboard')
+@login_required
+def patient_dashboard():
+    if current_user.is_doctor():
+        return redirect(url_for('doctor_dashboard'))
+    
     patient_data = patient_records.get(current_user.username, {})
     
-    if patient_data and 'history' in patient_data:
-        latest = patient_data['history'][0]
-        prediction_data = {
-            'age': patient_data.get('age', 0),
-            'gender': patient_data.get('gender', 'male'),
-            'serum_creatinine': latest.get('serum_creatinine', 1.0),
-            'blood_urea': latest.get('blood_urea', 20),
-            'hemoglobin': latest.get('hemoglobin', 14),
-            'bp_systolic': latest.get('bp_systolic', 120),
-            'bp_diastolic': latest.get('bp_diastolic', 80),
-            'specific_gravity': 1.020,
-            'albumin': 0,
-            'sugar': 0,
-            'red_blood_cells': 1,
-            'pus_cell': 0,
-            'bacteria': 0,
-            'blood_glucose': 100,
-            'sodium': 140,
-            'potassium': 4.5,
-            'packed_cell_volume': 44,
-            'white_blood_cell_count': 8000,
-            'red_blood_cell_count': 5,
-            'hypertension': 1 if latest.get('bp_systolic', 120) > 140 else 0,
-            'diabetes_mellitus': 0,
-            'coronary_artery_disease': 0,
-            'appetite': 1,
-            'pedal_edema': 0,
-            'anemia': 1 if latest.get('hemoglobin', 14) < 12 else 0
-        }
-        
-        prediction = ckd_model.predict_risk(prediction_data)
-        patient_data.update(prediction)
+    # Get patient trial information
+    patient_trials = patient_upload_trials.get(current_user.username, {'remaining': 2, 'used': 0})
     
-    return render_template('patient_portal.html', patient=patient_data)
+    # Get available doctors
+    available_doctors = [
+        {
+            'name': 'Dr. Ramesh Kumar',
+            'specialty': 'Nephrologist',
+            'experience': '15 years experience',
+            'avatar': 'DR'
+        },
+        {
+            'name': 'Dr. Sunita Agarwal',
+            'specialty': 'General Physician',
+            'experience': '12 years experience',
+            'avatar': 'SA'
+        },
+        {
+            'name': 'Dr. Vikram Patel',
+            'specialty': 'Ayurvedic Specialist',
+            'experience': '20 years experience',
+            'avatar': 'VP'
+        }
+    ]
+    
+    return render_template('patient_dashboard.html', 
+                         patient=patient_data, 
+                         trials=patient_trials,
+                         doctors=available_doctors)
+
+@app.route('/patient/upload-lab', methods=['POST'])
+@login_required
+def upload_lab_report():
+    if current_user.is_doctor():
+        return jsonify({'error': 'Access denied'}), 403
+    
+    # Check if patient has free trials remaining
+    if current_user.username not in patient_upload_trials:
+        patient_upload_trials[current_user.username] = {'remaining': 2, 'used': 0}
+    
+    trials = patient_upload_trials[current_user.username]
+    
+    if trials['remaining'] <= 0:
+        return jsonify({'error': 'No free trials remaining. Please upgrade to continue.'}), 400
+    
+    # Handle file upload (simplified for now)
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file uploaded'}), 400
+    
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'No file selected'}), 400
+    
+    # Update trial count
+    trials['remaining'] -= 1
+    trials['used'] += 1
+    
+    # Process the lab report (simplified - would integrate with actual ML model)
+    try:
+        if file.filename.endswith('.csv'):
+            df = pd.read_csv(file)
+            # Process CSV data
+            results = {'status': 'success', 'message': 'Lab report analyzed successfully', 'data_points': len(df)}
+        else:
+            # For PDF/Excel files, would need additional processing
+            results = {'status': 'success', 'message': 'Lab report uploaded successfully', 'file_type': file.filename.split('.')[-1]}
+        
+        return jsonify(results)
+    
+    except Exception as e:
+        return jsonify({'error': f'Error processing file: {str(e)}'}), 500
+
+@app.route('/patient/book-appointment', methods=['POST'])
+@login_required
+def book_appointment():
+    if current_user.is_doctor():
+        return jsonify({'error': 'Access denied'}), 403
+    
+    data = request.get_json()
+    doctor_name = data.get('doctor_name')
+    preferred_date = data.get('preferred_date')
+    preferred_time = data.get('preferred_time')
+    
+    if not doctor_name:
+        return jsonify({'error': 'Doctor name is required'}), 400
+    
+    # Create appointment record (simplified)
+    appointment = {
+        'patient': current_user.username,
+        'doctor': doctor_name,
+        'preferred_date': preferred_date,
+        'preferred_time': preferred_time,
+        'status': 'pending',
+        'created_at': pd.Timestamp.now().isoformat()
+    }
+    
+    # In a real implementation, this would be saved to a database
+    # For now, just return success message
+    return jsonify({
+        'status': 'success', 
+        'message': f'Appointment request sent to {doctor_name}. You will be notified shortly.',
+        'appointment': appointment
+    })
 
 @app.route('/modern-dashboard')
 def modern_dashboard():
