@@ -120,6 +120,97 @@ def logout():
     flash('You have been logged out successfully.', 'info')
     return redirect(url_for('landing'))
 
+# Admin Routes
+@app.route('/admin/login', methods=['GET', 'POST'])
+def admin_login():
+    # Default admin credentials
+    ADMIN_ID = 'admin'
+    ADMIN_PASSWORD = 'admin123'
+    
+    if request.method == 'POST':
+        admin_id = request.form.get('admin_id')
+        admin_password = request.form.get('admin_password')
+        
+        if admin_id == ADMIN_ID and admin_password == ADMIN_PASSWORD:
+            session['admin_logged_in'] = True
+            session['admin_id'] = admin_id
+            flash('Admin login successful!', 'success')
+            return redirect(url_for('admin_dashboard'))
+        else:
+            flash('Invalid admin credentials', 'danger')
+    
+    return render_template('admin_login.html')
+
+@app.route('/admin/dashboard')
+def admin_dashboard():
+    if not session.get('admin_logged_in'):
+        flash('Please login as admin first', 'warning')
+        return redirect(url_for('admin_login'))
+    
+    # Get all doctors
+    doctors = [user for user in users_db.values() if user.is_doctor()]
+    
+    # Add patients list to each doctor
+    for doctor in doctors:
+        doctor.patients = [user for user in users_db.values() if user.is_patient()]
+    
+    # Mock feedback data (in real app, this would come from database)
+    feedbacks = [
+        {
+            'patient_name': 'John Doe',
+            'doctor_name': 'doctor1',
+            'rating': 5,
+            'comment': 'Excellent service and very professional care.',
+            'date': pd.Timestamp('2025-01-15')
+        },
+        {
+            'patient_name': 'Jane Smith',
+            'doctor_name': 'doctor1',
+            'rating': 4,
+            'comment': 'Good experience, doctor was very helpful.',
+            'date': pd.Timestamp('2025-01-12')
+        }
+    ]
+    
+    return render_template('admin_dashboard.html', doctors=doctors, feedbacks=feedbacks)
+
+@app.route('/admin/add_doctor', methods=['POST'])
+def add_doctor():
+    if not session.get('admin_logged_in'):
+        flash('Please login as admin first', 'warning')
+        return redirect(url_for('admin_login'))
+    
+    username = request.form.get('username')
+    email = request.form.get('email')
+    password = request.form.get('password')
+    specialization = request.form.get('specialization')
+    
+    if not all([username, email, password, specialization]):
+        flash('All fields are required', 'danger')
+        return redirect(url_for('admin_dashboard'))
+    
+    # Check if username already exists
+    if username in users_db:
+        flash('Username already exists', 'danger')
+        return redirect(url_for('admin_dashboard'))
+    
+    # Create new doctor with proper User model constructor
+    doctor_id = str(len(users_db) + 1)
+    doctor = User(doctor_id, username, generate_password_hash(password), 'doctor')
+    doctor.email = email
+    doctor.specialization = specialization
+    users_db[username] = doctor
+    
+    flash(f'Doctor {username} added successfully!', 'success')
+    return redirect(url_for('admin_dashboard'))
+
+@app.route('/admin/logout')
+def admin_logout():
+    session.pop('admin_logged_in', None)
+    session.pop('admin_id', None)
+    flash('Admin logged out successfully', 'info')
+    return redirect(url_for('login'))
+
 @app.route('/doctor/dashboard')
 @login_required
 def doctor_dashboard():
