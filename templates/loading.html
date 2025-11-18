@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loading - CKD Diagnostic System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-green: #4BAEA0;
+            --light-green: #A3C4BC;
+            --accent-green: #7ABCA0;
+            --soft-white: #F8F9FA;
+            --dark-text: #333333;
+            --light-text: #666666;
+            --border-radius-sm: 8px;
+            --border-radius-md: 16px;
+            --border-radius-lg: 24px;
+            --shadow-light: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --shadow-medium: 0 8px 24px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            color: var(--dark-text);
+            line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .loading-container {
+            text-align: center;
+            max-width: 600px;
+            padding: 2rem;
+        }
+
+        .logo-container {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 2rem;
+        }
+
+        .kidney-logo {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            animation: pulse 2s infinite;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+        }
+
+        .kidney-logo::before,
+        .kidney-logo::after {
+            content: "";
+            position: absolute;
+            width: 80px;
+            height: 120px;
+            background: var(--primary-green);
+            border-radius: 50%;
+            top: 15px;
+        }
+
+        .kidney-logo::before {
+            left: 0;
+            transform: rotate(-20deg);
+        }
+
+        .kidney-logo::after {
+            right: 0;
+            transform: rotate(20deg);
+        }
+
+        .water-drop {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: rgba(75, 174, 160, 0.6);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: dropFill 3s infinite;
+            box-shadow: 0 0 10px rgba(75, 174, 160, 0.5);
+        }
+
+        .loading-text {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary-green);
+            margin-bottom: 1.5rem;
+            min-height: 3rem;
+        }
+
+        .loading-subtext {
+            font-size: 1rem;
+            color: var(--light-text);
+            margin-bottom: 2rem;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 12px;
+            background: #e0e0e0;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--primary-green), var(--accent-green));
+            border-radius: 6px;
+            animation: progress 3s ease-in-out forwards;
+            box-shadow: 0 2px 4px rgba(75, 174, 160, 0.3);
+        }
+
+        .fact-container {
+            background: white;
+            padding: 1.5rem;
+            border-radius: var(--border-radius-md);
+            box-shadow: var(--shadow-light);
+            border-left: 4px solid var(--primary-green);
+        }
+
+        .fact-title {
+            font-weight: 600;
+            color: var(--primary-green);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .fact-content {
+            font-size: 0.95rem;
+            color: var(--light-text);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes dropFill {
+            0% { 
+                transform: translate(-50%, -50%) scale(0.5);
+                opacity: 0.3;
+            }
+            50% { 
+                transform: translate(-50%, -50%) scale(1.2);
+                opacity: 0.7;
+            }
+            100% { 
+                transform: translate(-50%, -50%) scale(0.5);
+                opacity: 0.3;
+            }
+        }
+
+        @keyframes progress {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        @media (max-width: 768px) {
+            .logo-container {
+                width: 120px;
+                height: 120px;
+            }
+            
+            .loading-text {
+                font-size: 1.25rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-container">
+        <div class="logo-container">
+            <div class="kidney-logo">
+                <div class="water-drop"></div>
+                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 24px; color: #4BAEA0; font-weight: bold;">🩺</div>
+            </div>
+        </div>
+        
+        <h1 class="loading-text">Loading Your Kidney Health Journey</h1>
+        
+        <div class="progress-container">
+            <div class="progress-bar"></div>
+        </div>
+        
+        <div class="loading-subtext">Preparing your personalized kidney health insights...</div>
+        
+        <div class="fact-container">
+            <div class="fact-title">
+                <i class="fas fa-lightbulb"></i>
+                <span>Did You Know?</span>
+            </div>
+            <style>
+                .fact-title i::before {
+                    content: "💡";
+                    font-style: normal;
+                }
+            </style>
+            <div class="fact-content" id="kidney-fact">
+                <noscript>
+                    <p>Did you know? The 10% Rule: You can remain healthy with just 10% to 20% of your full kidney function. That is why early damage often goes unnoticed.</p>
+                </noscript>
+                <!-- Fact will be inserted here by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Array of kidney facts
+        const kidneyFacts = [
+            "The 10% Rule: You can remain healthy with just 10% to 20% of your full kidney function. That is why early damage often goes unnoticed.",
+            "Prevalence: Approximately 10% of the population worldwide is affected by chronic kidney disease (CKD).",
+            "Size doesn't matter: Each kidney is roughly the size of a computer mouse or a fist, yet they control your body's entire fluid balance.",
+            "Blood flow: Kidneys receive higher blood flow than the brain, liver, or heart.",
+            "🩺 Causes & Risk Factors - The Top Two: Diabetes and High Blood Pressure are responsible for up to two-thirds of all CKD cases.",
+            "🩺 Causes & Risk Factors - Heart-Kidney Connection: Heart disease and kidney disease are linked. Protecting one often helps protect the other.",
+            "🩺 Causes & Risk Factors - Family History: Having a family member with kidney disease increases your risk. Talk to your family about their health history.",
+            "🩺 Causes & Risk Factors - Medication Awareness: Frequent use of over-the-counter painkillers (NSAIDs) can harm your kidneys over time.",
+            "🛡️ Prevention & Lifestyle Tips - Salt Awareness: Reducing sodium intake is one of the most effective ways to lower blood pressure and protect your kidneys.",
+            "🛡️ Prevention & Lifestyle Tips - Hydration: Staying hydrated helps your kidneys clear sodium and toxins from the body.",
+            "🛡️ Prevention & Lifestyle Tips - Move more: Regular exercise helps control blood pressure and body weight, reducing the strain on your kidneys.",
+            "🛡️ Prevention & Lifestyle Tips - Smoking: Smoking slows blood flow to the kidneys. Quitting is one of the best things you can do for renal health.",
+            "⚠️ Early Detection (The \"Silent\" Disease) - The Silent Symptom: Most people with early-stage CKD have no symptoms. Testing is the only way to know for sure.",
+            "⚠️ Early Detection (The \"Silent\" Disease) - Two Simple Tests: Kidney disease is detected using two simple tests: a blood test (eGFR) and a urine test (ACR).",
+            "⚠️ Early Detection (The \"Silent\" Disease) - Creatinine: Creatinine is a waste product from muscle wear and tear. High levels in the blood can indicate kidney issues."
+        ];
+
+        // Function to get a random fact
+        function getRandomFact() {
+            const randomIndex = Math.floor(Math.random() * kidneyFacts.length);
+            return kidneyFacts[randomIndex];
+        }
+
+        // Display a random fact when the page loads
+        function initLoadingPage() {
+            // Set a default fact in case DOMContentLoaded doesn't fire
+            const factElement = document.getElementById('kidney-fact');
+            if (factElement) {
+                factElement.textContent = getRandomFact();
+                console.log('Loading page initialized with fact:', factElement.textContent);
+            }
+            
+            // Also try with DOMContentLoaded
+            document.addEventListener('DOMContentLoaded', function() {
+                const factElement = document.getElementById('kidney-fact');
+                if (factElement) {
+                    factElement.textContent = getRandomFact();
+                    console.log('DOM loaded with fact:', factElement.textContent);
+                }
+            });
+            
+            // Redirect to the main landing page after 3 seconds
+            setTimeout(function() {
+                console.log('Redirecting to landing page');
+                window.location.href = "/landing";
+            }, 3000);
+        }
+        
+        // Initialize the loading page
+        initLoadingPage();
+    </script>
+</body>
+</html>

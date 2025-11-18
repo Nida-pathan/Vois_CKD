@@ -9,7 +9,7 @@
         <a href="{{ url_for('add_patient') }}" class="btn btn-primary">Add New Patient</a>
         <button onclick="document.getElementById('csvUpload').click()" class="btn btn-secondary">Upload CSV</button>
         <button onclick="document.getElementById('pdfUpload').click()" class="btn btn-secondary">Upload PDF</button>
-        <a href="{{ url_for('modern_dashboard') }}" class="btn btn-secondary" target="_blank" title="View Modern Dashboard with Enhanced Visuals">
+        <a href="{{ url_for('modern_dashboard') }}" class="btn btn-secondary" title="View Modern Dashboard with Enhanced Visuals">
             <i class="fas fa-chart-line"></i> Modern Dashboard
         </a>
         <input type="file" id="csvUpload" accept=".csv" style="display: none;" onchange="uploadCSV(this)">

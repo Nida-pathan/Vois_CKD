@@ -21,6 +21,161 @@
             --shadow-light: 0 4px 12px rgba(0, 0, 0, 0.05);
             --shadow-medium: 0 8px 24px rgba(0, 0, 0, 0.1);
         }
+        
+        /* Loading overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 1;
+            transition: opacity 0.5s ease-out;
+        }
+        
+        .loading-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .loading-content {
+            text-align: center;
+            max-width: 500px;
+            padding: 2rem;
+        }
+        
+        .logo-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 2rem;
+        }
+        
+        .kidney-logo {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            animation: pulse 2s infinite;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+        }
+        
+        .kidney-logo::before,
+        .kidney-logo::after {
+            content: "";
+            position: absolute;
+            width: 70px;
+            height: 100px;
+            background: var(--primary-green);
+            border-radius: 50%;
+            top: 10px;
+        }
+        
+        .kidney-logo::before {
+            left: 0;
+            transform: rotate(-20deg);
+        }
+        
+        .kidney-logo::after {
+            right: 0;
+            transform: rotate(20deg);
+        }
+        
+        .water-drop {
+            position: absolute;
+            width: 35px;
+            height: 35px;
+            background: rgba(75, 174, 160, 0.6);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: dropFill 3s infinite;
+            box-shadow: 0 0 10px rgba(75, 174, 160, 0.5);
+        }
+        
+        .loading-text {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--primary-green);
+            margin-bottom: 1.5rem;
+        }
+        
+        .progress-container {
+            width: 100%;
+            height: 10px;
+            background: #e0e0e0;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--primary-green), var(--accent-green));
+            border-radius: 5px;
+            animation: progress 2.5s ease-in-out forwards;
+            box-shadow: 0 2px 4px rgba(75, 174, 160, 0.3);
+        }
+        
+        .fact-container {
+            background: white;
+            padding: 1.2rem;
+            border-radius: var(--border-radius-md);
+            box-shadow: var(--shadow-light);
+            border-left: 3px solid var(--primary-green);
+        }
+        
+        .fact-title {
+            font-weight: 600;
+            color: var(--primary-green);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .fact-title i::before {
+            content: "💡";
+            font-style: normal;
+        }
+        
+        .fact-content {
+            font-size: 0.9rem;
+            color: var(--light-text);
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes dropFill {
+            0% { 
+                transform: translate(-50%, -50%) scale(0.5);
+                opacity: 0.3;
+            }
+            50% { 
+                transform: translate(-50%, -50%) scale(1.2);
+                opacity: 0.7;
+            }
+            100% { 
+                transform: translate(-50%, -50%) scale(0.5);
+                opacity: 0.3;
+            }
+        }
+        
+        @keyframes progress {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
 
         * {
             margin: 0;
@@ -513,6 +668,33 @@
     </style>
 </head>
 <body>
+    <!-- Loading overlay that shows on each page refresh -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="logo-container">
+                <div class="kidney-logo">
+                    <div class="water-drop"></div>
+                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 20px; color: #4BAEA0; font-weight: bold;">🩺</div>
+                </div>
+            </div>
+            
+            <h1 class="loading-text">Loading Your Kidney Health Journey</h1>
+            
+            <div class="progress-container">
+                <div class="progress-bar"></div>
+            </div>
+            
+            <div class="fact-container">
+                <div class="fact-title">
+                    <i class="fas fa-lightbulb"></i>
+                    <span>Did You Know?</span>
+                </div>
+                <div class="fact-content" id="landingFact">
+                    <!-- Fact will be inserted by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- Sticky Header -->
     <nav class="navbar">
         <div class="container nav-container">
@@ -790,5 +972,56 @@
             </div>
         </div>
     </footer>
+    
+    <script>
+        // Array of kidney facts
+        const kidneyFacts = [
+            "The 10% Rule: You can remain healthy with just 10% to 20% of your full kidney function. That is why early damage often goes unnoticed.",
+            "Prevalence: Approximately 10% of the population worldwide is affected by chronic kidney disease (CKD).",
+            "Size doesn't matter: Each kidney is roughly the size of a computer mouse or a fist, yet they control your body's entire fluid balance.",
+            "Blood flow: Kidneys receive higher blood flow than the brain, liver, or heart.",
+            "🩺 Causes & Risk Factors - The Top Two: Diabetes and High Blood Pressure are responsible for up to two-thirds of all CKD cases.",
+            "🩺 Causes & Risk Factors - Heart-Kidney Connection: Heart disease and kidney disease are linked. Protecting one often helps protect the other.",
+            "🩺 Causes & Risk Factors - Family History: Having a family member with kidney disease increases your risk. Talk to your family about their health history.",
+            "🩺 Causes & Risk Factors - Medication Awareness: Frequent use of over-the-counter painkillers (NSAIDs) can harm your kidneys over time.",
+            "🛡️ Prevention & Lifestyle Tips - Salt Awareness: Reducing sodium intake is one of the most effective ways to lower blood pressure and protect your kidneys.",
+            "🛡️ Prevention & Lifestyle Tips - Hydration: Staying hydrated helps your kidneys clear sodium and toxins from the body.",
+            "🛡️ Prevention & Lifestyle Tips - Move more: Regular exercise helps control blood pressure and body weight, reducing the strain on your kidneys.",
+            "🛡️ Prevention & Lifestyle Tips - Smoking: Smoking slows blood flow to the kidneys. Quitting is one of the best things you can do for renal health.",
+            "⚠️ Early Detection (The \"Silent\" Disease) - The Silent Symptom: Most people with early-stage CKD have no symptoms. Testing is the only way to know for sure.",
+            "⚠️ Early Detection (The \"Silent\" Disease) - Two Simple Tests: Kidney disease is detected using two simple tests: a blood test (eGFR) and a urine test (ACR).",
+            "⚠️ Early Detection (The \"Silent\" Disease) - Creatinine: Creatinine is a waste product from muscle wear and tear. High levels in the blood can indicate kidney issues."
+        ];
+
+        // Function to get a random fact
+        function getRandomFact() {
+            const randomIndex = Math.floor(Math.random() * kidneyFacts.length);
+            return kidneyFacts[randomIndex];
+        }
+
+        // Function to hide the loading overlay
+        function hideLoadingOverlay() {
+            const overlay = document.getElementById('loadingOverlay');
+            if (overlay) {
+                overlay.classList.add('hidden');
+                // Remove the overlay after the transition completes
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                }, 500);
+            }
+        }
+
+        // Initialize the loading overlay
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set a random fact
+            const factElement = document.getElementById('landingFact');
+            if (factElement) {
+                factElement.textContent = getRandomFact();
+            }
+            
+            // Hide the loading overlay after 2.5 seconds
+            setTimeout(hideLoadingOverlay, 2500);
+        });
+    </script>
 </body>
 </html>

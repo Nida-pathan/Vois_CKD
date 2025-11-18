@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify, make_response
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.security import check_password_hash, generate_password_hash
 from models.user import User, users_db, patients_data, patient_records
@@ -31,7 +31,7 @@ def index():
             return redirect(url_for('doctor_dashboard'))
         else:
             return redirect(url_for('patient_portal'))
-    return redirect(url_for('landing'))
+    return render_template('loading.html')
 
 @app.route('/landing')
 def landing():
@@ -501,9 +501,6 @@ def patient_trends(username):
         'blood_urea': blood_urea,
         'hemoglobin': hemoglobin
     })
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=True)
 
 # Vercel requires this for the serverless function
 def main():
