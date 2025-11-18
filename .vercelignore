@@ -11,3 +11,4 @@ build/
 .local/
 vois_ckd.egg-info/
 *.egg-info/
+.env
