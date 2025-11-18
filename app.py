@@ -24,14 +24,14 @@ def load_user(user_id):
             return user
     return None
 
+@app.route('/test')
+def test():
+    return "Flask app is working!"
+
 @app.route('/')
 def index():
-    if current_user.is_authenticated:
-        if current_user.is_doctor():
-            return redirect(url_for('doctor_dashboard'))
-        else:
-            return redirect(url_for('patient_portal'))
-    return render_template('loading.html')
+    # Always redirect to landing page
+    return redirect(url_for('landing'))
 
 @app.route('/landing')
 def landing():
@@ -511,6 +511,10 @@ def patient_trends(username):
 def main():
     """Entry point for the application."""
     return app
+
+# Add Vercel handler function
+def handler(event, context):
+    return app(event, context)
 
 # For local development
 if __name__ == '__main__':

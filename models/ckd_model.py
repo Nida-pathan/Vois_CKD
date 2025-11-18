@@ -18,7 +18,9 @@ class CKDModel:
             'diabetes_mellitus', 'coronary_artery_disease', 'appetite',
             'pedal_edema', 'anemia'
         ]
-        self.train_model()
+        # Only train model if not running on Vercel (to save time during build)
+        if not os.environ.get('VERCEL'):
+            self.train_model()
     
     def train_model(self):
         np.random.seed(42)
@@ -50,6 +52,10 @@ class CKDModel:
         self.model.fit(X_scaled, y)
     
     def predict_risk(self, patient_data):
+        # If model hasn't been trained yet (e.g., on Vercel), train it now
+        if self.model is None:
+            self.train_model()
+            
         features = self.prepare_features(patient_data)
         features_scaled = self.scaler.transform([features])
         
@@ -117,6 +123,10 @@ class CKDModel:
             return 'Critical'
     
     def get_feature_importance(self, features):
+        # If model hasn't been trained yet, return empty list
+        if self.model is None:
+            return []
+            
         importance = self.model.feature_importances_
         feature_importance = []
         

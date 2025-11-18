@@ -1,6 +1,7 @@
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash
 from models.ckd_model import ckd_model
+import os
 
 class User(UserMixin):
     def __init__(self, id, username, password_hash, role):
@@ -115,8 +116,10 @@ sample_patients = [
 # Process the sample patients with the CKD model to generate predictions
 patients_data = {}
 for patient in sample_patients:
-    prediction = ckd_model.predict_risk(patient)
-    patient.update(prediction)
+    # Only process if not on Vercel to save build time
+    if not os.environ.get('VERCEL'):
+        prediction = ckd_model.predict_risk(patient)
+        patient.update(prediction)
     patients_data[patient['patient_id']] = patient
 
 patient_records = {
