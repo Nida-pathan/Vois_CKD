@@ -200,6 +200,10 @@
             box-sizing: border-box;
         }
 
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
             font-family: 'Poppins', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
             background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
@@ -722,12 +726,11 @@
                 <h1>KidneyCompanion</h1>
             </div>
             <div class="nav-menu">
-                <a href="#">Home</a>
-                <a href="#">Services</a>
-                <a href="#">Diseases</a>
-                <a href="#">About Us</a>
-                <a href="#">Hospitals</a>
-                <a href="#">Contact</a>
+                <a href="#home">Home</a>
+                <a href="#services">Services</a>
+                <a href="#diseases">Diseases</a>
+                <a href="#about">About Us</a>
+                <a href="#contact">Contact</a>
             </div>
             <div class="nav-buttons">
                 <a href="#" class="btn btn-primary">Book Appointment</a>
@@ -741,7 +744,7 @@
 
     <main class="container">
         <!-- Hero Section -->
-        <section class="hero">
+        <section class="hero" id="home">
             <div class="hero-content">
                 <h1>KidneyCompanion: Your Partner for Integrated Kidney Care.</h1>
                 <p class="subtitle">Combining advanced medical expertise with natural healing approaches to support your
@@ -757,81 +760,89 @@
         </section>
 
         <!-- Diseases We Treat Section -->
-        <section class="section">
+        <section class="section" id="diseases">
             <div class="section-header">
                 <h2>Diseases and Conditions We Treat</h2>
                 <p>Comprehensive care for all stages of kidney-related conditions</p>
             </div>
             <div class="diseases-grid">
-                <div class="disease-card">
+                <a href="{{ url_for('disease_detail', disease_id='ckd') }}" class="disease-card"
+                    style="text-decoration: none; display: block;">
                     <div class="disease-icon" style="background: none;">
                         <img src="{{ url_for('static', filename='images/CKD.png') }}" alt="Chronic Kidney Disease"
                             style="width: 120px; height: 120px; object-fit: contain;">
                     </div>
                     <h3>Chronic Kidney Disease (CKD)</h3>
                     <p>Monitoring and management for all stages of CKD</p>
-                </div>
-                <div class="disease-card">
+                </a>
+                <a href="{{ url_for('disease_detail', disease_id='diabetic-nephropathy') }}" class="disease-card"
+                    style="text-decoration: none; display: block;">
                     <div class="disease-icon" style="background: none;">
                         <img src="{{ url_for('static', filename='images/Diabetic Nephropathy.png') }}"
                             alt="Diabetic Nephropathy" style="width: 120px; height: 120px; object-fit: contain;">
                     </div>
                     <h3>Diabetic Nephropathy</h3>
                     <p>Kidney disease caused by diabetes with specialized care approaches</p>
-                </div>
-                <div class="disease-card">
+                </a>
+                <a href="{{ url_for('disease_detail', disease_id='aki') }}" class="disease-card"
+                    style="text-decoration: none; display: block;">
                     <div class="disease-icon" style="background: none;">
                         <img src="{{ url_for('static', filename='images/AKI.png') }}" alt="Acute Kidney Injury"
                             style="width: 150px; height: 150px; object-fit: contain;">
                     </div>
                     <h3>Acute Kidney Injury (AKI)</h3>
                     <p>Immediate care and recovery support for sudden kidney damage</p>
-                </div>
-                <div class="disease-card">
+                </a>
+                <a href="{{ url_for('disease_detail', disease_id='kidney-stones') }}" class="disease-card"
+                    style="text-decoration: none; display: block;">
                     <div class="disease-icon" style="background: none;">
                         <img src="{{ url_for('static', filename='images/Kidney_stone.png') }}" alt="Kidney Stones"
                             style="width: 120px; height: 120px; object-fit: contain;">
                     </div>
                     <h3>Kidney Stones</h3>
                     <p>Prevention and treatment strategies for nephrolithiasis</p>
-                </div>
-                <div class="disease-card">
+                </a>
+                <a href="{{ url_for('disease_detail', disease_id='glomerulonephritis') }}" class="disease-card"
+                    style="text-decoration: none; display: block;">
                     <div class="disease-icon" style="background: none;">
                         <img src="{{ url_for('static', filename='images/Glomerulonephritis.png') }}"
                             alt="Glomerulonephritis" style="width: 120px; height: 120px; object-fit: contain;">
                     </div>
                     <h3>Glomerulonephritis</h3>
                     <p>Inflammatory conditions affecting kidney filtering units</p>
-                </div>
-                <div class="disease-card">
+                </a>
+                <a href="{{ url_for('disease_detail', disease_id='nephrotic-syndrome') }}" class="disease-card"
+                    style="text-decoration: none; display: block;">
                     <div class="disease-icon" style="background: none;">
                         <img src="{{ url_for('static', filename='images/Nephrotic Syndrome.png') }}"
                             alt="Nephrotic Syndrome" style="width: 120px; height: 120px; object-fit: contain;">
                     </div>
                     <h3>Nephrotic Syndrome</h3>
                     <p>Management of proteinuria and related complications</p>
-                </div>
-                <div class="disease-card">
+                </a>
+                <a href="{{ url_for('disease_detail', disease_id='hypertensive-nephropathy') }}" class="disease-card"
+                    style="text-decoration: none; display: block;">
                     <div class="disease-icon" style="background: none;">
                         <img src="{{ url_for('static', filename='images/Hypertensive Nephropathy.png') }}"
                             alt="Hypertensive Nephropathy" style="width: 120px; height: 120px; object-fit: contain;">
                     </div>
                     <h3>Hypertensive Nephropathy</h3>
                     <p>Kidney damage caused by high blood pressure</p>
-                </div>
-                <div class="disease-card">
+                </a>
+                <a href="{{ url_for('disease_detail', disease_id='renal-osteodystrophy') }}" class="disease-card"
+                    style="text-decoration: none; display: block;">
                     <div class="disease-icon" style="background: none;">
                         <img src="{{ url_for('static', filename='images/Renal Osteodystrophy.png') }}"
                             alt="Renal Osteodystrophy" style="width: 120px; height: 120px; object-fit: contain;">
                     </div>
                     <h3>Renal Osteodystrophy</h3>
                     <p>Bone disorders associated with chronic kidney disease</p>
-                </div>
+                </a>
             </div>
         </section>
 
         <!-- Why Choose Us Section -->
-        <section class="section">
+        <section class="section" id="about">
             <div class="section-header">
                 <h2>Why Choose KidneyCompanion</h2>
                 <p>Our unique approach combines modern medicine with holistic healing</p>
@@ -873,7 +884,7 @@
         </section>
 
         <!-- How We Treat Section -->
-        <section class="section">
+        <section class="section" id="services">
             <div class="section-header">
                 <h2>How We Treat</h2>
                 <p>Integrative approach combining traditional and alternative therapies</p>
@@ -911,7 +922,7 @@
         </section>
 
         <!-- Contact Form Section -->
-        <section class="section">
+        <section class="section" id="contact">
             <div class="section-header">
                 <h2>Have a Question? We're Here to Help.</h2>
                 <p>Reach out to our kidney care specialists for personalized guidance</p>

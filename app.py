@@ -487,6 +487,285 @@ def modern_dashboard():
 def kidneycompanion_landing():
     return render_template('kidneycompanion_landing.html')
 
+@app.route('/disease/<disease_id>')
+def disease_detail(disease_id):
+    # Map disease IDs to human-readable names and detailed information
+    disease_info = {
+        'ckd': {
+            'name': 'Chronic Kidney Disease',
+            'description': 'Chronic Kidney Disease (CKD) is a long-term condition where the kidneys don\'t work as well as they should. It\'s a common condition often associated with aging, affecting around 1 in 10 people.',
+            'stages': 'CKD is classified into 5 stages based on the glomerular filtration rate (GFR):\n'
+                      '- Stage 1: Normal or high GFR (>90 mL/min)\n'
+                      '- Stage 2: Mild CKD (60-89 mL/min)\n'
+                      '- Stage 3: Moderate CKD (30-59 mL/min)\n'
+                      '- Stage 4: Severe CKD (15-29 mL/min)\n'
+                      '- Stage 5: End Stage CKD (<15 mL/min)',
+            'symptoms': 'Early stages may have no symptoms. As CKD progresses, symptoms may include:\n'
+                        '- Tiredness\n'
+                        '- Swollen ankles, feet or hands\n'
+                        '- Shortness of breath\n'
+                        '- Nausea\n'
+                        '- Blood in urine\n'
+                        '- High blood pressure',
+            'causes': 'Common causes include:\n'
+                      '- Diabetes (diabetic nephropathy)\n'
+                      '- High blood pressure (hypertensive nephropathy)\n'
+                      '- Glomerulonephritis\n'
+                      '- Polycystic kidney disease\n'
+                      '- Blocked urinary tract\n'
+                      '- Repeated urinary infections',
+            'prevention': 'To reduce your risk:\n'
+                         '- Keep blood pressure and blood sugar under control\n'
+                         '- Maintain a healthy weight\n'
+                         '- Eat a balanced diet\n'
+                         '- Exercise regularly\n'
+                         '- Don\'t smoke\n'
+                         '- Limit alcohol intake\n'
+                         '- Take medications as prescribed'
+        },
+        'diabetic-nephropathy': {
+            'name': 'Diabetic Nephropathy',
+            'description': 'Diabetic nephropathy is kidney disease that occurs as a result of diabetes. It\'s a leading cause of end-stage kidney disease and affects approximately 20-40% of patients with diabetes.',
+            'stages': 'The progression typically follows these stages:\n'
+                      '1. Hyperfiltration - Increased kidney function\n'
+                      '2. Microalbuminuria - Small amounts of protein in urine\n'
+                      '3. Proteinuria - Large amounts of protein in urine\n'
+                      '4. Declining kidney function - Reduced GFR\n'
+                      '5. End-stage renal disease - Kidney failure',
+            'symptoms': 'Early stages may be asymptomatic. Later symptoms include:\n'
+                        '- Protein in urine (foamy urine)\n'
+                        '- Swelling in legs, ankles, and feet\n'
+                        '- Increased urination\n'
+                        '- Fatigue\n'
+                        '- Loss of appetite\n'
+                        '- Nausea and vomiting\n'
+                        '- Persistent itching',
+            'causes': 'Primary cause is uncontrolled diabetes leading to:\n'
+                      '- Damage to blood vessels in kidneys\n'
+                      '- Scarring of kidney filtering units (glomeruli)\n'
+                      '- Reduced kidney function over time',
+            'prevention': 'Key prevention strategies:\n'
+                         '- Maintain tight blood sugar control\n'
+                         '- Manage blood pressure (target <130/80 mmHg)\n'
+                         '- Follow a diabetic diet\n'
+                         '- Regular exercise\n'
+                         '- Take prescribed medications (ACE inhibitors or ARBs)\n'
+                         '- Regular monitoring of kidney function\n'
+                         '- Avoid nephrotoxic substances'
+        },
+        'aki': {
+            'name': 'Acute Kidney Injury',
+            'description': 'Acute Kidney Injury (AKI) is a sudden episode of kidney failure or kidney damage that happens within a few hours or a few days. It causes a build-up of waste products in your blood and makes it hard for your kidneys to keep the right balance of fluid in your body.',
+            'stages': 'AKI is classified by KDIGO criteria:\n'
+                      'Stage 1: Increase in serum creatinine by 1.5-1.9 times baseline or GFR decrease >25%\n'
+                      'Stage 2: Increase in serum creatinine by 2.0-2.9 times baseline\n'
+                      'Stage 3: Increase in serum creatinine by 3.0 times baseline or initiation of renal replacement therapy',
+            'symptoms': 'Symptoms may include:\n'
+                        '- Decreased urine output\n'
+                        '- Fluid retention causing swelling in legs, ankles or feet\n'
+                        '- Shortness of breath\n'
+                        '- Fatigue\n'
+                        '- Confusion\n'
+                        '- Nausea\n'
+                        '- Seizures or coma in severe cases',
+            'causes': 'Three main categories:\n'
+                      '1. Prerenal - Decreased blood flow to kidneys:\n'
+                      '   - Dehydration\n'
+                      '   - Blood loss\n'
+                      '   - Heart failure\n'
+                      '2. Intrinsic - Direct damage to kidney tissue:\n'
+                      '   - Acute tubular necrosis\n'
+                      '   - Glomerulonephritis\n'
+                      '   - Interstitial nephritis\n'
+                      '3. Postrenal - Obstruction of urine flow:\n'
+                      '   - Kidney stones\n'
+                      '   - Enlarged prostate\n'
+                      '   - Tumors',
+            'prevention': 'Prevention measures include:\n'
+                         '- Stay hydrated\n'
+                         '- Avoid nephrotoxic drugs (NSAIDs)\n'
+                         '- Manage chronic conditions\n'
+                         '- Monitor kidney function during illness\n'
+                         '- Avoid contrast dyes when possible in high-risk patients'
+        },
+        'kidney-stones': {
+            'name': 'Kidney Stones',
+            'description': 'Kidney stones (renal lithiasis) are hard deposits made of minerals and salts that form inside your kidneys. They can affect any part of your urinary tract and cause severe pain when passing.',
+            'stages': 'Stone formation process:\n'
+                      '1. Supersaturation - Urine contains more crystal-forming substances\n'
+                      '2. Nucleation - Crystal formation begins\n'
+                      '3. Growth - Crystals enlarge\n'
+                      '4. Aggregation - Crystals clump together\n'
+                      '5. Retention - Stones become trapped in kidney',
+            'symptoms': 'Common symptoms include:\n'
+                        '- Severe pain in side and back, below ribs\n'
+                        '- Pain radiating to lower abdomen and groin\n'
+                        '- Pain during urination\n'
+                        '- Pink, red or brown urine\n'
+                        '- Cloudy or foul-smelling urine\n'
+                        '- Nausea and vomiting\n'
+                        '- Persistent urge to urinate',
+            'causes': 'Types and causes:\n'
+                      '1. Calcium stones - Most common, usually calcium oxalate\n'
+                      '2. Uric acid stones - Form in chronically dehydrated people\n'
+                      '3. Struvite stones - Form due to infections\n'
+                      '4. Cystine stones - Hereditary disorder causing cystine buildup\n'
+                      'Risk factors include dehydration, diet, obesity, digestive diseases, and certain supplements',
+            'prevention': 'Prevention strategies:\n'
+                         '- Drink 2.5-3 liters of water daily\n'
+                         '- Reduce oxalate-rich foods (spinach, nuts, chocolate)\n'
+                         '- Limit salt intake\n'
+                         '- Reduce animal protein\n'
+                         '- Continue eating calcium-rich foods but with meals\n'
+                         '- Consider preventive medication if prone to recurrent stones'
+        },
+        'glomerulonephritis': {
+            'name': 'Glomerulonephritis',
+            'description': 'Glomerulonephritis is inflammation of the glomeruli, the tiny filters in your kidneys that remove excess fluid, electrolytes and waste from your bloodstream and pass them into your urine.',
+            'stages': 'Classification includes:\n'
+                      'Acute: Sudden onset, often post-infectious\n'
+                      'Rapidly progressive: Quick deterioration of kidney function\n'
+                      'Chronic: Long-term inflammation leading to scarring\n'
+                      'Nephrotic syndrome: Heavy proteinuria with edema\n'
+                      'Nephritic syndrome: Blood in urine with hypertension',
+            'symptoms': 'Signs and symptoms may include:\n'
+                        '- Pink or cola-colored urine (hematuria)\n'
+                        '- Foamy urine (proteinuria)\n'
+                        '- High blood pressure\n'
+                        '- Fluid retention (edema) in face, hands, feet and abdomen\n'
+                        '- Fatigue\n'
+                        '- Headache\n'
+                        '- Frequent urination',
+            'causes': 'Causes include:\n'
+                      'Primary (kidney-specific):\n'
+                      '   - Minimal change disease\n'
+                      '   - Focal segmental glomerulosclerosis\n'
+                      '   - Membranous nephropathy\n'
+                      'Secondary (systemic diseases):\n'
+                      '   - Diabetes\n'
+                      '   - Lupus\n'
+                      '   - Vasculitis\n'
+                      'Infections:\n'
+                      '   - Streptococcal infection\n'
+                      '   - Viral infections\n'
+                      'Autoimmune disorders',
+            'prevention': 'While many causes can\'t be prevented, you can:\n'
+                         '- Treat infections promptly\n'
+                         '- Control blood pressure and blood sugar\n'
+                         '- Avoid nephrotoxic substances\n'
+                         '- Get regular checkups to detect early changes\n'
+                         '- Follow treatment plans for autoimmune conditions'
+        },
+        'nephrotic-syndrome': {
+            'name': 'Nephrotic Syndrome',
+            'description': 'Nephrotic syndrome is a kidney disorder that causes your body to excrete too much protein in your urine. It\'s characterized by severe proteinuria, hypoalbuminemia, edema, and hyperlipidemia.',
+            'stages': 'Progression typically follows:\n'
+                      '1. Initial proteinuria (>3.5g/day)\n'
+                      '2. Hypoalbuminemia (<3.0 g/dL)\n'
+                      '3. Edema formation\n'
+                      '4. Hyperlipidemia development\n'
+                      '5. Increased risk of thromboembolism and infections',
+            'symptoms': 'Key symptoms include:\n'
+                        '- Severe swelling (edema), particularly in legs, feet and ankles\n'
+                        '- Weight gain due to fluid retention\n'
+                        '- Fatigue\n'
+                        '- Foamy urine due to excess protein\n'
+                        '- Loss of appetite\n'
+                        '- Pleural effusion (fluid around lungs)\n'
+                        '- Increased susceptibility to infections',
+            'causes': 'Two main categories:\n'
+                      'Primary (glomerular diseases):\n'
+                      '   - Minimal change disease (most common in children)\n'
+                      '   - Focal segmental glomerulosclerosis\n'
+                      '   - Membranous nephropathy\n'
+                      'Secondary causes:\n'
+                      '   - Diabetes\n'
+                      '   - Systemic lupus erythematosus\n'
+                      '   - Amyloidosis\n'
+                      '   - Certain medications\n'
+                      '   - Infections (HIV, hepatitis B and C)',
+            'prevention': 'Prevention focuses on managing underlying conditions:\n'
+                         '- Control blood sugar in diabetes\n'
+                         '- Manage autoimmune diseases\n'
+                         '- Avoid nephrotoxic drugs\n'
+                         '- Treat infections promptly\n'
+                         '- Monitor kidney function regularly\n'
+                         '- Follow a low-salt, appropriate protein diet'
+        },
+        'hypertensive-nephropathy': {
+            'name': 'Hypertensive Nephropathy',
+            'description': 'Hypertensive nephropathy is kidney damage caused by chronic high blood pressure. It\'s both a cause and consequence of hypertension, creating a dangerous cycle that can lead to kidney failure.',
+            'stages': 'Progression includes:\n'
+                      '1. Early stage - Microalbuminuria\n'
+                      '2. Moderate stage - Proteinuria\n'
+                      '3. Advanced stage - Reduced GFR\n'
+                      '4. End stage - Kidney failure requiring dialysis or transplant',
+            'symptoms': 'Often asymptomatic in early stages. Later symptoms:\n'
+                        '- Protein in urine\n'
+                        '- Elevated blood pressure\n'
+                        '- Swelling in legs and ankles\n'
+                        '- Fatigue\n'
+                        '- Headaches\n'
+                        '- Shortness of breath\n'
+                        '- Decreased urine output',
+            'causes': 'Primary cause is uncontrolled hypertension leading to:\n'
+                      '- Damage to small blood vessels in kidneys\n'
+                      '- Reduced blood flow to kidney tissue\n'
+                      '- Scarring of kidney filtering units\n'
+                      '- Progressive loss of kidney function\n'
+                      'Risk factors include obesity, diabetes, family history, and older age',
+            'prevention': 'Essential prevention measures:\n'
+                         '- Maintain blood pressure <130/80 mmHg\n'
+                         '- Take prescribed antihypertensive medications\n'
+                         '- Follow DASH diet (Dietary Approaches to Stop Hypertension)\n'
+                         '- Exercise regularly\n'
+                         '- Maintain healthy weight\n'
+                         '- Limit sodium intake\n'
+                         '- Avoid excessive alcohol\n'
+                         '- Regular kidney function monitoring'
+        },
+        'renal-osteodystrophy': {
+            'name': 'Renal Osteodystrophy',
+            'description': 'Renal osteodystrophy is a bone disease that occurs when your kidneys fail to maintain proper levels of calcium and phosphorus in your blood. It\'s a common complication of chronic kidney disease, affecting up to 90% of dialysis patients.',
+            'stages': 'Progression correlates with CKD stages:\n'
+                      'Stage 3 CKD: Early biochemical changes\n'
+                      'Stage 4 CKD: Bone turnover abnormalities\n'
+                      'Stage 5 CKD: Severe bone and mineral disorders\n'
+                      'With dialysis: Advanced bone disease with fractures',
+            'symptoms': 'Symptoms may include:\n'
+                        '- Bone pain\n'
+                        '- Joint pain\n'
+                        '- Muscle weakness\n'
+                        '- Fractures\n'
+                        '- Itching\n'
+                        '- Calcification of blood vessels\n'
+                        '- Growth retardation in children',
+            'causes': 'Results from:\n'
+                      '- Impaired vitamin D activation\n'
+                      '- Phosphorus retention\n'
+                      '- Calcium imbalance\n'
+                      '- Secondary hyperparathyroidism\n'
+                      '- Aluminum toxicity (from dialysate or medications)\n'
+                      '- Metabolic acidosis',
+            'prevention': 'Management strategies:\n'
+                         '- Control phosphorus levels with diet and binders\n'
+                         '- Maintain adequate calcium intake\n'
+                         '- Use active vitamin D analogs\n'
+                         '- Monitor parathyroid hormone levels\n'
+                         '- Regular bone density testing\n'
+                         '- Appropriate dialysis prescription\n'
+                         '- Parathyroidectomy when indicated'
+        }
+    }
+    
+    disease_data = disease_info.get(disease_id)
+    
+    if not disease_data:
+        disease_name = disease_id.replace('-', ' ').title()
+        return render_template('disease_detail.html', disease_id=disease_id, disease_name=disease_name, disease_data=None)
+    
+    return render_template('disease_detail.html', disease_id=disease_id, disease_name=disease_data['name'], disease_data=disease_data)
+
 @app.route('/api/patient-trends/<username>')
 @login_required
 def patient_trends(username):
