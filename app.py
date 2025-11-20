@@ -1,28 +1,34 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify, make_response, send_from_directory
-from flask_login import LoginManager, login_user, logout_user, login_required, current_user
-from werkzeug.security import check_password_hash, generate_password_hash
-from models.user import User, users_db, patients_data, patient_records
-from models.ckd_model import ckd_model
-import pandas as pd
-import io
 import os
+import io
+import pandas as pd
+from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify, send_from_directory
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
+from models.database import Database
+from models.user import (
+    User, get_all_doctors, get_all_patients, get_patient_data, save_patient_data, 
+    get_all_patients_data, get_patient_records, save_patient_record, get_patient_trials, 
+    update_patient_trials, create_appointment, get_appointments_for_doctor, 
+    get_appointments_for_patient, save_feedback, get_all_feedbacks
+)
+from dotenv import load_dotenv
 
-# Track patient free trials for lab uploads
-patient_upload_trials = {}
+load_dotenv()
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.environ.get('SESSION_SECRET', 'ckd-diagnostic-system-secret-key-2025')
+app.config['SECRET_KEY'] = os.environ.get('SESSION_SECRET', 'dev_secret_key')
 
+# Initialize Database
+Database.initialize()
+
+# Setup Login Manager
 login_manager = LoginManager()
 login_manager.init_app(app)
-login_manager.login_view = 'landing'  # type: ignore
+login_manager.login_view = 'login'
 
 @login_manager.user_loader
 def load_user(user_id):
-    for user in users_db.values():
-        if user.id == user_id:
-            return user
-    return None
+    return User.get_by_id(user_id)
 
 @app.route('/test')
 def test():
@@ -35,9 +41,39 @@ def index():
 
 @app.route('/landing')
 def landing():
-    if current_user.is_authenticated:
-        return redirect(url_for('index'))
     return render_template('kidneycompanion_landing.html')
+
+@app.route('/auth-choice')
+def auth_choice():
+    return render_template('auth_choice.html')
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        email = request.form.get('email')
+        password = request.form.get('password')
+        confirm_password = request.form.get('confirm_password')
+        
+        if not all([username, email, password, confirm_password]):
+            flash('All fields are required', 'danger')
+            return render_template('register.html')
+        
+        if password != confirm_password:
+            flash('Passwords do not match', 'danger')
+            return render_template('register.html')
+        
+        if User.get_by_username(username):
+            flash('Username already exists', 'danger')
+            return render_template('register.html')
+        
+        # Create new patient user
+        User.create_user(username, password, 'patient', email)
+        
+        flash('Registration successful! Please login.', 'success')
+        return redirect(url_for('login'))
+        
+    return render_template('register.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -45,7 +81,7 @@ def login():
         username = request.form.get('username') or ''
         password = request.form.get('password') or ''
         
-        user = users_db.get(username)
+        user = User.get_by_username(username)
         
         if user and password and check_password_hash(user.password_hash, password):
             login_user(user)
@@ -72,7 +108,7 @@ def doctor_login():
         username = request.form.get('username') or ''
         password = request.form.get('password') or ''
         
-        user = users_db.get(username)
+        user = User.get_by_username(username)
         
         if user and password and check_password_hash(user.password_hash, password):
             if user.is_doctor():
@@ -100,7 +136,7 @@ def patient_login():
         password = request.form.get('password') or ''
         
         if username:
-            user = users_db.get(username)
+            user = User.get_by_username(username)
         else:
             user = None
         
@@ -151,29 +187,14 @@ def admin_dashboard():
         return redirect(url_for('admin_login'))
     
     # Get all doctors
-    doctors = [user for user in users_db.values() if user.is_doctor()]
+    doctors = get_all_doctors()
     
     # Add patients list to each doctor
     for doctor in doctors:
-        doctor.patients = [user for user in users_db.values() if user.is_patient()]
+        doctor.patients = get_all_patients()
     
-    # Mock feedback data (in real app, this would come from database)
-    feedbacks = [
-        {
-            'patient_name': 'John Doe',
-            'doctor_name': 'doctor1',
-            'rating': 5,
-            'comment': 'Excellent service and very professional care.',
-            'date': pd.Timestamp('2025-01-15')
-        },
-        {
-            'patient_name': 'Jane Smith',
-            'doctor_name': 'doctor1',
-            'rating': 4,
-            'comment': 'Good experience, doctor was very helpful.',
-            'date': pd.Timestamp('2025-01-12')
-        }
-    ]
+    # Get feedbacks from database
+    feedbacks = get_all_feedbacks()
     
     return render_template('admin_dashboard.html', doctors=doctors, feedbacks=feedbacks)
 
@@ -193,16 +214,12 @@ def add_doctor():
         return redirect(url_for('admin_dashboard'))
     
     # Check if username already exists
-    if username in users_db:
+    if User.get_by_username(username):
         flash('Username already exists', 'danger')
         return redirect(url_for('admin_dashboard'))
     
-    # Create new doctor with proper User model constructor
-    doctor_id = str(len(users_db) + 1)
-    doctor = User(doctor_id, username, generate_password_hash(password), 'doctor')
-    doctor.email = email
-    doctor.specialization = specialization
-    users_db[username] = doctor
+    # Create new doctor
+    User.create_user(username, password, 'doctor', email, specialization)
     
     flash(f'Doctor {username} added successfully!', 'success')
     return redirect(url_for('admin_dashboard'))
@@ -221,10 +238,11 @@ def doctor_dashboard():
         flash('Access denied. Doctors only.', 'danger')
         return redirect(url_for('patient_portal'))
     
+    all_patients_data = get_all_patients_data()
     all_patients = []
-    for patient_id, data in patients_data.items():
+    for data in all_patients_data:
         all_patients.append({
-            'patient_id': patient_id,
+            'patient_id': data.get('patient_id'),
             'name': data.get('patient_name', 'Unknown'),
             'risk_percentage': data.get('risk_percentage', 0),
             'stage': data.get('stage', 'N/A'),
@@ -273,10 +291,11 @@ def add_patient():
             'anemia': int(request.form.get('anemia', 0))
         }
         
+        from models.ckd_model import ckd_model
         prediction = ckd_model.predict_risk(patient_data)
         
         patient_data.update(prediction)
-        patients_data[patient_data['patient_id']] = patient_data
+        save_patient_data(patient_data)
         
         flash(f'Patient {patient_data["patient_name"]} added successfully!', 'success')
         return redirect(url_for('results', patient_id=patient_data['patient_id']))
@@ -315,11 +334,13 @@ def process_csv_upload(file):
     df = pd.read_csv(io.StringIO(file.stream.read().decode('utf-8')))
     
     patient_list = df.to_dict('records')
+    from models.ckd_model import ckd_model
     results = ckd_model.predict_batch(patient_list)
     
     for result in results:
-        patient_id = result.get('patient_id', f"AUTO_{len(patients_data) + 1}")
-        patients_data[patient_id] = result
+        patient_id = result.get('patient_id', f"AUTO_{pd.Timestamp.now().timestamp()}")
+        result['patient_id'] = patient_id
+        save_patient_data(result)
     
     flash(f'Successfully processed {len(results)} patients from CSV', 'success')
     return jsonify({'success': True, 'count': len(results)})
@@ -335,10 +356,13 @@ def process_pdf_upload(file):
 @app.route('/results/<patient_id>')
 @login_required
 def results(patient_id):
-    patient_data = patients_data.get(patient_id)
+    patient_data = get_patient_data(patient_id)
     
     if not patient_data:
-        patient_data = patient_records.get(current_user.username, {})
+        # Try to find in patient records
+        records = get_patient_records(current_user.username)
+        if records and records.get('patient_id') == patient_id:
+            patient_data = records
     
     if not patient_data:
         flash('Patient not found', 'danger')
@@ -361,32 +385,21 @@ def patient_dashboard():
     if current_user.is_doctor():
         return redirect(url_for('doctor_dashboard'))
     
-    patient_data = patient_records.get(current_user.username, {})
+    patient_data = get_patient_records(current_user.username)
     
     # Get patient trial information
-    patient_trials = patient_upload_trials.get(current_user.username, {'remaining': 2, 'used': 0})
+    patient_trials = get_patient_trials(current_user.username)
     
     # Get available doctors
-    available_doctors = [
-        {
-            'name': 'Dr. Ramesh Kumar',
-            'specialty': 'Nephrologist',
-            'experience': '15 years experience',
-            'avatar': 'DR'
-        },
-        {
-            'name': 'Dr. Sunita Agarwal',
-            'specialty': 'General Physician',
-            'experience': '12 years experience',
-            'avatar': 'SA'
-        },
-        {
-            'name': 'Dr. Vikram Patel',
-            'specialty': 'Ayurvedic Specialist',
-            'experience': '20 years experience',
-            'avatar': 'VP'
-        }
-    ]
+    doctors_list = get_all_doctors()
+    available_doctors = []
+    for doc in doctors_list:
+        available_doctors.append({
+            'name': f"Dr. {doc.username}",
+            'specialty': doc.specialization or 'General',
+            'experience': 'Experienced',
+            'avatar': doc.username[:2].upper()
+        })
     
     return render_template('patient_dashboard.html', 
                          patient=patient_data, 
@@ -400,10 +413,7 @@ def upload_lab_report():
         return jsonify({'error': 'Access denied'}), 403
     
     # Check if patient has free trials remaining
-    if current_user.username not in patient_upload_trials:
-        patient_upload_trials[current_user.username] = {'remaining': 2, 'used': 0}
-    
-    trials = patient_upload_trials[current_user.username]
+    trials = get_patient_trials(current_user.username)
     
     if trials['remaining'] <= 0:
         return jsonify({'error': 'No free trials remaining. Please upgrade to continue.'}), 400
@@ -417,8 +427,9 @@ def upload_lab_report():
         return jsonify({'error': 'No file selected'}), 400
     
     # Update trial count
-    trials['remaining'] -= 1
-    trials['used'] += 1
+    new_remaining = trials['remaining'] - 1
+    new_used = trials['used'] + 1
+    update_patient_trials(current_user.username, new_remaining, new_used)
     
     # Process the lab report (simplified - would integrate with actual ML model)
     try:
@@ -459,8 +470,9 @@ def book_appointment():
         'created_at': pd.Timestamp.now().isoformat()
     }
     
-    # In a real implementation, this would be saved to a database
-    # For now, just return success message
+    # Save to database
+    create_appointment(appointment)
+    
     return jsonify({
         'status': 'success', 
         'message': f'Appointment request sent to {doctor_name}. You will be notified shortly.',
@@ -475,18 +487,13 @@ def modern_dashboard():
 def kidneycompanion_landing():
     return render_template('kidneycompanion_landing.html')
 
-@app.route('/favicon.ico')
-def favicon():
-    return send_from_directory(os.path.join(app.root_path, 'static'),
-                               'favicon.ico', mimetype='image/vnd.microsoft.icon')
-
 @app.route('/api/patient-trends/<username>')
 @login_required
 def patient_trends(username):
     if current_user.username != username and not current_user.is_doctor():
         return jsonify({'error': 'Access denied'}), 403
     
-    patient_data = patient_records.get(username, {})
+    patient_data = get_patient_records(username)
     
     if not patient_data or 'history' not in patient_data:
         return jsonify({'error': 'No data available'}), 404
@@ -506,6 +513,11 @@ def patient_trends(username):
         'blood_urea': blood_urea,
         'hemoglobin': hemoglobin
     })
+
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static'),
+                               'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 # Vercel requires this for the serverless function
 def main():

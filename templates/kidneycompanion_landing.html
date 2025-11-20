@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KidneyCompanion - Your Partner for Integrated Kidney Care</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
     <style>
         :root {
             --primary-green: #4BAEA0;
@@ -21,7 +23,7 @@
             --shadow-light: 0 4px 12px rgba(0, 0, 0, 0.05);
             --shadow-medium: 0 8px 24px rgba(0, 0, 0, 0.1);
         }
-        
+
         /* Loading overlay */
         .loading-overlay {
             position: fixed;
@@ -37,33 +39,33 @@
             opacity: 1;
             transition: opacity 0.5s ease-out;
         }
-        
+
         .loading-overlay.hidden {
             opacity: 0;
             pointer-events: none;
         }
-        
+
         .loading-content {
             text-align: center;
             max-width: 500px;
             padding: 2rem;
         }
-        
+
         .logo-container {
             position: relative;
             width: 120px;
             height: 120px;
             margin: 0 auto 2rem;
         }
-        
+
         .kidney-logo {
             width: 100%;
             height: 100%;
             position: relative;
             animation: pulse 2s infinite;
-            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
         }
-        
+
         .kidney-logo::before,
         .kidney-logo::after {
             content: "";
@@ -74,17 +76,17 @@
             border-radius: 50%;
             top: 10px;
         }
-        
+
         .kidney-logo::before {
             left: 0;
             transform: rotate(-20deg);
         }
-        
+
         .kidney-logo::after {
             right: 0;
             transform: rotate(20deg);
         }
-        
+
         .water-drop {
             position: absolute;
             width: 35px;
@@ -97,14 +99,14 @@
             animation: dropFill 3s infinite;
             box-shadow: 0 0 10px rgba(75, 174, 160, 0.5);
         }
-        
+
         .loading-text {
             font-size: 1.3rem;
             font-weight: 600;
             color: var(--primary-green);
             margin-bottom: 1.5rem;
         }
-        
+
         .progress-container {
             width: 100%;
             height: 10px;
@@ -112,9 +114,9 @@
             border-radius: 5px;
             overflow: hidden;
             margin-bottom: 2rem;
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
         }
-        
+
         .progress-bar {
             height: 100%;
             width: 0%;
@@ -123,7 +125,7 @@
             animation: progress 2.5s ease-in-out forwards;
             box-shadow: 0 2px 4px rgba(75, 174, 160, 0.3);
         }
-        
+
         .fact-container {
             background: white;
             padding: 1.2rem;
@@ -131,7 +133,7 @@
             box-shadow: var(--shadow-light);
             border-left: 3px solid var(--primary-green);
         }
-        
+
         .fact-title {
             font-weight: 600;
             color: var(--primary-green);
@@ -140,41 +142,56 @@
             align-items: center;
             gap: 0.5rem;
         }
-        
+
         .fact-title i::before {
             content: "💡";
             font-style: normal;
         }
-        
+
         .fact-content {
             font-size: 0.9rem;
             color: var(--light-text);
         }
-        
+
         @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                transform: scale(1);
+            }
         }
-        
+
         @keyframes dropFill {
-            0% { 
+            0% {
                 transform: translate(-50%, -50%) scale(0.5);
                 opacity: 0.3;
             }
-            50% { 
+
+            50% {
                 transform: translate(-50%, -50%) scale(1.2);
                 opacity: 0.7;
             }
-            100% { 
+
+            100% {
                 transform: translate(-50%, -50%) scale(0.5);
                 opacity: 0.3;
             }
         }
-        
+
         @keyframes progress {
-            0% { width: 0%; }
-            100% { width: 100%; }
+            0% {
+                width: 0%;
+            }
+
+            100% {
+                width: 100%;
+            }
         }
 
         * {
@@ -295,7 +312,7 @@
             padding: 0;
             position: relative;
         }
-        
+
         .hero-image img {
             width: 100%;
             height: 100%;
@@ -304,7 +321,7 @@
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             border-radius: var(--border-radius-lg);
         }
-        
+
         .hero-image:hover img {
             transform: scale(1.05);
         }
@@ -641,7 +658,7 @@
             .hero {
                 flex-direction: column;
             }
-            
+
             .hero-image {
                 width: 100%;
             }
@@ -651,22 +668,23 @@
             .nav-menu {
                 display: none;
             }
-            
+
             .hero h1 {
                 font-size: 2.2rem;
             }
-            
+
             .hero-buttons {
                 flex-direction: column;
                 gap: 1rem;
             }
-            
+
             .contact-container {
                 padding: 2rem 1.5rem;
             }
         }
     </style>
 </head>
+
 <body>
     <!-- Loading overlay that shows on each page refresh -->
     <div class="loading-overlay" id="loadingOverlay">
@@ -674,16 +692,18 @@
             <div class="logo-container">
                 <div class="kidney-logo">
                     <div class="water-drop"></div>
-                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 20px; color: #4BAEA0; font-weight: bold;">🩺</div>
+                    <div
+                        style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 20px; color: #4BAEA0; font-weight: bold;">
+                        🩺</div>
                 </div>
             </div>
-            
+
             <h1 class="loading-text">Loading Your Kidney Health Journey</h1>
-            
+
             <div class="progress-container">
                 <div class="progress-bar"></div>
             </div>
-            
+
             <div class="fact-container">
                 <div class="fact-title">
                     <i class="fas fa-lightbulb"></i>
@@ -724,9 +744,10 @@
         <section class="hero">
             <div class="hero-content">
                 <h1>KidneyCompanion: Your Partner for Integrated Kidney Care.</h1>
-                <p class="subtitle">Combining advanced medical expertise with natural healing approaches to support your kidney health journey. Personalized care for every stage of kidney wellness.</p>
+                <p class="subtitle">Combining advanced medical expertise with natural healing approaches to support your
+                    kidney health journey. Personalized care for every stage of kidney wellness.</p>
                 <div class="hero-buttons">
-                    <a href="{{ url_for('login') }}" class="btn btn-primary">Get Started</a>
+                    <a href="{{ url_for('auth_choice') }}" class="btn btn-primary">Get Started</a>
                     <a href="#" class="btn btn-secondary">Learn More</a>
                 </div>
             </div>
@@ -744,56 +765,64 @@
             <div class="diseases-grid">
                 <div class="disease-card">
                     <div class="disease-icon" style="background: none;">
-                        <img src="{{ url_for('static', filename='images/CKD.png') }}" alt="Chronic Kidney Disease" style="width: 120px; height: 120px; object-fit: contain;">
+                        <img src="{{ url_for('static', filename='images/CKD.png') }}" alt="Chronic Kidney Disease"
+                            style="width: 120px; height: 120px; object-fit: contain;">
                     </div>
                     <h3>Chronic Kidney Disease (CKD)</h3>
                     <p>Monitoring and management for all stages of CKD</p>
                 </div>
                 <div class="disease-card">
                     <div class="disease-icon" style="background: none;">
-                        <img src="{{ url_for('static', filename='images/Diabetic Nephropathy.png') }}" alt="Diabetic Nephropathy" style="width: 120px; height: 120px; object-fit: contain;">
+                        <img src="{{ url_for('static', filename='images/Diabetic Nephropathy.png') }}"
+                            alt="Diabetic Nephropathy" style="width: 120px; height: 120px; object-fit: contain;">
                     </div>
                     <h3>Diabetic Nephropathy</h3>
                     <p>Kidney disease caused by diabetes with specialized care approaches</p>
                 </div>
                 <div class="disease-card">
                     <div class="disease-icon" style="background: none;">
-                        <img src="{{ url_for('static', filename='images/AKI.png') }}" alt="Acute Kidney Injury" style="width: 150px; height: 150px; object-fit: contain;">
+                        <img src="{{ url_for('static', filename='images/AKI.png') }}" alt="Acute Kidney Injury"
+                            style="width: 150px; height: 150px; object-fit: contain;">
                     </div>
                     <h3>Acute Kidney Injury (AKI)</h3>
                     <p>Immediate care and recovery support for sudden kidney damage</p>
                 </div>
                 <div class="disease-card">
                     <div class="disease-icon" style="background: none;">
-                        <img src="{{ url_for('static', filename='images/Kidney_stone.png') }}" alt="Kidney Stones" style="width: 120px; height: 120px; object-fit: contain;">
+                        <img src="{{ url_for('static', filename='images/Kidney_stone.png') }}" alt="Kidney Stones"
+                            style="width: 120px; height: 120px; object-fit: contain;">
                     </div>
                     <h3>Kidney Stones</h3>
                     <p>Prevention and treatment strategies for nephrolithiasis</p>
                 </div>
                 <div class="disease-card">
                     <div class="disease-icon" style="background: none;">
-                        <img src="{{ url_for('static', filename='images/Glomerulonephritis.png') }}" alt="Glomerulonephritis" style="width: 120px; height: 120px; object-fit: contain;">
+                        <img src="{{ url_for('static', filename='images/Glomerulonephritis.png') }}"
+                            alt="Glomerulonephritis" style="width: 120px; height: 120px; object-fit: contain;">
                     </div>
                     <h3>Glomerulonephritis</h3>
                     <p>Inflammatory conditions affecting kidney filtering units</p>
                 </div>
                 <div class="disease-card">
                     <div class="disease-icon" style="background: none;">
-                        <img src="{{ url_for('static', filename='images/Nephrotic Syndrome.png') }}" alt="Nephrotic Syndrome" style="width: 120px; height: 120px; object-fit: contain;">
+                        <img src="{{ url_for('static', filename='images/Nephrotic Syndrome.png') }}"
+                            alt="Nephrotic Syndrome" style="width: 120px; height: 120px; object-fit: contain;">
                     </div>
                     <h3>Nephrotic Syndrome</h3>
                     <p>Management of proteinuria and related complications</p>
                 </div>
                 <div class="disease-card">
                     <div class="disease-icon" style="background: none;">
-                        <img src="{{ url_for('static', filename='images/Hypertensive Nephropathy.png') }}" alt="Hypertensive Nephropathy" style="width: 120px; height: 120px; object-fit: contain;">
+                        <img src="{{ url_for('static', filename='images/Hypertensive Nephropathy.png') }}"
+                            alt="Hypertensive Nephropathy" style="width: 120px; height: 120px; object-fit: contain;">
                     </div>
                     <h3>Hypertensive Nephropathy</h3>
                     <p>Kidney damage caused by high blood pressure</p>
                 </div>
                 <div class="disease-card">
                     <div class="disease-icon" style="background: none;">
-                        <img src="{{ url_for('static', filename='images/Renal Osteodystrophy.png') }}" alt="Renal Osteodystrophy" style="width: 120px; height: 120px; object-fit: contain;">
+                        <img src="{{ url_for('static', filename='images/Renal Osteodystrophy.png') }}"
+                            alt="Renal Osteodystrophy" style="width: 120px; height: 120px; object-fit: contain;">
                     </div>
                     <h3>Renal Osteodystrophy</h3>
                     <p>Bone disorders associated with chronic kidney disease</p>
@@ -810,28 +839,32 @@
             <div class="features-grid">
                 <div class="feature-card">
                     <div class="feature-image" style="background: none; height: auto;">
-                        <img src="{{ url_for('static', filename='images/Free Kidney Report Analysis.png') }}" alt="Free Kidney Report Analysis" style="width: 150px; height: 150px; object-fit: contain;">
+                        <img src="{{ url_for('static', filename='images/Free Kidney Report Analysis.png') }}"
+                            alt="Free Kidney Report Analysis" style="width: 150px; height: 150px; object-fit: contain;">
                     </div>
                     <h3>Free Kidney Report Analysis</h3>
                     <p>Upload your lab reports for instant expert analysis</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-image" style="background: none; height: auto;">
-                        <img src="{{ url_for('static', filename='images/24x7 Support.png') }}" alt="24x7 Support" style="width: 150px; height: 150px; object-fit: contain;">
+                        <img src="{{ url_for('static', filename='images/24x7 Support.png') }}" alt="24x7 Support"
+                            style="width: 150px; height: 150px; object-fit: contain;">
                     </div>
                     <h3>24x7 Support</h3>
                     <p>Round-the-clock assistance for urgent concerns</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-image" style="background: none; height: auto;">
-                        <img src="{{ url_for('static', filename='images/Personalized Diet Plans.png') }}" alt="Personalized Diet Plans" style="width: 150px; height: 150px; object-fit: contain;">
+                        <img src="{{ url_for('static', filename='images/Personalized Diet Plans.png') }}"
+                            alt="Personalized Diet Plans" style="width: 150px; height: 150px; object-fit: contain;">
                     </div>
                     <h3>Personalized Diet Plans</h3>
                     <p>Customized nutrition based on your condition</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-image" style="background: none; height: auto;">
-                        <img src="{{ url_for('static', filename='images/Trusted Nationwide.png') }}" alt="Trusted Nationwide" style="width: 150px; height: 150px; object-fit: contain;">
+                        <img src="{{ url_for('static', filename='images/Trusted Nationwide.png') }}"
+                            alt="Trusted Nationwide" style="width: 150px; height: 150px; object-fit: contain;">
                     </div>
                     <h3>Trusted Nationwide</h3>
                     <p>Network of kidney specialists across the country</p>
@@ -972,7 +1005,7 @@
             </div>
         </div>
     </footer>
-    
+
     <script>
         // Array of kidney facts
         const kidneyFacts = [
@@ -1012,16 +1045,17 @@
         }
 
         // Initialize the loading overlay
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Set a random fact
             const factElement = document.getElementById('landingFact');
             if (factElement) {
                 factElement.textContent = getRandomFact();
             }
-            
+
             // Hide the loading overlay after 2.5 seconds
             setTimeout(hideLoadingOverlay, 2500);
         });
     </script>
 </body>
+
 </html>
