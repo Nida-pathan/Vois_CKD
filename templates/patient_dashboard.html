@@ -576,25 +576,25 @@
 
         <!-- Stats Overview -->
         <div class="stats-grid">
-            <div class="stat-card stage-1">
+            <div class="stat-card {{ dashboard.stage_class }}">
                 <div class="stat-icon"><i class="fas fa-kidney"></i></div>
                 <div class="stat-label">CKD Stage</div>
-                <div class="stat-number">Stage 2</div>
+                <div class="stat-number">{{ dashboard.ckd_stage }}</div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon"><i class="fas fa-heart"></i></div>
                 <div class="stat-label">Risk Level</div>
-                <div class="stat-number">Low</div>
+                <div class="stat-number">{{ dashboard.risk_level }}</div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
                 <div class="stat-label">Next Checkup</div>
-                <div class="stat-number">5 days</div>
+                <div class="stat-number">{{ dashboard.next_checkup }}</div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon"><i class="fas fa-file-medical"></i></div>
-                <div class="stat-label">Lab Reports</div>
-                <div class="stat-number">3</div>
+                <div class="stat-label">Lab Reports</div>
+                <div class="stat-number">{{ dashboard.lab_reports_count }}</div>
             </div>
         </div>
 
@@ -636,15 +636,15 @@
                     </div>
                     <div class="metric-item">
                         <span class="metric-label">Age</span>
-                        <span class="metric-value">45 years</span>
+                        <span class="metric-value">{{ dashboard.age }}</span>
                     </div>
                     <div class="metric-item">
                         <span class="metric-label">Blood Type</span>
-                        <span class="metric-value">O+</span>
+                        <span class="metric-value">{{ dashboard.blood_type }}</span>
                     </div>
                     <div class="metric-item">
                         <span class="metric-label">Patient ID</span>
-                        <span class="metric-value">P001</span>
+                        <span class="metric-value">{{ dashboard.patient_id }}</span>
                     </div>
                 </div>
 
@@ -659,29 +659,29 @@
                     <div class="metric-item">
                         <span class="metric-label">Blood Pressure</span>
                         <div>
-                            <span class="metric-value">120/80 mmHg</span>
-                            <span class="metric-status status-normal">Normal</span>
+                            <span class="metric-value">{{ dashboard.current_metrics.bp_systolic }}/{{ dashboard.current_metrics.bp_diastolic }} mmHg</span>
+                            <span class="metric-status status-{{ dashboard.current_metrics.bp_status }}">{{ dashboard.current_metrics.bp_status|capitalize }}</span>
                         </div>
                     </div>
                     <div class="metric-item">
-                        <span class="metric-label">Blood Sugar</span>
-                        <div>
-                            <span class="metric-value">95 mg/dL</span>
-                            <span class="metric-status status-normal">Normal</span>
+                        <span class="metric-label">Blood Sugar</span>
+                        <div>
+                            <span class="metric-value">{{ dashboard.current_metrics.blood_glucose }} mg/dL</span>
+                            <span class="metric-status status-{{ dashboard.current_metrics.glucose_status }}">{{ dashboard.current_metrics.glucose_status|capitalize }}</span>
                         </div>
                     </div>
                     <div class="metric-item">
-                        <span class="metric-label">Creatinine</span>
-                        <div>
-                            <span class="metric-value">1.1 mg/dL</span>
-                            <span class="metric-status status-normal">Normal</span>
+                        <span class="metric-label">Creatinine</span>
+                        <div>
+                            <span class="metric-value">{{ dashboard.current_metrics.serum_creatinine }} mg/dL</span>
+                            <span class="metric-status status-{{ dashboard.current_metrics.creatinine_status }}">{{ dashboard.current_metrics.creatinine_status|capitalize }}</span>
                         </div>
                     </div>
                     <div class="metric-item">
-                        <span class="metric-label">GFR</span>
-                        <div>
-                            <span class="metric-value">85 mL/min</span>
-                            <span class="metric-status status-normal">Normal</span>
+                        <span class="metric-label">GFR</span>
+                        <div>
+                            <span class="metric-value">{{ dashboard.current_metrics.egfr }} mL/min</span>
+                            <span class="metric-status status-{{ dashboard.current_metrics.egfr_status }}">{{ dashboard.current_metrics.egfr_status|capitalize }}</span>
                         </div>
                     </div>
                 </div>

@@ -385,6 +385,7 @@ def patient_dashboard():
     if current_user.is_doctor():
         return redirect(url_for('doctor_dashboard'))
     
+    # Get patient records
     patient_data = get_patient_records(current_user.username)
     
     # Get patient trial information
@@ -401,10 +402,132 @@ def patient_dashboard():
             'avatar': doc.username[:2].upper()
         })
     
+    # Prepare dashboard data with defaults
+    dashboard_data = {
+        'patient_id': patient_data.get('patient_id', 'N/A') if patient_data else 'N/A',
+        'age': patient_data.get('age', 'N/A') if patient_data else 'N/A',
+        'gender': patient_data.get('gender', 'N/A') if patient_data else 'N/A',
+        'blood_type': patient_data.get('blood_type', 'N/A') if patient_data else 'N/A',
+        'ckd_stage': 'N/A',
+        'stage_class': 'stage-1',
+        'risk_level': 'Unknown',
+        'risk_class': '',
+        'next_checkup': 'Not scheduled',
+        'lab_reports_count': 0,
+        'current_metrics': {
+            'bp_systolic': 'N/A',
+            'bp_diastolic': 'N/A',
+            'blood_glucose': 'N/A',
+            'serum_creatinine': 'N/A',
+            'egfr': 'N/A',
+            'hemoglobin': 'N/A',
+            'blood_urea': 'N/A',
+            'sodium': 'N/A',
+            'potassium': 'N/A',
+            'bp_status': 'unknown',
+            'glucose_status': 'unknown',
+            'creatinine_status': 'unknown',
+            'egfr_status': 'unknown'
+        },
+        'has_history': False,
+        'history': []
+    }
+    
+    if patient_data:
+        # Calculate CKD stage from eGFR
+        egfr = patient_data.get('egfr')
+        if egfr:
+            if egfr >= 90:
+                dashboard_data['ckd_stage'] = 'Stage 1'
+                dashboard_data['stage_class'] = 'stage-1'
+            elif egfr >= 60:
+                dashboard_data['ckd_stage'] = 'Stage 2'
+                dashboard_data['stage_class'] = 'stage-2'
+            elif egfr >= 30:
+                dashboard_data['ckd_stage'] = 'Stage 3'
+                dashboard_data['stage_class'] = 'stage-3'
+            elif egfr >= 15:
+                dashboard_data['ckd_stage'] = 'Stage 4'
+                dashboard_data['stage_class'] = 'stage-4'
+            else:
+                dashboard_data['ckd_stage'] = 'Stage 5'
+                dashboard_data['stage_class'] = 'stage-5'
+        
+        # Get risk level
+        risk_level = patient_data.get('risk_level', 'Unknown')
+        dashboard_data['risk_level'] = risk_level
+        if risk_level == 'High':
+            dashboard_data['risk_class'] = 'status-critical'
+        elif risk_level == 'Moderate':
+            dashboard_data['risk_class'] = 'status-warning'
+        elif risk_level == 'Low':
+            dashboard_data['risk_class'] = 'status-normal'
+        
+        # Current metrics
+        dashboard_data['current_metrics'] = {
+            'bp_systolic': patient_data.get('bp_systolic', 'N/A'),
+            'bp_diastolic': patient_data.get('bp_diastolic', 'N/A'),
+            'blood_glucose': patient_data.get('blood_glucose', 'N/A'),
+            'serum_creatinine': patient_data.get('serum_creatinine', 'N/A'),
+            'egfr': patient_data.get('egfr', 'N/A'),
+            'hemoglobin': patient_data.get('hemoglobin', 'N/A'),
+            'blood_urea': patient_data.get('blood_urea', 'N/A'),
+            'sodium': patient_data.get('sodium', 'N/A'),
+            'potassium': patient_data.get('potassium', 'N/A')
+        }
+        
+        # Determine status for each metric
+        # Blood Pressure
+        bp_sys = patient_data.get('bp_systolic')
+        bp_dia = patient_data.get('bp_diastolic')
+        if bp_sys and bp_dia:
+            if bp_sys < 120 and bp_dia < 80:
+                dashboard_data['current_metrics']['bp_status'] = 'normal'
+            elif bp_sys < 140 and bp_dia < 90:
+                dashboard_data['current_metrics']['bp_status'] = 'warning'
+            else:
+                dashboard_data['current_metrics']['bp_status'] = 'critical'
+        
+        # Blood Glucose
+        glucose = patient_data.get('blood_glucose')
+        if glucose:
+            if glucose < 100:
+                dashboard_data['current_metrics']['glucose_status'] = 'normal'
+            elif glucose < 126:
+                dashboard_data['current_metrics']['glucose_status'] = 'warning'
+            else:
+                dashboard_data['current_metrics']['glucose_status'] = 'critical'
+        
+        # Creatinine
+        creatinine = patient_data.get('serum_creatinine')
+        if creatinine:
+            if creatinine <= 1.2:
+                dashboard_data['current_metrics']['creatinine_status'] = 'normal'
+            elif creatinine <= 2.0:
+                dashboard_data['current_metrics']['creatinine_status'] = 'warning'
+            else:
+                dashboard_data['current_metrics']['creatinine_status'] = 'critical'
+        
+        # eGFR
+        if egfr:
+            if egfr >= 60:
+                dashboard_data['current_metrics']['egfr_status'] = 'normal'
+            elif egfr >= 30:
+                dashboard_data['current_metrics']['egfr_status'] = 'warning'
+            else:
+                dashboard_data['current_metrics']['egfr_status'] = 'critical'
+        
+        # History data for charts
+        if 'history' in patient_data and patient_data['history']:
+            dashboard_data['has_history'] = True
+            dashboard_data['history'] = patient_data['history']
+            dashboard_data['lab_reports_count'] = len(patient_data['history'])
+    
     return render_template('patient_dashboard.html', 
                          patient=patient_data, 
                          trials=patient_trials,
-                         doctors=available_doctors)
+                         doctors=available_doctors,
+                         dashboard=dashboard_data)
 
 @app.route('/patient/upload-lab', methods=['POST'])
 @login_required
@@ -809,4 +932,138 @@ def handler(event, context):
 
 # For local development
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=True)
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=True)# Patient Intake Form Routes
+@app.route('/patient/intake')
+@login_required
+def patient_intake():
+    """Display the patient intake form"""
+    if current_user.is_doctor():
+        flash('This page is for patients only', 'warning')
+        return redirect(url_for('doctor_dashboard'))
+    
+    return render_template('patient_intake.html')
+
+@app.route('/patient/intake/submit', methods=['POST'])
+@login_required
+def submit_patient_intake():
+    """Process and save patient intake form data"""
+    if current_user.is_doctor():
+        return jsonify({'error': 'Access denied'}), 403
+    
+    try:
+        # Collect form data
+        patient_data = {
+            'patient_id': f"P{current_user.id}",
+            'patient_name': request.form.get('full_name'),
+            'username': current_user.username,
+            'age': int(request.form.get('age', 0)),
+            'gender': request.form.get('gender'),
+            'blood_type': request.form.get('blood_type', 'N/A'),
+            'phone': request.form.get('phone'),
+            'email': request.form.get('email'),
+            'address': request.form.get('address', ''),
+            
+            # Emergency contact
+            'emergency_contact': {
+                'name': request.form.get('emergency_contact_name', ''),
+                'phone': request.form.get('emergency_contact_phone', ''),
+                'relationship': request.form.get('emergency_contact_relationship', '')
+            },
+            
+            # Medical history
+            'hypertension': 1 if request.form.get('hypertension') else 0,
+            'diabetes_mellitus': 1 if request.form.get('diabetes_mellitus') else 0,
+            'coronary_artery_disease': 1 if request.form.get('coronary_artery_disease') else 0,
+            'anemia': 1 if request.form.get('anemia') else 0,
+            'current_medications': request.form.get('current_medications', ''),
+            'allergies': request.form.get('allergies', ''),
+            'family_history_kidney': request.form.get('family_history_kidney', 'No'),
+            'previous_surgeries': request.form.get('previous_surgeries', ''),
+            
+            # Lab values
+            'bp_systolic': float(request.form.get('bp_systolic')) if request.form.get('bp_systolic') else None,
+            'bp_diastolic': float(request.form.get('bp_diastolic')) if request.form.get('bp_diastolic') else None,
+            'serum_creatinine': float(request.form.get('serum_creatinine')) if request.form.get('serum_creatinine') else None,
+            'blood_urea': float(request.form.get('blood_urea')) if request.form.get('blood_urea') else None,
+            'egfr': float(request.form.get('egfr')) if request.form.get('egfr') else None,
+            'hemoglobin': float(request.form.get('hemoglobin')) if request.form.get('hemoglobin') else None,
+            'blood_glucose': float(request.form.get('blood_glucose')) if request.form.get('blood_glucose') else None,
+            'sodium': float(request.form.get('sodium')) if request.form.get('sodium') else None,
+            'potassium': float(request.form.get('potassium')) if request.form.get('potassium') else None,
+            'specific_gravity': float(request.form.get('specific_gravity')) if request.form.get('specific_gravity') else None,
+            'albumin': float(request.form.get('albumin')) if request.form.get('albumin') else None,
+            'sugar': float(request.form.get('sugar')) if request.form.get('sugar') else None,
+            
+            # Lifestyle
+            'smoking': request.form.get('smoking', 'Never'),
+            'alcohol': request.form.get('alcohol', 'None'),
+            'exercise_frequency': request.form.get('exercise_frequency', 'None'),
+            'water_intake': request.form.get('water_intake', '4-6 glasses'),
+            'sleep_hours': int(request.form.get('sleep_hours')) if request.form.get('sleep_hours') else None,
+            
+            # Symptoms
+            'symptoms': {
+                'fatigue': 1 if request.form.get('symptom_fatigue') else 0,
+                'pedal_edema': 1 if request.form.get('symptom_swelling') else 0,
+                'urination_changes': 1 if request.form.get('symptom_urination') else 0,
+                'appetite_loss': 1 if request.form.get('symptom_appetite') else 0,
+                'nausea': 1 if request.form.get('symptom_nausea') else 0,
+                'sleep_issues': 1 if request.form.get('symptom_sleep') else 0
+            },
+            'additional_comments': request.form.get('additional_comments', ''),
+            
+            # Set pedal_edema for ML model
+            'pedal_edema': 1 if request.form.get('symptom_swelling') else 0,
+            'appetite': 0 if request.form.get('symptom_appetite') else 1,  # Inverted: 0 = poor, 1 = good
+        }
+        
+        # Calculate CKD risk if we have necessary lab values
+        if patient_data['serum_creatinine'] and patient_data['blood_urea']:
+            from models.ckd_model import ckd_model
+            
+            # Prepare data for ML model (fill missing values with defaults)
+            ml_data = {
+                'age': patient_data['age'],
+                'bp_systolic': patient_data['bp_systolic'] or 120,
+                'bp_diastolic': patient_data['bp_diastolic'] or 80,
+                'specific_gravity': patient_data['specific_gravity'] or 1.020,
+                'albumin': patient_data['albumin'] or 0,
+                'sugar': patient_data['sugar'] or 0,
+                'red_blood_cells': 1,  # Default normal
+                'pus_cell': 0,  # Default normal
+                'bacteria': 0,  # Default normal
+                'blood_glucose': patient_data['blood_glucose'] or 100,
+                'blood_urea': patient_data['blood_urea'],
+                'serum_creatinine': patient_data['serum_creatinine'],
+                'sodium': patient_data['sodium'] or 140,
+                'potassium': patient_data['potassium'] or 4.5,
+                'hemoglobin': patient_data['hemoglobin'] or 14,
+                'packed_cell_volume': 44,  # Default
+                'white_blood_cell_count': 8000,  # Default
+                'red_blood_cell_count': 5,  # Default
+                'hypertension': patient_data['hypertension'],
+                'diabetes_mellitus': patient_data['diabetes_mellitus'],
+                'coronary_artery_disease': patient_data['coronary_artery_disease'],
+                'appetite': patient_data['appetite'],
+                'pedal_edema': patient_data['pedal_edema'],
+                'anemia': patient_data['anemia']
+            }
+            
+            # Get prediction
+            prediction = ckd_model.predict_risk(ml_data)
+            patient_data.update(prediction)
+        else:
+            # Set default risk assessment
+            patient_data['risk_level'] = 'Unknown'
+            patient_data['risk_percentage'] = 0
+            patient_data['stage'] = 'N/A'
+        
+        # Save to database
+        save_patient_record(current_user.username, patient_data)
+        
+        flash('Your medical information has been saved successfully!', 'success')
+        return redirect(url_for('patient_dashboard'))
+        
+    except Exception as e:
+        flash(f'Error saving intake data: {str(e)}', 'danger')
+        return redirect(url_for('patient_intake'))
