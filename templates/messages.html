@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messages - CKD Diagnostic System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%);
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.18);
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --shadow-light: 0 4px 30px rgba(0, 0, 0, 0.05);
+            --border-radius-md: 16px;
+        }
+
+        [data-theme="dark"] {
+            --primary-gradient: linear-gradient(135deg, #0f766e 0%, #115e59 100%);
+            --glass-bg: rgba(30, 41, 59, 0.95);
+            --glass-border: rgba(255, 255, 255, 0.05);
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --shadow-light: 0 4px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f0fdfa 0%, #e0f2fe 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        body[data-theme="dark"] {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            background: var(--glass-bg);
+            padding: 15px 20px;
+            border-radius: var(--border-radius-md);
+            border: 1px solid var(--glass-border);
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+        .chat-container {
+            display: flex;
+            gap: 20px;
+            height: calc(100vh - 140px);
+        }
+
+        .contacts-list {
+            width: 300px;
+            background: var(--glass-bg);
+            border-radius: var(--border-radius-md);
+            border: 1px solid var(--glass-border);
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-bottom: 5px;
+        }
+
+        .contact-item:hover,
+        .contact-item.active {
+            background: rgba(13, 148, 136, 0.1);
+        }
+
+        .contact-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .contact-info {
+            flex-grow: 1;
+        }
+
+        .contact-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .contact-status {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .chat-area {
+            flex-grow: 1;
+            background: var(--glass-bg);
+            border-radius: var(--border-radius-md);
+            border: 1px solid var(--glass-border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--glass-border);
+            font-weight: 600;
+        }
+
+        .messages-box {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .message {
+            max-width: 70%;
+            padding: 10px 15px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .message.sent {
+            align-self: flex-end;
+            background: var(--primary-gradient);
+            color: white;
+            border-bottom-right-radius: 2px;
+        }
+
+        .message.received {
+            align-self: flex-start;
+            background: rgba(0, 0, 0, 0.05);
+            color: var(--text-primary);
+            border-bottom-left-radius: 2px;
+        }
+
+        [data-theme="dark"] .message.received {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .message-time {
+            font-size: 0.7rem;
+            opacity: 0.7;
+            margin-top: 5px;
+            text-align: right;
+        }
+
+        .chat-input-area {
+            padding: 20px;
+            border-top: 1px solid var(--glass-border);
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input {
+            flex-grow: 1;
+            padding: 10px 15px;
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.5);
+            outline: none;
+        }
+
+        .btn-send {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="page-title">
+                <i class="fas fa-comments"></i> Messages
+            </div>
+            <a href="{{ url_for('doctor_dashboard') }}" class="btn-primary">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+
+        <div class="chat-container">
+            <div class="contacts-list">
+                <h3 style="margin-bottom: 15px; font-size: 1rem;">Contacts</h3>
+                {% for contact in contacts %}
+                <div class="contact-item" onclick="loadChat('{{ contact }}', this)">
+                    <div class="contact-avatar" style="background: #{{ contact|length * 123456 % 999999 }}">{{
+                        contact[:2].upper() }}</div>
+                    <div class="contact-info">
+                        <div class="contact-name">{{ contact }}</div>
+                        <div class="contact-status">Click to chat</div>
+                    </div>
+                </div>
+                {% else %}
+                <p style="color: var(--text-secondary); text-align: center;">No contacts yet.</p>
+                {% endfor %}
+            </div>
+
+            <div class="chat-area">
+                <div class="chat-header" id="chatHeader">Select a contact to start chatting</div>
+                <div class="messages-box" id="messagesBox">
+                    <!-- Messages will appear here -->
+                    <div style="text-align: center; color: var(--text-secondary); margin-top: 50px;">
+                        <i class="fas fa-paper-plane" style="font-size: 3rem; margin-bottom: 10px; opacity: 0.5;"></i>
+                        <p>Select a contact from the left to view messages.</p>
+                    </div>
+                </div>
+                <div class="chat-input-area" style="display: none;" id="inputArea">
+                    <input type="text" class="chat-input" id="messageInput" placeholder="Type a message...">
+                    <button class="btn-send" onclick="sendMessage()">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentRecipient = null;
+
+        function loadChat(username, element) {
+            currentRecipient = username;
+            document.getElementById('chatHeader').innerText = 'Chat with ' + username;
+            document.getElementById('inputArea').style.display = 'flex';
+
+            // Update active state
+            document.querySelectorAll('.contact-item').forEach(el => el.classList.remove('active'));
+            if (element) element.classList.add('active');
+
+            // Fetch messages
+            fetch(`/get_messages/${username}`)
+                .then(response => response.json())
+                .then(messages => {
+                    const box = document.getElementById('messagesBox');
+                    box.innerHTML = '';
+                    messages.forEach(msg => {
+                        const div = document.createElement('div');
+                        div.className = `message ${msg.sender === '{{ current_user.username }}' ? 'sent' : 'received'}`;
+                        div.innerHTML = `
+                            ${msg.content}
+                            <div class="message-time">${new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                        `;
+                        box.appendChild(div);
+                    });
+                    box.scrollTop = box.scrollHeight;
+                });
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const content = input.value.trim();
+            if (!content || !currentRecipient) return;
+
+            const formData = new FormData();
+            formData.append('recipient', currentRecipient);
+            formData.append('content', content);
+
+            fetch('/send_message', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        input.value = '';
+                        loadChat(currentRecipient); // Reload chat
+                    }
+                });
+        }
+
+        // Allow Enter key to send
+        document.getElementById('messageInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // Theme check
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.setAttribute('data-theme', 'dark');
+        }
+    </script>
+</body>
+
+</html>

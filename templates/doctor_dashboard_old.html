@@ -1,0 +1,681 @@
+{% extends "base.html" %}
+
+{% block title %}Doctor Dashboard - CKD Diagnostic System{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+    <h2>Doctor Dashboard</h2>
+    <div class="dashboard-actions">
+        <a href="{{ url_for('add_patient') }}" class="btn btn-primary">Add New Patient</a>
+        <button onclick="document.getElementById('csvUpload').click()" class="btn btn-secondary">Upload CSV</button>
+        <button onclick="document.getElementById('pdfUpload').click()" class="btn btn-secondary">Upload PDF</button>
+        <a href="{{ url_for('modern_dashboard') }}" class="btn btn-secondary" title="View Modern Dashboard with Enhanced Visuals">
+            <i class="fas fa-chart-line"></i> Modern Dashboard
+        </a>
+        <input type="file" id="csvUpload" accept=".csv" style="display: none;" onchange="uploadCSV(this)">
+        <input type="file" id="pdfUpload" accept=".pdf" style="display: none;" onchange="uploadPDF(this)">
+    </div>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <h3>Total Patients</h3>
+        <p class="stat-number">{{ patients|length }}</p>
+    </div>
+    <div class="stat-card high-risk">
+        <h3>High Risk Patients</h3>
+        <p class="stat-number">{{ patients|selectattr('risk_level', 'in', ['High', 'Critical'])|list|length }}</p>
+    </div>
+    <div class="stat-card stage-5">
+        <h3>Stage 5 CKD</h3>
+        <p class="stat-number">{{ patients|selectattr('stage', 'equalto', 5)|list|length }}</p>
+    </div>
+    <div class="stat-card">
+        <h3>Avg Risk %</h3>
+        <p class="stat-number">
+            {% if patients %}
+                {{ "%.1f"|format((patients|sum(attribute='risk_percentage') / patients|length)) }}%
+            {% else %}
+                0%
+            {% endif %}
+        </p>
+    </div>
+</div>
+
+<!-- Charts Section -->
+<div class="charts-section">
+    <div class="chart-container">
+        <div class="chart-header">
+            <h3 class="chart-title">Patient Risk Distribution</h3>
+            <div class="chart-actions">
+                <button class="chart-action-btn" onclick="toggleChartType('risk')">Toggle View</button>
+            </div>
+        </div>
+        <div class="chart-canvas-container">
+            <canvas id="riskDistributionChart"></canvas>
+        </div>
+    </div>
+    <div class="chart-container">
+        <div class="chart-header">
+            <h3 class="chart-title">CKD Stage Distribution</h3>
+            <div class="chart-actions">
+                <button class="chart-action-btn" onclick="toggleChartType('stage')">Toggle View</button>
+            </div>
+        </div>
+        <div class="chart-canvas-container">
+            <canvas id="stageDistributionChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Search and Filter -->
+<div class="filter-section">
+    <div class="filter-controls">
+        <div class="search-container">
+            <div class="form-group">
+                <input type="text" id="patientSearch" placeholder="Search patients by name or ID..." onkeyup="filterPatients()">
+            </div>
+        </div>
+        <div class="filter-select-container">
+            <div class="filter-group">
+                <label for="riskFilter">Risk Level</label>
+                <select id="riskFilter" onchange="filterPatients()">
+                    <option value="">All Risk Levels</option>
+                    <option value="Low">Low Risk</option>
+                    <option value="Moderate">Moderate Risk</option>
+                    <option value="High">High Risk</option>
+                    <option value="Critical">Critical Risk</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="stageFilter">CKD Stage</label>
+                <select id="stageFilter" onchange="filterPatients()">
+                    <option value="">All Stages</option>
+                    <option value="1">Stage 1</option>
+                    <option value="2">Stage 2</option>
+                    <option value="3">Stage 3</option>
+                    <option value="4">Stage 4</option>
+                    <option value="5">Stage 5</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="patients-section">
+    <div class="patients-section-header">
+        <h3>Patient List</h3>
+        <button class="refresh-btn" onclick="refreshPatientList()">
+            <i class="refresh-icon">↻</i> Refresh
+        </button>
+    </div>
+    
+    <!-- Patient Summary Cards -->
+    <div class="patient-summary-cards" id="patientSummaryCards">
+        {% for patient in patients[:3] %}
+        <div class="patient-summary-card" onclick="viewPatientDetails('{{ patient.patient_id }}')">
+            <div class="patient-summary-card-header">
+                <h4>{{ patient.name }}</h4>
+                <span class="badge badge-{{ patient.risk_level.lower() }}">{{ patient.risk_level }}</span>
+            </div>
+            <div class="patient-summary-details">
+                <div class="patient-summary-item">
+                    <span class="patient-summary-label">ID</span>
+                    <span class="patient-summary-value">{{ patient.patient_id }}</span>
+                </div>
+                <div class="patient-summary-item">
+                    <span class="patient-summary-label">Age</span>
+                    <span class="patient-summary-value">{{ patient.age if patient.age else 'N/A' }}</span>
+                </div>
+                <div class="patient-summary-item">
+                    <span class="patient-summary-label">Risk</span>
+                    <span class="patient-summary-value">{{ patient.risk_percentage }}%</span>
+                </div>
+                <div class="patient-summary-item">
+                    <span class="patient-summary-label">Stage</span>
+                    <span class="patient-summary-value">Stage {{ patient.stage }}</span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    {% if patients %}
+    <table class="patients-table" id="patientsTable">
+        <thead>
+            <tr>
+                <th data-sort="patient_id">Patient ID <span class="sort-indicator"></span></th>
+                <th data-sort="name">Name <span class="sort-indicator"></span></th>
+                <th data-sort="age">Age <span class="sort-indicator"></span></th>
+                <th data-sort="risk_level">Risk Level <span class="sort-indicator"></span></th>
+                <th data-sort="risk_percentage">Risk % <span class="sort-indicator"></span></th>
+                <th data-sort="stage">CKD Stage <span class="sort-indicator"></span></th>
+                <th data-sort="egfr">eGFR <span class="sort-indicator"></span></th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="patientsTableBody">
+            {% for patient in patients %}
+            <tr data-name="{{ patient.name|lower }}" data-id="{{ patient.patient_id|lower }}" 
+                data-risk="{{ patient.risk_level }}" data-stage="{{ patient.stage }}"
+                onclick="viewPatientDetails('{{ patient.patient_id }}')">
+                <td>{{ patient.patient_id }}</td>
+                <td>{{ patient.name }}</td>
+                <td>{{ patient.age if patient.age else 'N/A' }}</td>
+                <td>
+                    <span class="badge badge-{{ patient.risk_level.lower() }}">
+                        {{ patient.risk_level }}
+                    </span>
+                </td>
+                <td>{{ patient.risk_percentage }}%</td>
+                <td>Stage {{ patient.stage }}</td>
+                <td>{{ "%.1f"|format(patient.egfr) if patient.egfr else 'N/A' }} mL/min</td>
+                <td class="patient-actions">
+                    <button class="btn btn-sm" onclick="event.stopPropagation(); viewPatientDetails('{{ patient.patient_id }}')">View</button>
+                    <button class="btn btn-sm" onclick="event.stopPropagation(); editPatient('{{ patient.patient_id }}')">Edit</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+        <p>No patients added yet. Click "Add New Patient" to get started.</p>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+// Add a delay to the search function to improve performance
+let searchTimeout;
+document.getElementById('patientSearch').addEventListener('input', function() {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(filterPatients, 300); // Wait 300ms after user stops typing
+});
+
+// Filter patients based on search and filter criteria
+function filterPatients() {
+    const searchInput = document.getElementById('patientSearch').value.toLowerCase().trim();
+    const riskFilter = document.getElementById('riskFilter').value;
+    const stageFilter = document.getElementById('stageFilter').value;
+    
+    const tableRows = document.querySelectorAll('#patientsTableBody tr');
+    
+    tableRows.forEach(row => {
+        const name = row.getAttribute('data-name') || '';
+        const id = row.getAttribute('data-id') || '';
+        const risk = row.getAttribute('data-risk') || '';
+        const stage = row.getAttribute('data-stage') || '';
+        
+        // Check if the row matches the search criteria
+        const matchesSearch = searchInput === '' || 
+                             name.toLowerCase().includes(searchInput) || 
+                             id.toLowerCase().includes(searchInput);
+        
+        // Check if the row matches the risk filter
+        const matchesRisk = riskFilter === '' || risk === riskFilter;
+        
+        // Check if the row matches the stage filter
+        const matchesStage = stageFilter === '' || stage === stageFilter;
+        
+        // Show or hide the row based on all criteria
+        if (matchesSearch && matchesRisk && matchesStage) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+
+// Sort table by column
+let sortDirection = {};
+function sortTable(column) {
+    const table = document.getElementById('patientsTable');
+    const tbody = table.querySelector('tbody');
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+    const th = table.querySelector(`th[data-sort="${column}"]`);
+    const indicator = th.querySelector('.sort-indicator');
+    
+    // Reset all indicators
+    table.querySelectorAll('.sort-indicator').forEach(ind => {
+        ind.className = 'sort-indicator';
+    });
+    
+    // Determine sort direction
+    if (sortDirection[column] === 'asc') {
+        sortDirection[column] = 'desc';
+        indicator.className = 'sort-indicator desc';
+    } else {
+        sortDirection[column] = 'asc';
+        indicator.className = 'sort-indicator asc';
+    }
+    
+    // Sort rows
+    rows.sort((a, b) => {
+        const aVal = a.cells[Array.from(th.parentNode.children).indexOf(th)].textContent.trim();
+        const bVal = b.cells[Array.from(th.parentNode.children).indexOf(th)].textContent.trim();
+        
+        // Handle numeric values
+        const aNum = parseFloat(aVal);
+        const bNum = parseFloat(bVal);
+        
+        if (!isNaN(aNum) && !isNaN(bNum)) {
+            return sortDirection[column] === 'asc' ? aNum - bNum : bNum - aNum;
+        }
+        
+        // Handle text values
+        if (sortDirection[column] === 'asc') {
+            return aVal.localeCompare(bVal);
+        } else {
+            return bVal.localeCompare(aVal);
+        }
+    });
+    
+    // Re-append sorted rows
+    rows.forEach(row => tbody.appendChild(row));
+}
+
+// View patient details
+function viewPatientDetails(patientId) {
+    window.location.href = `/results/${patientId}`;
+}
+
+// Edit patient
+function editPatient(patientId) {
+    // In a real implementation, this would open an edit form
+    alert(`Edit functionality for patient ${patientId} would be implemented here.`);
+}
+
+// Refresh patient list
+function refreshPatientList() {
+    location.reload();
+}
+
+// Initialize sortable columns
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('th[data-sort]').forEach(th => {
+        th.addEventListener('click', () => {
+            sortTable(th.getAttribute('data-sort'));
+        });
+    });
+});
+
+function uploadCSV(input) {
+    const file = input.files[0];
+    if (!file) return;
+    
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('file_type', 'csv');
+    
+    fetch('{{ url_for("upload_file") }}', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(`Successfully processed ${data.count} patients from CSV`);
+            location.reload();
+        } else {
+            alert('Error: ' + data.error);
+        }
+    })
+    .catch(error => {
+        alert('Error uploading file: ' + error);
+    });
+}
+
+function uploadPDF(input) {
+    const file = input.files[0];
+    if (!file) return;
+    
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('file_type', 'pdf');
+    
+    fetch('{{ url_for("upload_file") }}', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(`Successfully processed PDF report`);
+            location.reload();
+        } else {
+            alert('Error: ' + data.error);
+        }
+    })
+    .catch(error => {
+        alert('Error uploading file: ' + error);
+    });
+}
+
+// Chart initialization
+document.addEventListener('DOMContentLoaded', function() {
+    // Risk Distribution Chart
+    const riskCtx = document.getElementById('riskDistributionChart').getContext('2d');
+    const riskData = {
+        labels: ['Low', 'Moderate', 'High', 'Critical'],
+        datasets: [{
+            data: [
+                {{ patients|selectattr('risk_level', 'equalto', 'Low')|list|length }},
+                {{ patients|selectattr('risk_level', 'equalto', 'Moderate')|list|length }},
+                {{ patients|selectattr('risk_level', 'equalto', 'High')|list|length }},
+                {{ patients|selectattr('risk_level', 'equalto', 'Critical')|list|length }}
+            ],
+            backgroundColor: [
+                '#10b981', // green for low
+                '#f59e0b', // amber for moderate
+                '#ef4444', // red for high
+                '#7f1d1d'  // dark red for critical
+            ],
+            borderColor: [
+                '#047857',
+                '#b45309',
+                '#dc2626',
+                '#450a0a'
+            ],
+            borderWidth: 1,
+            hoverOffset: 15
+        }]
+    };
+    
+    const riskChart = new Chart(riskCtx, {
+        type: 'doughnut',
+        data: riskData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: false
+                },
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 15,
+                        usePointStyle: true,
+                        pointStyle: 'circle',
+                        font: {
+                            size: 12
+                        }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const total = context.dataset.data.reduce((acc, data) => acc + data, 0);
+                            const value = context.parsed;
+                            const percentage = Math.round((value / total) * 100);
+                            return `${context.label}: ${value} (${percentage}%)`;
+                        }
+                    }
+                }
+            },
+            animation: {
+                animateRotate: true,
+                animateScale: true
+            },
+            aspectRatio: 1
+        }
+    });
+    
+    // Stage Distribution Chart
+    const stageCtx = document.getElementById('stageDistributionChart').getContext('2d');
+    const stageData = {
+        labels: ['Stage 1', 'Stage 2', 'Stage 3', 'Stage 4', 'Stage 5'],
+        datasets: [{
+            label: 'Number of Patients',
+            data: [
+                {{ patients|selectattr('stage', 'equalto', 1)|list|length }},
+                {{ patients|selectattr('stage', 'equalto', 2)|list|length }},
+                {{ patients|selectattr('stage', 'equalto', 3)|list|length }},
+                {{ patients|selectattr('stage', 'equalto', 4)|list|length }},
+                {{ patients|selectattr('stage', 'equalto', 5)|list|length }}
+            ],
+            backgroundColor: [
+                '#10b981', // green for stage 1
+                '#84cc16', // lime for stage 2
+                '#f59e0b', // amber for stage 3
+                '#f97316', // orange for stage 4
+                '#ef4444'  // red for stage 5
+            ],
+            borderColor: [
+                '#047857',
+                '#65a30d',
+                '#b45309',
+                '#ea580c',
+                '#dc2626'
+            ],
+            borderWidth: 1
+        }]
+    };
+    
+    const stageChart = new Chart(stageCtx, {
+        type: 'bar',
+        data: stageData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: false
+                },
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `Patients: ${context.parsed.y}`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        precision: 0,
+                        stepSize: 1,
+                        font: {
+                            size: 10
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Patients',
+                        font: {
+                            size: 12
+                        }
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'CKD Stages',
+                        font: {
+                            size: 12
+                        }
+                    },
+                    ticks: {
+                        font: {
+                            size: 10
+                        }
+                    }
+                }
+            },
+            animation: {
+                duration: 1000,
+                easing: 'easeInOutQuart'
+            }
+        }
+    });
+    
+    // Store chart instances for toggling
+    window.riskChart = riskChart;
+    window.stageChart = stageChart;
+    window.riskChartType = 'doughnut';
+    window.stageChartType = 'bar';
+});
+
+// Toggle chart types
+function toggleChartType(chartName) {
+    if (chartName === 'risk') {
+        const newType = window.riskChartType === 'doughnut' ? 'polarArea' : 'doughnut';
+        window.riskChart.destroy();
+        
+        const riskCtx = document.getElementById('riskDistributionChart').getContext('2d');
+        const riskData = {
+            labels: ['Low', 'Moderate', 'High', 'Critical'],
+            datasets: [{
+                data: [
+                    {{ patients|selectattr('risk_level', 'equalto', 'Low')|list|length }},
+                    {{ patients|selectattr('risk_level', 'equalto', 'Moderate')|list|length }},
+                    {{ patients|selectattr('risk_level', 'equalto', 'High')|list|length }},
+                    {{ patients|selectattr('risk_level', 'equalto', 'Critical')|list|length }}
+                ],
+                backgroundColor: [
+                    '#10b981',
+                    '#f59e0b',
+                    '#ef4444',
+                    '#7f1d1d'
+                ],
+                borderColor: [
+                    '#047857',
+                    '#b45309',
+                    '#dc2626',
+                    '#450a0a'
+                ],
+                borderWidth: 1,
+                hoverOffset: 15
+            }]
+        };
+        
+        window.riskChart = new Chart(riskCtx, {
+            type: newType,
+            data: riskData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: false
+                    },
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const total = context.dataset.data.reduce((acc, data) => acc + data, 0);
+                                const value = context.parsed;
+                                const percentage = Math.round((value / total) * 100);
+                                return `${context.label}: ${value} (${percentage}%)`;
+                            }
+                        }
+                    }
+                },
+                animation: {
+                    animateRotate: true,
+                    animateScale: true
+                }
+            }
+        });
+        
+        window.riskChartType = newType;
+    } else if (chartName === 'stage') {
+        const newType = window.stageChartType === 'bar' ? 'line' : 'bar';
+        window.stageChart.destroy();
+        
+        const stageCtx = document.getElementById('stageDistributionChart').getContext('2d');
+        const stageData = {
+            labels: ['Stage 1', 'Stage 2', 'Stage 3', 'Stage 4', 'Stage 5'],
+            datasets: [{
+                label: 'Number of Patients',
+                data: [
+                    {{ patients|selectattr('stage', 'equalto', 1)|list|length }},
+                    {{ patients|selectattr('stage', 'equalto', 2)|list|length }},
+                    {{ patients|selectattr('stage', 'equalto', 3)|list|length }},
+                    {{ patients|selectattr('stage', 'equalto', 4)|list|length }},
+                    {{ patients|selectattr('stage', 'equalto', 5)|list|length }}
+                ],
+                backgroundColor: [
+                    '#10b981',
+                    '#84cc16',
+                    '#f59e0b',
+                    '#f97316',
+                    '#ef4444'
+                ],
+                borderColor: [
+                    '#10b981',
+                    '#84cc16',
+                    '#f59e0b',
+                    '#f97316',
+                    '#ef4444'
+                ],
+                borderWidth: 2,
+                fill: newType === 'line'
+            }]
+        };
+        
+        window.stageChart = new Chart(stageCtx, {
+            type: newType,
+            data: stageData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: false
+                    },
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `Patients: ${context.parsed.y}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0,
+                            stepSize: 1
+                        },
+                        title: {
+                            display: true,
+                            text: 'Number of Patients'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'CKD Stages'
+                        }
+                    }
+                },
+                animation: {
+                    duration: 1000,
+                    easing: 'easeInOutQuart'
+                }
+            }
+        });
+        
+        window.stageChartType = newType;
+    }
+}
+
+</script>
+{% endblock %}

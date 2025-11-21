@@ -108,64 +108,6 @@ def doctor_login():
         username = request.form.get('username') or ''
         password = request.form.get('password') or ''
         
-        user = User.get_by_username(username)
-        
-        if user and password and check_password_hash(user.password_hash, password):
-            if user.is_doctor():
-                login_user(user)
-                flash(f'Welcome, Dr. {user.username}!', 'success')
-                return redirect(url_for('doctor_dashboard'))
-            else:
-                flash('This login is for healthcare professionals only. Please use the Patient Login.', 'danger')
-        else:
-            flash('Invalid username or password', 'danger')
-    
-    return render_template('doctor_login.html')
-
-@app.route('/patient/login', methods=['GET', 'POST'])
-def patient_login():
-    if current_user.is_authenticated:
-        if current_user.is_patient():
-            return redirect(url_for('patient_portal'))
-        else:
-            flash('You are logged in as a doctor. Please logout first.', 'warning')
-            return redirect(url_for('doctor_dashboard'))
-    
-    if request.method == 'POST':
-        username = request.form.get('username') or ''
-        password = request.form.get('password') or ''
-        
-        if username:
-            user = User.get_by_username(username)
-        else:
-            user = None
-        
-        if user and password and check_password_hash(user.password_hash, password):
-            if user.is_patient():
-                login_user(user)
-                flash(f'Welcome, {user.username}!', 'success')
-                return redirect(url_for('patient_portal'))
-            else:
-                flash('This login is for patients only. Please use the Doctor Login.', 'danger')
-        else:
-            flash('Invalid username or password', 'danger')
-    
-    return render_template('patient_login.html')
-
-@app.route('/logout')
-@login_required
-def logout():
-    logout_user()
-    flash('You have been logged out successfully.', 'info')
-    return redirect(url_for('landing'))
-
-# Admin Routes
-@app.route('/admin/login', methods=['GET', 'POST'])
-def admin_login():
-    # Default admin credentials
-    ADMIN_ID = 'admin'
-    ADMIN_PASSWORD = 'admin123'
-    
     if request.method == 'POST':
         admin_id = request.form.get('admin_id')
         admin_password = request.form.get('admin_password')
@@ -231,6 +173,13 @@ def admin_logout():
     flash('Admin logged out successfully', 'info')
     return redirect(url_for('login'))
 
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash('Logged out successfully', 'info')
+    return redirect(url_for('index'))
+
 @app.route('/doctor/dashboard')
 @login_required
 def doctor_dashboard():
@@ -252,6 +201,50 @@ def doctor_dashboard():
         })
     
     return render_template('doctor_dashboard.html', patients=all_patients)
+
+@app.route('/api/doctor/dashboard/stats')
+@login_required
+def get_dashboard_stats():
+    """Return dashboard statistics as JSON for AJAX updates"""
+    if not current_user.is_doctor():
+        return jsonify({'error': 'Access denied'}), 403
+    
+    all_patients_data = get_all_patients_data()
+    
+    total_patients = len(all_patients_data)
+    high_risk = len([p for p in all_patients_data if p.get('risk_level') in ['High', 'Critical']])
+    stage_5 = len([p for p in all_patients_data if p.get('stage') == 5])
+    avg_risk = sum([p.get('risk_percentage', 0) for p in all_patients_data]) / total_patients if total_patients > 0 else 0
+    
+    return jsonify({
+        'total_patients': total_patients,
+        'high_risk': high_risk,
+        'stage_5': stage_5,
+        'avg_risk': round(avg_risk, 1)
+    })
+
+@app.route('/api/doctor/dashboard/patients')
+@login_required
+def get_dashboard_patients():
+    """Return patient list as JSON for AJAX updates"""
+    if not current_user.is_doctor():
+        return jsonify({'error': 'Access denied'}), 403
+    
+    all_patients_data = get_all_patients_data()
+    patients = []
+    for data in all_patients_data:
+        patients.append({
+            'patient_id': data.get('patient_id'),
+            'name': data.get('patient_name', 'Unknown'),
+            'risk_percentage': data.get('risk_percentage', 0),
+            'stage': data.get('stage', 'N/A'),
+            'risk_level': data.get('risk_level', 'Unknown'),
+            'age': data.get('age', 'N/A'),
+            'egfr': data.get('egfr', 'N/A')
+        })
+    
+    return jsonify({'patients': patients})
+
 
 @app.route('/doctor/add-patient', methods=['GET', 'POST'])
 @login_required
@@ -602,9 +595,138 @@ def book_appointment():
         'appointment': appointment
     })
 
-@app.route('/modern-dashboard')
-def modern_dashboard():
-    return render_template('modern_dashboard.html')
+
+# Phase 2: Communication & Scheduling Routes
+
+@app.route('/appointments')
+@login_required
+def appointments():
+    if not current_user.is_doctor():
+        return redirect(url_for('index'))
+    
+    from models.user import get_appointments_for_doctor
+    appointments_list = get_appointments_for_doctor(current_user.username)
+    return render_template('appointments.html', appointments=appointments_list)
+
+@app.route('/create_appointment', methods=['POST'])
+@login_required
+def create_appointment_route():
+    if not current_user.is_doctor():
+        return redirect(url_for('index'))
+        
+    appointment_data = {
+        'doctor': current_user.username,
+        'patient_name': request.form.get('patient_name'),
+        'date': request.form.get('date'),
+        'time': request.form.get('time'),
+        'type': request.form.get('type'),
+        'notes': request.form.get('notes'),
+        'created_at': pd.Timestamp.now().isoformat()
+    }
+    
+    from models.user import create_appointment
+    create_appointment(appointment_data)
+    flash('Appointment scheduled successfully', 'success')
+    return redirect(url_for('appointments'))
+
+@app.route('/messages')
+@login_required
+def messages():
+    from models.user import Message, get_all_patients
+    contacts = Message.get_conversations(current_user.username)
+    # Add all patients as contacts for doctors
+    if current_user.is_doctor():
+        patients = get_all_patients()
+        for p in patients:
+            if p.username not in contacts:
+                contacts.append(p.username)
+    
+    return render_template('messages.html', contacts=contacts)
+
+@app.route('/get_messages/<username>')
+@login_required
+def get_messages(username):
+    from models.user import Message
+    messages_list = Message.get_messages(current_user.username, username)
+    return jsonify([{
+        'sender': msg.sender,
+        'recipient': msg.recipient,
+        'content': msg.content,
+        'timestamp': msg.timestamp
+    } for msg in messages_list])
+
+@app.route('/send_message', methods=['POST'])
+@login_required
+def send_message():
+    from models.user import Message
+    recipient = request.form.get('recipient')
+    content = request.form.get('content')
+    
+    if not recipient or not content:
+        return jsonify({'success': False, 'error': 'Missing data'}), 400
+    
+    Message.send_message(current_user.username, recipient, content)
+    return jsonify({'success': True})
+
+# Phase 3: Clinical Tools Routes
+
+@app.route('/prescriptions')
+@login_required
+def prescriptions():
+    if not current_user.is_doctor():
+        return redirect(url_for('index'))
+    
+    from models.user import Prescription
+    prescriptions_list = Prescription.get_by_doctor(current_user.username)
+    return render_template('prescriptions.html', prescriptions=prescriptions_list)
+
+@app.route('/create_prescription', methods=['POST'])
+@login_required
+def create_prescription():
+    if not current_user.is_doctor():
+        return redirect(url_for('index'))
+    
+    # Parse medications from form
+    med_names = request.form.getlist('med_name[]')
+    med_dosages = request.form.getlist('med_dosage[]')
+    med_frequencies = request.form.getlist('med_frequency[]')
+    
+    medications = []
+    for name, dosage, frequency in zip(med_names, med_dosages, med_frequencies):
+        medications.append({
+            'name': name,
+            'dosage': dosage,
+            'frequency': frequency
+        })
+    
+    prescription_data = {
+        'doctor': current_user.username,
+        'patient': request.form.get('patient'),
+        'date': request.form.get('date'),
+        'medications': medications,
+        'notes': request.form.get('notes', '')
+    }
+    
+    from models.user import Prescription
+    Prescription.create(prescription_data)
+    flash('Prescription created successfully', 'success')
+    return redirect(url_for('prescriptions'))
+
+@app.route('/lab_results')
+@login_required
+def lab_results():
+    if not current_user.is_doctor():
+        return redirect(url_for('index'))
+    
+    # For now, return empty list - can be extended later
+    return render_template('lab_results.html', results=[])
+
+@app.route('/education')
+@login_required
+def education():
+    return render_template('education.html')
+
+
 
 @app.route('/kidneycompanion')
 def kidneycompanion_landing():

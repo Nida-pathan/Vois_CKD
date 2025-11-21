@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab Results - CKD Diagnostic System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%);
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.18);
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --shadow-light: 0 4px 30px rgba(0, 0, 0, 0.05);
+            --border-radius-md: 16px;
+        }
+
+        [data-theme="dark"] {
+            --primary-gradient: linear-gradient(135deg, #0f766e 0%, #115e59 100%);
+            --glass-bg: rgba(30, 41, 59, 0.95);
+            --glass-border: rgba(255, 255, 255, 0.05);
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --shadow-light: 0 4px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f0fdfa 0%, #e0f2fe 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+            padding: 20px;
+        }
+
+        body[data-theme="dark"] {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            background: var(--glass-bg);
+            padding: 15px 20px;
+            border-radius: var(--border-radius-md);
+            border: 1px solid var(--glass-border);
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+        .empty-state {
+            background: var(--glass-bg);
+            border-radius: var(--border-radius-md);
+            border: 1px solid var(--glass-border);
+            padding: 60px 20px;
+            text-align: center;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: var(--text-secondary);
+            opacity: 0.5;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="page-title">
+                <i class="fas fa-flask"></i> Lab Results
+            </div>
+            <a href="{{ url_for('doctor_dashboard') }}" class="btn-primary">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+
+        <div class="empty-state">
+            <i class="fas fa-vial"></i>
+            <h3>Lab Results Feature Coming Soon</h3>
+            <p>This feature will allow you to view and manage patient lab results.</p>
+        </div>
+    </div>
+
+    <script>
+        // Theme check
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.setAttribute('data-theme', 'dark');
+        }
+    </script>
+</body>
+
+</html>

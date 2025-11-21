@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appointments - CKD Diagnostic System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Reuse existing styles from doctor_dashboard.html via style.css or inline if needed */
+        /* Adding specific styles for appointments */
+        :root {
+            --primary-gradient: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%);
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.18);
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --shadow-light: 0 4px 30px rgba(0, 0, 0, 0.05);
+            --border-radius-md: 16px;
+        }
+
+        [data-theme="dark"] {
+            --primary-gradient: linear-gradient(135deg, #0f766e 0%, #115e59 100%);
+            --glass-bg: rgba(30, 41, 59, 0.95);
+            --glass-border: rgba(255, 255, 255, 0.05);
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --shadow-light: 0 4px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f0fdfa 0%, #e0f2fe 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+            padding: 20px;
+        }
+
+        body[data-theme="dark"] {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background: var(--glass-bg);
+            padding: 20px;
+            border-radius: var(--border-radius-md);
+            border: 1px solid var(--glass-border);
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+
+        .appointments-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .appointment-card {
+            background: var(--glass-bg);
+            padding: 20px;
+            border-radius: var(--border-radius-md);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-light);
+        }
+
+        .appointment-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .patient-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .appointment-time {
+            color: #0d9488;
+            font-weight: 500;
+        }
+
+        .appointment-details {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-sm {
+            padding: 5px 10px;
+            border-radius: 5px;
+            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            color: var(--text-primary);
+        }
+
+        .btn-join {
+            background: #0d9488;
+            color: white;
+            border: none;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: var(--glass-bg);
+            padding: 30px;
+            border-radius: var(--border-radius-md);
+            width: 400px;
+            max-width: 90%;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--text-secondary);
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            background: rgba(255, 255, 255, 0.8);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="page-title">
+                <i class="fas fa-calendar-alt"></i> Appointments
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-primary" onclick="window.location.href='{{ url_for('doctor_dashboard') }}'">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </button>
+                <button class="btn-primary" onclick="openModal()">
+                    <i class="fas fa-plus"></i> New Appointment
+                </button>
+            </div>
+        </div>
+
+        <div class="appointments-grid">
+            {% for appointment in appointments %}
+            <div class="appointment-card">
+                <div class="appointment-header">
+                    <div class="patient-name">{{ appointment.patient_name }}</div>
+                    <div class="appointment-time">
+                        <i class="far fa-clock"></i> {{ appointment.date }} {{ appointment.time }}
+                    </div>
+                </div>
+                <div class="appointment-details">
+                    <p><i class="fas fa-info-circle"></i> Type: {{ appointment.type }}</p>
+                    <p><i class="fas fa-notes-medical"></i> {{ appointment.notes }}</p>
+                </div>
+                <div class="actions">
+                    <button class="btn-sm btn-join" onclick="startVideoCall('{{ appointment._id }}')">
+                        <i class="fas fa-video"></i> Join Call
+                    </button>
+                    <button class="btn-sm">Reschedule</button>
+                    <button class="btn-sm" style="color: #ef4444;">Cancel</button>
+                </div>
+            </div>
+            {% else %}
+            <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-secondary);">
+                No upcoming appointments found.
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- New Appointment Modal -->
+    <div class="modal" id="appointmentModal">
+        <div class="modal-content">
+            <h3 style="margin-bottom: 20px;">Schedule Appointment</h3>
+            <form action="{{ url_for('create_appointment_route') }}" method="POST">
+                <div class="form-group">
+                    <label>Patient Name</label>
+                    <input type="text" name="patient_name" required>
+                </div>
+                <div class="form-group">
+                    <label>Date</label>
+                    <input type="date" name="date" required>
+                </div>
+                <div class="form-group">
+                    <label>Time</label>
+                    <input type="time" name="time" required>
+                </div>
+                <div class="form-group">
+                    <label>Type</label>
+                    <select name="type">
+                        <option value="Consultation">Consultation</option>
+                        <option value="Follow-up">Follow-up</option>
+                        <option value="Emergency">Emergency</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Notes</label>
+                    <input type="text" name="notes">
+                </div>
+                <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                    <button type="button" class="btn-sm" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn-primary">Schedule</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openModal() {
+            document.getElementById('appointmentModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('appointmentModal').style.display = 'none';
+        }
+
+        function startVideoCall(id) {
+            // Simple Jitsi integration
+            const domain = "meet.jit.si";
+            const roomName = "CKD_Consult_" + id;
+            window.open(`https://${domain}/${roomName}`, '_blank');
+        }
+
+        // Theme check
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.setAttribute('data-theme', 'dark');
+        }
+    </script>
+</body>
+
+</html>

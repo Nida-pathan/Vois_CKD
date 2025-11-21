@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -24,6 +25,16 @@
             --border-radius-lg: 24px;
         }
 
+        [data-theme="dark"] {
+            --primary-gradient: linear-gradient(135deg, #0f766e 0%, #115e59 100%);
+            --glass-bg: rgba(30, 41, 59, 0.95);
+            --glass-border: rgba(255, 255, 255, 0.05);
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --shadow-light: 0 4px 30px rgba(0, 0, 0, 0.3);
+            --shadow-medium: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -36,6 +47,11 @@
             min-height: 100vh;
             color: var(--text-primary);
             padding: 20px;
+            transition: background 0.3s ease;
+        }
+
+        body[data-theme="dark"] {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
         }
 
         .dashboard-container {
@@ -371,6 +387,12 @@
             justify-content: center;
             color: white;
             font-size: 1.2rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .app-icon:hover {
+            transform: scale(1.1);
         }
 
         .csv {
@@ -438,7 +460,8 @@
             gap: 25px;
         }
 
-        .meetings-card, .skills-card {
+        .meetings-card,
+        .skills-card {
             background: var(--glass-bg);
             backdrop-filter: blur(10px);
             border: 1px solid var(--glass-border);
@@ -466,6 +489,7 @@
             border-radius: var(--border-radius-sm);
             background: rgba(255, 255, 255, 0.5);
             transition: all 0.3s ease;
+            cursor: pointer;
         }
 
         .meeting-item:hover {
@@ -571,7 +595,7 @@
             .dashboard-grid {
                 grid-template-columns: 1fr;
             }
-            
+
             .sidebar {
                 grid-row: 1;
             }
@@ -581,33 +605,218 @@
             .gradient-cards {
                 grid-template-columns: 1fr;
             }
-            
+
             .top-bar {
                 flex-direction: column;
                 gap: 15px;
             }
-            
+
             .top-bar-right {
                 width: 100%;
                 justify-content: space-between;
             }
-            
+
             .search-bar input {
                 width: 100%;
             }
-            
+
             .stats-grid {
                 grid-template-columns: 1fr 1fr;
             }
         }
-        
+
         @media (max-width: 480px) {
             .stats-grid {
                 grid-template-columns: 1fr;
             }
         }
+
+        .patients-table-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius-md);
+            padding: 25px;
+            box-shadow: var(--shadow-light);
+            margin-bottom: 25px;
+            overflow-x: auto;
+        }
+
+        .patients-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .patients-table th,
+        .patients-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .patients-table th {
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .badge {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .badge-low {
+            background: rgba(16, 185, 129, 0.1);
+            color: #047857;
+        }
+
+        .badge-moderate {
+            background: rgba(245, 158, 11, 0.1);
+            color: #b45309;
+        }
+
+        .badge-high {
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+        }
+
+        .badge-critical {
+            background: rgba(127, 29, 29, 0.1);
+            color: #7f1d1d;
+        }
+
+        .btn-sm {
+            padding: 5px 10px;
+            border-radius: 5px;
+            border: none;
+            background: var(--primary-gradient);
+            color: white;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        /* New Action Button Styles */
+        .btn-action {
+            padding: 8px 20px;
+            border-radius: 30px;
+            border: none;
+            background: var(--primary-gradient);
+            color: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 6px rgba(13, 148, 136, 0.2);
+        }
+
+        .btn-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(13, 148, 136, 0.3);
+        }
+
+        .upload-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .icon-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .icon-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* Navigation Menu Styles */
+        .nav-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius-md);
+            padding: 25px;
+            box-shadow: var(--shadow-light);
+            margin-bottom: 25px;
+        }
+
+        .nav-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 15px;
+            border-radius: var(--border-radius-sm);
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: rgba(13, 148, 136, 0.1);
+            color: #0d9488;
+        }
+
+        .nav-item i {
+            width: 24px;
+            text-align: center;
+        }
+
+        /* Notification & Theme Toggle Styles */
+        .top-icon-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .top-icon-btn:hover {
+            background: rgba(13, 148, 136, 0.1);
+            color: #0d9488;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 10px;
+            height: 10px;
+            background: #ef4444;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
     </style>
 </head>
+
 <body>
     <div class="dashboard-container">
         <!-- Top Welcome Section -->
@@ -618,132 +827,149 @@
                 </div>
                 <span>CKD Diagnostic System</span>
             </div>
-            
-            <div class="welcome-text">Welcome, <span>Dr. Smith</span></div>
-            
+
+            <div class="welcome-text">Welcome, <span>Dr. {{ current_user.username }}</span></div>
+
             <div class="top-bar-right">
+                <div class="actions-group" style="display: flex; gap: 15px; align-items: center; margin-right: 20px;">
+                    <button onclick="window.location.href='{{ url_for('add_patient') }}'" class="btn-action">
+                        <i class="fas fa-user-plus"></i> Add Patient
+                    </button>
+
+                    <button onclick="document.getElementById('pdfUpload').click()" class="btn-action">
+                        <i class="fas fa-file-upload"></i> Upload Prescription
+                    </button>
+
+                    <!-- Hidden inputs for file upload -->
+                    <input type="file" id="pdfUpload" accept=".pdf" style="display: none;" onchange="uploadPDF(this)">
+                </div>
+
                 <div class="search-bar">
                     <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Search patients...">
+                    <input type="text" id="patientSearch" placeholder="Search patients..." onkeyup="filterPatients()">
                 </div>
-                <div class="profile-icon">
-                    <i class="fas fa-user-md"></i>
+
+                <div class="top-icon-btn" onclick="toggleTheme()" title="Toggle Dark Mode">
+                    <i class="fas fa-moon" id="themeIcon"></i>
+                </div>
+
+                <div class="top-icon-btn" title="Notifications">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge"></span>
+                </div>
+
+                <div class="profile-icon" onclick="window.location.href='{{ url_for('logout') }}'" title="Logout">
+                    <i class="fas fa-sign-out-alt"></i>
                 </div>
             </div>
         </div>
-        
+
         <!-- Stats Grid -->
         <div class="stats-grid">
             <div class="stat-card">
                 <h3>Total Patients</h3>
-                <p class="stat-number">142</p>
+                <p class="stat-number">{{ patients|length }}</p>
             </div>
             <div class="stat-card high-risk">
                 <h3>High Risk Patients</h3>
-                <p class="stat-number">28</p>
+                <p class="stat-number">{{ patients|selectattr('risk_level', 'in', ['High', 'Critical'])|list|length }}
+                </p>
             </div>
             <div class="stat-card stage-5">
                 <h3>Stage 5 CKD</h3>
-                <p class="stat-number">12</p>
+                <p class="stat-number">{{ patients|selectattr('stage', 'equalto', 5)|list|length }}</p>
             </div>
             <div class="stat-card">
                 <h3>Avg Risk %</h3>
-                <p class="stat-number">42.3%</p>
+                <p class="stat-number">
+                    {% if patients %}
+                    {{ "%.1f"|format((patients|sum(attribute='risk_percentage') / patients|length)) }}%
+                    {% else %}
+                    0%
+                    {% endif %}
+                </p>
             </div>
         </div>
-        
+
         <div class="dashboard-grid">
             <div class="main-content">
                 <!-- Profile Card -->
                 <div class="profile-card">
                     <div class="profile-header">
-                        <div class="profile-photo">DS</div>
+                        <div class="profile-photo">{{ current_user.username[:2].upper() }}</div>
                         <div class="profile-info">
-                            <h2>Dr. Smith</h2>
-                            <p>Nephrologist</p>
+                            <h2>Dr. {{ current_user.username }}</h2>
+                            <p>{{ current_user.specialization if current_user.specialization else 'Nephrologist' }}</p>
                             <div class="stats-pills">
                                 <div class="stat-pill">
                                     <i class="fas fa-users"></i>
-                                    <span>142 patients</span>
+                                    <span>{{ patients|length }} patients</span>
                                 </div>
                                 <div class="stat-pill">
                                     <i class="fas fa-file-medical"></i>
-                                    <span>87 reports</span>
+                                    <span>{{ patients|length }} reports</span>
                                 </div>
                                 <div class="stat-pill">
                                     <i class="fas fa-award"></i>
-                                    <span>15 years experience</span>
+                                    <span>Experienced</span>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                
-                <!-- Gradient Cards -->
-                <div class="gradient-cards">
-                    <div class="gradient-card patients">
-                        <div class="card-header">
-                            <div class="card-title">Patient Management</div>
-                            <div class="card-icon patients-icon">
-                                <i class="fas fa-user-injured"></i>
-                            </div>
-                        </div>
-                        <div class="progress-container">
-                            <div class="progress-header">
-                                <span>Active Patients</span>
-                                <span>85%</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill"></div>
-                            </div>
-                        </div>
+
+                <!-- Patient List Section -->
+                <div class="patients-table-container">
+                    <div class="chart-header">
+                        <div class="chart-title">Patient List</div>
                     </div>
-                    
-                    <div class="gradient-card reports">
-                        <div class="card-header">
-                            <div class="card-title">Reports Processed</div>
-                            <div class="card-icon reports-icon">
-                                <i class="fas fa-file-medical"></i>
-                            </div>
-                        </div>
-                        <div class="progress-container">
-                            <div class="progress-header">
-                                <span>Completed</span>
-                                <span>62%</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill"></div>
-                            </div>
-                        </div>
+                    {% if patients %}
+                    <table class="patients-table" id="patientsTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Age</th>
+                                <th>Risk Level</th>
+                                <th>Risk %</th>
+                                <th>Stage</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="patientsTableBody">
+                            {% for patient in patients %}
+                            <tr data-name="{{ patient.name|lower }}" data-id="{{ patient.patient_id|lower }}">
+                                <td>{{ patient.patient_id }}</td>
+                                <td>{{ patient.name }}</td>
+                                <td>{{ patient.age if patient.age else 'N/A' }}</td>
+                                <td>
+                                    <span class="badge badge-{{ patient.risk_level.lower() }}">
+                                        {{ patient.risk_level }}
+                                    </span>
+                                </td>
+                                <td>{{ patient.risk_percentage }}%</td>
+                                <td>Stage {{ patient.stage }}</td>
+                                <td>
+                                    <button class="btn-sm"
+                                        onclick="window.location.href='/results/{{ patient.patient_id }}'">View</button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <div class="empty-state" style="text-align: center; padding: 20px;">
+                        <p>No patients added yet. Click "Add New Patient" to get started.</p>
                     </div>
+                    {% endif %}
                 </div>
-                
-                <!-- Connection Widget -->
-                <div class="connection-widget">
-                    <div class="connection-header">
-                        <div class="connection-title">File Upload Options</div>
-                        <div class="connection-count">3 formats supported</div>
-                    </div>
-                    <div class="app-icons">
-                        <div class="app-icon csv">
-                            <i class="fas fa-file-csv"></i>
-                        </div>
-                        <div class="app-icon pdf">
-                            <i class="fas fa-file-pdf"></i>
-                        </div>
-                        <div class="app-icon excel">
-                            <i class="fas fa-file-excel"></i>
-                        </div>
-                    </div>
-                </div>
-                
+
                 <!-- Line Chart Section -->
                 <div class="chart-section">
                     <div class="chart-header">
                         <div class="chart-title">CKD Patient Trends</div>
                         <div class="chart-stats">
-                            <div class="week-label">Last 30 Days</div>
-                            <div class="concentration">+12% New Diagnoses</div>
+                            <div class="week-label">Risk Distribution</div>
                         </div>
                     </div>
                     <div class="chart-container">
@@ -751,233 +977,239 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Right Sidebar -->
             <div class="sidebar">
+                <!-- Navigation Menu -->
+                <div class="nav-card">
+                    <div class="sidebar-title">Menu</div>
+                    <div class="nav-list">
+                        <a href="#" class="nav-item active">
+                            <i class="fas fa-th-large"></i>
+                            <span>Dashboard</span>
+                        </a>
+                        <a href="#" class="nav-item">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span>Appointments</span>
+                        </a>
+                        <a href="#" class="nav-item">
+                            <i class="fas fa-comments"></i>
+                            <span>Messages</span>
+                        </a>
+                        <a href="#" class="nav-item">
+                            <i class="fas fa-file-prescription"></i>
+                            <span>Prescriptions</span>
+                        </a>
+                        <a href="#" class="nav-item">
+                            <i class="fas fa-flask"></i>
+                            <span>Lab Results</span>
+                        </a>
+                        <a href="#" class="nav-item">
+                            <i class="fas fa-book-medical"></i>
+                            <span>Education</span>
+                        </a>
+                    </div>
+                </div>
+
                 <!-- High Risk Patients Card -->
                 <div class="meetings-card">
                     <div class="sidebar-title">High Risk Patients</div>
                     <div class="meeting-list">
-                        <div class="meeting-item">
-                            <div class="meeting-icon critical">
-                                <i class="fas fa-exclamation-triangle"></i>
+                        {% set high_risk_patients = patients|selectattr('risk_level', 'in', ['High', 'Critical'])|list
+                        %}
+                        {% for patient in high_risk_patients[:5] %}
+                        <div class="meeting-item" onclick="window.location.href='/results/{{ patient.patient_id }}'">
+                            <div class="meeting-icon {{ 'critical' if patient.risk_level == 'Critical' else 'high' }}">
+                                <i
+                                    class="fas fa-exclamation-{{ 'triangle' if patient.risk_level == 'Critical' else 'circle' }}"></i>
                             </div>
                             <div class="meeting-info">
-                                <div class="meeting-name">John Smith</div>
-                                <div class="meeting-time">Critical Risk - 87%</div>
-                                <div class="meeting-date">Stage 5</div>
+                                <div class="meeting-name">{{ patient.name }}</div>
+                                <div class="meeting-time">{{ patient.risk_level }} Risk - {{ patient.risk_percentage }}%
+                                </div>
+                                <div class="meeting-date">Stage {{ patient.stage }}</div>
                             </div>
                         </div>
-                        
+                        {% else %}
                         <div class="meeting-item">
-                            <div class="meeting-icon high">
-                                <i class="fas fa-exclamation-circle"></i>
-                            </div>
                             <div class="meeting-info">
-                                <div class="meeting-name">Mary Johnson</div>
-                                <div class="meeting-time">High Risk - 76%</div>
-                                <div class="meeting-date">Stage 4</div>
+                                <div class="meeting-name">No high risk patients</div>
                             </div>
                         </div>
-                        
-                        <div class="meeting-item">
-                            <div class="meeting-icon moderate">
-                                <i class="fas fa-exclamation"></i>
-                            </div>
-                            <div class="meeting-info">
-                                <div class="meeting-name">Robert Davis</div>
-                                <div class="meeting-time">Moderate Risk - 54%</div>
-                                <div class="meeting-date">Stage 3</div>
-                            </div>
-                        </div>
+                        {% endfor %}
                     </div>
                 </div>
-                
+
                 <!-- Skills Card -->
                 <div class="skills-card">
-                    <div class="sidebar-title">Specialization Areas</div>
-                    <div class="skill-item ckd-stages">
+                    <div class="sidebar-title">CKD Stage Distribution</div>
+                    {% for i in range(1, 6) %}
+                    {% set count = patients|selectattr('stage', 'equalto', i)|list|length %}
+                    {% set total = patients|length %}
+                    {% set percentage = (count / total * 100) if total > 0 else 0 %}
+                    <div class="skill-item">
                         <div class="skill-header">
-                            <span>CKD Stages</span>
-                            <span>71%</span>
+                            <span>Stage {{ i }}</span>
+                            <span>{{ count }} Patients</span>
                         </div>
                         <div class="skill-bar">
-                            <div class="skill-fill"></div>
+                            <div class="skill-fill"
+                                style="width: {{ percentage }}%; background: var(--primary-gradient);"></div>
                         </div>
                     </div>
-                    
-                    <div class="skill-item risk-assessment">
-                        <div class="skill-header">
-                            <span>Risk Assessment</span>
-                            <span>92%</span>
-                        </div>
-                        <div class="skill-bar">
-                            <div class="skill-fill"></div>
-                        </div>
-                    </div>
-                    
-                    <div class="skill-item treatment-plans">
-                        <div class="skill-header">
-                            <span>Treatment Plans</span>
-                            <span>33%</span>
-                        </div>
-                        <div class="skill-bar">
-                            <div class="skill-fill"></div>
-                        </div>
-                    </div>
-                    
-                    <div class="skill-item patient-monitoring">
-                        <div class="skill-header">
-                            <span>Patient Monitoring</span>
-                            <span>56%</span>
-                        </div>
-                        <div class="skill-bar">
-                            <div class="skill-fill"></div>
-                        </div>
-                    </div>
-                    
-                    <div class="skill-item research">
-                        <div class="skill-header">
-                            <span>Research</span>
-                            <span>79%</span>
-                        </div>
-                        <div class="skill-bar">
-                            <div class="skill-fill"></div>
-                        </div>
-                    </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Initialize the CKD trends chart
-        document.addEventListener('DOMContentLoaded', function() {
-            const ctx = document.getElementById('ckdTrendsChart').getContext('2d');
-            
-            // Sample data for the chart
-            const data = {
-                labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
-                datasets: [
-                    {
-                        label: 'New Diagnoses',
-                        data: [8, 12, 15, 17],
-                        borderColor: '#0d9488',
-                        backgroundColor: 'rgba(13, 148, 136, 0.1)',
-                        borderWidth: 3,
-                        pointRadius: 4,
-                        pointBackgroundColor: '#fff',
-                        pointBorderColor: '#0d9488',
-                        pointBorderWidth: 2,
-                        tension: 0.4,
-                        fill: true
-                    },
-                    {
-                        label: 'High Risk Patients',
-                        data: [5, 7, 9, 12],
-                        borderColor: '#ef4444',
-                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                        borderWidth: 3,
-                        pointRadius: 4,
-                        pointBackgroundColor: '#fff',
-                        pointBorderColor: '#ef4444',
-                        pointBorderWidth: 2,
-                        tension: 0.4,
-                        fill: true
-                    },
-                    {
-                        label: 'Stage 5 CKD',
-                        data: [2, 3, 4, 6],
-                        borderColor: '#f59e0b',
-                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                        borderWidth: 3,
-                        pointRadius: 4,
-                        pointBackgroundColor: '#fff',
-                        pointBorderColor: '#f59e0b',
-                        pointBorderWidth: 2,
-                        tension: 0.4,
-                        fill: true
+        // Theme Toggle
+        function toggleTheme() {
+            const body = document.body;
+            const icon = document.getElementById('themeIcon');
+
+            if (body.getAttribute('data-theme') === 'dark') {
+                body.removeAttribute('data-theme');
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+                localStorage.setItem('theme', 'light');
+            } else {
+                body.setAttribute('data-theme', 'dark');
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // Initialize Theme
+        document.addEventListener('DOMContentLoaded', function () {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.setAttribute('data-theme', 'dark');
+                document.getElementById('themeIcon').classList.replace('fa-moon', 'fa-sun');
+            }
+        });
+
+        // Filter patients
+        function filterPatients() {
+            const searchInput = document.getElementById('patientSearch').value.toLowerCase().trim();
+            const tableRows = document.querySelectorAll('#patientsTableBody tr');
+
+            tableRows.forEach(row => {
+                const name = row.getAttribute('data-name') || '';
+                const id = row.getAttribute('data-id') || '';
+
+                if (name.includes(searchInput) || id.includes(searchInput)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        // File Upload Functions
+        function uploadCSV(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('file_type', 'csv');
+
+            fetch('{{ url_for("upload_file") }}', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(`Successfully processed ${data.count} patients from CSV`);
+                        location.reload();
+                    } else {
+                        alert('Error: ' + data.error);
                     }
-                ]
+                })
+                .catch(error => {
+                    alert('Error uploading file: ' + error);
+                });
+        }
+
+        function uploadPDF(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('file_type', 'pdf');
+
+            fetch('{{ url_for("upload_file") }}', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(`Successfully processed PDF report`);
+                        location.reload();
+                    } else {
+                        alert('Error: ' + data.error);
+                    }
+                })
+                .catch(error => {
+                    alert('Error uploading file: ' + error);
+                });
+        }
+
+        // Chart initialization
+        document.addEventListener('DOMContentLoaded', function () {
+            const ctx = document.getElementById('ckdTrendsChart').getContext('2d');
+
+            const data = {
+                labels: ['Low', 'Moderate', 'High', 'Critical'],
+                datasets: [{
+                    label: 'Patient Risk Distribution',
+                    data: [
+                        {{ patients| selectattr('risk_level', 'equalto', 'Low') | list | length }},
+                {{ patients| selectattr('risk_level', 'equalto', 'Moderate') | list | length
+        }},
+            {{ patients| selectattr('risk_level', 'equalto', 'High') | list | length }},
+            {{ patients| selectattr('risk_level', 'equalto', 'Critical') | list | length }}
+                    ],
+            backgroundColor: [
+            '#10b981',
+            '#f59e0b',
+            '#ef4444',
+            '#7f1d1d'
+        ],
+            borderWidth: 0,
+            borderRadius: 5
+                }]
             };
-            
-            // Chart configuration
-            const config = {
-                type: 'line',
-                data: data,
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                            labels: {
-                                usePointStyle: true,
-                                padding: 20,
-                                font: {
-                                    size: 14
-                                }
-                            }
-                        },
-                        tooltip: {
-                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                            titleColor: '#333',
-                            bodyColor: '#666',
-                            borderColor: '#e0e0e0',
-                            borderWidth: 1,
-                            padding: 12,
-                            boxPadding: 6,
-                            usePointStyle: true
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: data,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
                         }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.05)'
-                            },
-                            ticks: {
-                                color: '#666',
-                                stepSize: 5
-                            },
-                            title: {
-                                display: true,
-                                text: 'Number of Patients',
-                                color: '#0d9488',
-                                font: {
-                                    size: 14,
-                                    weight: 'bold'
-                                }
-                            }
-                        },
-                        x: {
-                            grid: {
-                                display: false
-                            },
-                            ticks: {
-                                color: '#666'
-                            },
-                            title: {
-                                display: true,
-                                text: 'Time Period',
-                                color: '#0d9488',
-                                font: {
-                                    size: 14,
-                                    weight: 'bold'
-                                }
-                            }
-                        }
-                    },
-                    interaction: {
-                        mode: 'index',
-                        intersect: false
                     }
                 }
-            };
-            
-            // Create the chart
-            const ckdTrendsChart = new Chart(ctx, config);
+            }
+        });
         });
     </script>
 </body>
+
 </html>
