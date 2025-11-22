@@ -4,44 +4,178 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - KidneyCompanion</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Patient Registration - KidneyCompanion</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #0d9488;
+            --primary-dark: #0f766e;
+            --secondary-color: #06b6d4;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --bg-light: #f9fafb;
+            --border-color: #e5e7eb;
+        }
+
         body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             padding: 2rem;
         }
 
-        .register-container {
+        .intake-container {
+            max-width: 900px;
+            margin: 0 auto;
             background: white;
-            border-radius: 24px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            padding: 3rem;
-            width: 100%;
-            max-width: 500px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
         }
 
-        .header {
+        .intake-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 2rem;
             text-align: center;
-            margin-bottom: 2rem;
         }
 
-        .header h1 {
-            color: #333;
+        .intake-header h1 {
             font-size: 2rem;
             margin-bottom: 0.5rem;
         }
 
-        .header p {
-            color: #666;
+        .intake-header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .progress-bar {
+            display: flex;
+            justify-content: space-between;
+            padding: 2rem;
+            background: var(--bg-light);
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .progress-step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+        }
+
+        .progress-step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            width: 100%;
+            height: 2px;
+            background: var(--border-color);
+            z-index: 0;
+        }
+
+        .progress-step.active:not(:last-child)::after {
+            background: var(--primary-color);
+        }
+
+        .step-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid var(--border-color);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--text-secondary);
+            position: relative;
+            z-index: 1;
+            transition: all 0.3s;
+        }
+
+        .progress-step.active .step-circle {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+
+        .progress-step.completed .step-circle {
+            background: var(--success-color);
+            border-color: var(--success-color);
+            color: white;
+        }
+
+        .step-label {
+            margin-top: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .progress-step.active .step-label {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .form-content {
+            padding: 2rem;
+        }
+
+        .form-step {
+            display: none;
+        }
+
+        .form-step.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-section {
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-title i {
+            color: var(--primary-color);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
         }
 
         .form-group {
@@ -51,55 +185,136 @@
         .form-group label {
             display: block;
             margin-bottom: 0.5rem;
-            color: #333;
+            color: var(--text-primary);
             font-weight: 500;
+            font-size: 0.95rem;
         }
 
-        .form-control {
+        .form-group label .required {
+            color: var(--danger-color);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
             width: 100%;
-            padding: 0.8rem 1rem;
-            border: 1px solid #ddd;
-            border-radius: 12px;
+            padding: 0.75rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
             font-size: 1rem;
-            font-family: inherit;
-            transition: border-color 0.3s;
+            transition: all 0.3s;
         }
 
-        .form-control:focus {
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
             outline: none;
-            border-color: #4BAEA0;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
         }
 
-        .btn-submit {
-            width: 100%;
-            padding: 1rem;
-            background-color: #4BAEA0;
-            color: white;
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: auto;
+            cursor: pointer;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .radio-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .radio-item input[type="radio"] {
+            width: auto;
+            cursor: pointer;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            padding: 2rem;
+            background: var(--bg-light);
+            border-top: 2px solid var(--border-color);
+        }
+
+        .btn {
+            padding: 0.75rem 2rem;
             border: none;
-            border-radius: 12px;
-            font-size: 1.1rem;
+            border-radius: 8px;
+            font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 1rem;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
-        .btn-submit:hover {
-            background-color: #3d8e82;
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(75, 174, 160, 0.3);
+            box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3);
         }
 
-        .login-link {
-            text-align: center;
-            margin-top: 1.5rem;
-            color: #666;
+        .btn-secondary {
+            background: var(--text-secondary);
+            color: white;
         }
 
-        .login-link a {
-            color: #4BAEA0;
-            text-decoration: none;
-            font-weight: 600;
+        .btn-secondary:hover {
+            background: var(--text-primary);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .info-box {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border-radius: 4px;
+        }
+
+        .info-box i {
+            color: #3b82f6;
+            margin-right: 0.5rem;
+        }
+
+        .help-text {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
         }
 
         .alert {
@@ -114,52 +329,532 @@
             color: #dc2626;
             border: 1px solid #fecaca;
         }
+
+        .alert-success {
+            background-color: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .login-link {
+            text-align: center;
+            padding: 1rem;
+            background: var(--bg-light);
+            color: var(--text-secondary);
+        }
+
+        .login-link a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 
 <body>
-    <div class="register-container">
-        <div class="header">
-            <h1>Create Account</h1>
-            <p>Start your journey with KidneyCompanion</p>
+    <div class="intake-container">
+        <div class="intake-header">
+            <h1><i class="fas fa-user-plus"></i> Patient Registration</h1>
+            <p>Join KidneyCompanion - Complete your medical profile</p>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-step active" data-step="1">
+                <div class="step-circle">1</div>
+                <div class="step-label">Account & Info</div>
+            </div>
+            <div class="progress-step" data-step="2">
+                <div class="step-circle">2</div>
+                <div class="step-label">Medical History</div>
+            </div>
+            <div class="progress-step" data-step="3">
+                <div class="step-circle">3</div>
+                <div class="step-label">Lab Values</div>
+            </div>
+            <div class="progress-step" data-step="4">
+                <div class="step-circle">4</div>
+                <div class="step-label">Lifestyle</div>
+            </div>
         </div>
 
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
-        {% for category, message in messages %}
-        <div class="alert alert-{{ category }}">{{ message }}</div>
-        {% endfor %}
+        <div style="padding: 2rem; padding-bottom: 0;">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        </div>
         {% endif %}
         {% endwith %}
 
-        <form method="POST" action="{{ url_for('register') }}">
-            <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" id="username" name="username" class="form-control" required>
+        <form id="registerForm" method="POST" action="{{ url_for('register') }}">
+            <div class="form-content">
+                <!-- Step 1: Account & Personal Information -->
+                <div class="form-step active" data-step="1">
+                    <div class="form-section">
+                        <h2 class="section-title">
+                            <i class="fas fa-user-circle"></i> Account Information
+                        </h2>
+                        <div class="info-box">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>Note:</strong> All fields marked with <span style="color: #ef4444;">*</span> are
+                            required.
+                        </div>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Username <span class="required">*</span></label>
+                                <input type="text" name="username" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Email Address <span class="required">*</span></label>
+                                <input type="email" name="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Password <span class="required">*</span></label>
+                                <input type="password" name="password" id="password" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Confirm Password <span class="required">*</span></label>
+                                <input type="password" name="confirm_password" id="confirm_password" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h2 class="section-title">
+                            <i class="fas fa-user"></i> Personal Information
+                        </h2>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Full Name <span class="required">*</span></label>
+                                <input type="text" name="full_name" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Age <span class="required">*</span></label>
+                                <input type="number" name="age" min="1" max="120" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Gender <span class="required">*</span></label>
+                                <select name="gender" required>
+                                    <option value="">Select Gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Blood Type</label>
+                                <select name="blood_type">
+                                    <option value="">Select Blood Type</option>
+                                    <option value="A+">A+</option>
+                                    <option value="A-">A-</option>
+                                    <option value="B+">B+</option>
+                                    <option value="B-">B-</option>
+                                    <option value="AB+">AB+</option>
+                                    <option value="AB-">AB-</option>
+                                    <option value="O+">O+</option>
+                                    <option value="O-">O-</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Phone Number <span class="required">*</span></label>
+                                <input type="tel" name="phone" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Address</label>
+                            <textarea name="address" rows="3"></textarea>
+                        </div>
+                        <div class="form-section">
+                            <h3 class="section-title" style="font-size: 1.1rem;">
+                                <i class="fas fa-phone-alt"></i> Emergency Contact
+                            </h3>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label>Contact Name</label>
+                                    <input type="text" name="emergency_contact_name">
+                                </div>
+                                <div class="form-group">
+                                    <label>Contact Phone</label>
+                                    <input type="tel" name="emergency_contact_phone">
+                                </div>
+                                <div class="form-group">
+                                    <label>Relationship</label>
+                                    <input type="text" name="emergency_contact_relationship">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Medical History -->
+                <div class="form-step" data-step="2">
+                    <div class="form-section">
+                        <h2 class="section-title">
+                            <i class="fas fa-notes-medical"></i> Medical History
+                        </h2>
+                        <div class="form-group">
+                            <label>Pre-existing Conditions</label>
+                            <div class="checkbox-group">
+                                <div class="checkbox-item">
+                                    <input type="checkbox" name="hypertension" id="hypertension" value="1">
+                                    <label for="hypertension">Hypertension (High Blood Pressure)</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" name="diabetes_mellitus" id="diabetes" value="1">
+                                    <label for="diabetes">Diabetes Mellitus</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" name="coronary_artery_disease" id="heart_disease" value="1">
+                                    <label for="heart_disease">Coronary Artery Disease</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" name="anemia" id="anemia" value="1">
+                                    <label for="anemia">Anemia</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Current Medications</label>
+                            <textarea name="current_medications"
+                                placeholder="List all medications you are currently taking..."></textarea>
+                            <span class="help-text">Include dosage and frequency if known</span>
+                        </div>
+                        <div class="form-group">
+                            <label>Allergies</label>
+                            <textarea name="allergies"
+                                placeholder="List any known allergies (medications, food, environmental)..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Family History of Kidney Disease</label>
+                            <div class="radio-group">
+                                <div class="radio-item">
+                                    <input type="radio" name="family_history_kidney" id="family_yes" value="Yes">
+                                    <label for="family_yes">Yes</label>
+                                </div>
+                                <div class="radio-item">
+                                    <input type="radio" name="family_history_kidney" id="family_no" value="No" checked>
+                                    <label for="family_no">No</label>
+                                </div>
+                                <div class="radio-item">
+                                    <input type="radio" name="family_history_kidney" id="family_unknown"
+                                        value="Unknown">
+                                    <label for="family_unknown">Unknown</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Previous Surgeries/Hospitalizations</label>
+                            <textarea name="previous_surgeries"
+                                placeholder="Describe any previous surgeries or hospitalizations..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3: Lab Values & Vitals (OPTIONAL) -->
+                <div class="form-step" data-step="3">
+                    <div class="form-section">
+                        <h2 class="section-title">
+                            <i class="fas fa-vial"></i> Lab Values & Vitals
+                        </h2>
+                        <div class="info-box">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>Optional:</strong> If you don't have recent lab results, you can skip this section
+                            and
+                            upload them later.
+                        </div>
+
+                        <h3 class="section-title" style="font-size: 1.1rem;">
+                            <i class="fas fa-heartbeat"></i> Vital Signs
+                        </h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Blood Pressure - Systolic</label>
+                                <input type="number" name="bp_systolic" placeholder="e.g., 120">
+                                <span class="help-text">mmHg</span>
+                            </div>
+                            <div class="form-group">
+                                <label>Blood Pressure - Diastolic</label>
+                                <input type="number" name="bp_diastolic" placeholder="e.g., 80">
+                                <span class="help-text">mmHg</span>
+                            </div>
+                        </div>
+
+                        <h3 class="section-title" style="font-size: 1.1rem;">
+                            <i class="fas fa-flask"></i> Blood Tests
+                        </h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Serum Creatinine</label>
+                                <input type="number" step="0.1" name="serum_creatinine" placeholder="e.g., 1.0">
+                                <span class="help-text">mg/dL</span>
+                            </div>
+                            <div class="form-group">
+                                <label>Blood Urea Nitrogen (BUN)</label>
+                                <input type="number" step="0.1" name="blood_urea" placeholder="e.g., 20">
+                                <span class="help-text">mg/dL</span>
+                            </div>
+                            <div class="form-group">
+                                <label>eGFR (if known)</label>
+                                <input type="number" step="0.1" name="egfr" placeholder="e.g., 90">
+                                <span class="help-text">mL/min/1.73m²</span>
+                            </div>
+                            <div class="form-group">
+                                <label>Hemoglobin</label>
+                                <input type="number" step="0.1" name="hemoglobin" placeholder="e.g., 14">
+                                <span class="help-text">g/dL</span>
+                            </div>
+                            <div class="form-group">
+                                <label>Blood Glucose</label>
+                                <input type="number" step="0.1" name="blood_glucose" placeholder="e.g., 100">
+                                <span class="help-text">mg/dL</span>
+                            </div>
+                            <div class="form-group">
+                                <label>Sodium</label>
+                                <input type="number" step="0.1" name="sodium" placeholder="e.g., 140">
+                                <span class="help-text">mEq/L</span>
+                            </div>
+                            <div class="form-group">
+                                <label>Potassium</label>
+                                <input type="number" step="0.1" name="potassium" placeholder="e.g., 4.5">
+                                <span class="help-text">mEq/L</span>
+                            </div>
+                        </div>
+
+                        <h3 class="section-title" style="font-size: 1.1rem;">
+                            <i class="fas fa-prescription-bottle"></i> Urine Tests
+                        </h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Specific Gravity</label>
+                                <input type="number" step="0.001" name="specific_gravity" placeholder="e.g., 1.020">
+                            </div>
+                            <div class="form-group">
+                                <label>Albumin</label>
+                                <input type="number" step="0.1" name="albumin" placeholder="e.g., 0">
+                                <span class="help-text">g/dL</span>
+                            </div>
+                            <div class="form-group">
+                                <label>Sugar</label>
+                                <input type="number" step="0.1" name="sugar" placeholder="e.g., 0">
+                                <span class="help-text">g/dL</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 4: Lifestyle & Symptoms -->
+                <div class="form-step" data-step="4">
+                    <div class="form-section">
+                        <h2 class="section-title">
+                            <i class="fas fa-running"></i> Lifestyle & Symptoms
+                        </h2>
+
+                        <h3 class="section-title" style="font-size: 1.1rem;">
+                            <i class="fas fa-utensils"></i> Diet & Habits
+                        </h3>
+                        <div class="form-group">
+                            <label>Smoking Status</label>
+                            <div class="radio-group">
+                                <div class="radio-item">
+                                    <input type="radio" name="smoking" id="smoke_never" value="Never" checked>
+                                    <label for="smoke_never">Never</label>
+                                </div>
+                                <div class="radio-item">
+                                    <input type="radio" name="smoking" id="smoke_former" value="Former">
+                                    <label for="smoke_former">Former</label>
+                                </div>
+                                <div class="radio-item">
+                                    <input type="radio" name="smoking" id="smoke_current" value="Current">
+                                    <label for="smoke_current">Current</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Alcohol Consumption</label>
+                            <select name="alcohol">
+                                <option value="None">None</option>
+                                <option value="Occasional">Occasional (1-2 drinks/week)</option>
+                                <option value="Moderate">Moderate (3-7 drinks/week)</option>
+                                <option value="Heavy">Heavy (>7 drinks/week)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Exercise Frequency</label>
+                            <select name="exercise_frequency">
+                                <option value="None">None</option>
+                                <option value="1-2 times/week">1-2 times per week</option>
+                                <option value="3-4 times/week">3-4 times per week</option>
+                                <option value="5+ times/week">5 or more times per week</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Daily Water Intake</label>
+                            <select name="water_intake">
+                                <option value="<4 glasses">Less than 4 glasses</option>
+                                <option value="4-6 glasses">4-6 glasses</option>
+                                <option value="7-8 glasses">7-8 glasses</option>
+                                <option value=">8 glasses">More than 8 glasses</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Sleep Hours per Night</label>
+                            <input type="number" name="sleep_hours" min="0" max="24" placeholder="e.g., 7">
+                        </div>
+
+                        <h3 class="section-title" style="font-size: 1.1rem;">
+                            <i class="fas fa-stethoscope"></i> Current Symptoms
+                        </h3>
+                        <div class="form-group">
+                            <label>Are you experiencing any of the following?</label>
+                            <div class="checkbox-group">
+                                <div class="checkbox-item">
+                                    <input type="checkbox" name="symptom_fatigue" id="fatigue" value="1">
+                                    <label for="fatigue">Fatigue or weakness</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" name="symptom_swelling" id="swelling" value="1">
+                                    <label for="swelling">Swelling in legs, ankles, or feet (Pedal Edema)</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" name="symptom_urination" id="urination" value="1">
+                                    <label for="urination">Changes in urination frequency</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" name="symptom_appetite" id="appetite_loss" value="1">
+                                    <label for="appetite_loss">Loss of appetite</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" name="symptom_nausea" id="nausea" value="1">
+                                    <label for="nausea">Nausea or vomiting</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" name="symptom_sleep" id="sleep_issues" value="1">
+                                    <label for="sleep_issues">Difficulty sleeping</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Additional Comments or Concerns</label>
+                            <textarea name="additional_comments"
+                                placeholder="Any other information you'd like to share..."></textarea>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div class="form-group">
-                <label for="email">Email Address</label>
-                <input type="email" id="email" name="email" class="form-control" required>
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" id="prevBtn" style="display: none;">
+                    <i class="fas fa-arrow-left"></i> Previous
+                </button>
+                <button type="button" class="btn btn-primary" id="nextBtn">
+                    Next <i class="fas fa-arrow-right"></i>
+                </button>
+                <button type="submit" class="btn btn-primary" id="submitBtn" style="display: none;">
+                    <i class="fas fa-check"></i> Create Account
+                </button>
             </div>
-
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" class="form-control" required>
-            </div>
-
-            <div class="form-group">
-                <label for="confirm_password">Confirm Password</label>
-                <input type="password" id="confirm_password" name="confirm_password" class="form-control" required>
-            </div>
-
-            <button type="submit" class="btn-submit">Sign Up</button>
         </form>
 
         <div class="login-link">
             Already have an account? <a href="{{ url_for('login') }}">Sign In</a>
         </div>
     </div>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 4;
+
+        function showStep(step) {
+            // Hide all steps
+            document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.progress-step').forEach(s => {
+                s.classList.remove('active');
+                if (parseInt(s.dataset.step) < step) {
+                    s.classList.add('completed');
+                } else {
+                    s.classList.remove('completed');
+                }
+            });
+
+            // Show current step
+            document.querySelector(`.form-step[data-step="${step}"]`).classList.add('active');
+            document.querySelector(`.progress-step[data-step="${step}"]`).classList.add('active');
+
+            // Update buttons
+            document.getElementById('prevBtn').style.display = step === 1 ? 'none' : 'inline-flex';
+            document.getElementById('nextBtn').style.display = step === totalSteps ? 'none' : 'inline-flex';
+            document.getElementById('submitBtn').style.display = step === totalSteps ? 'inline-flex' : 'none';
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function validateStep(step) {
+            const currentStepElement = document.querySelector(`.form-step[data-step="${step}"]`);
+            const requiredFields = currentStepElement.querySelectorAll('[required]');
+
+            for (let field of requiredFields) {
+                if (!field.value.trim()) {
+                    field.focus();
+                    alert('Please fill in all required fields before proceeding.');
+                    return false;
+                }
+            }
+
+            // Password validation for step 1
+            if (step === 1) {
+                const password = document.getElementById('password').value;
+                const confirmPassword = document.getElementById('confirm_password').value;
+
+                if (password !== confirmPassword) {
+                    alert('Passwords do not match!');
+                    document.getElementById('confirm_password').focus();
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        document.getElementById('nextBtn').addEventListener('click', () => {
+            if (validateStep(currentStep)) {
+                if (currentStep < totalSteps) {
+                    currentStep++;
+                    showStep(currentStep);
+                }
+            }
+        });
+
+        document.getElementById('prevBtn').addEventListener('click', () => {
+            if (currentStep > 1) {
+                currentStep--;
+                showStep(currentStep);
+            }
+        });
+
+        // Form submission
+        document.getElementById('registerForm').addEventListener('submit', (e) => {
+            if (!validateStep(currentStep)) {
+                e.preventDefault();
+                return;
+            }
+
+            // Show loading state
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
+        });
+
+        // Initialize
+        showStep(1);
+    </script>
 </body>
 
 </html>

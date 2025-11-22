@@ -56,7 +56,7 @@ def register():
         confirm_password = request.form.get('confirm_password')
         
         if not all([username, email, password, confirm_password]):
-            flash('All fields are required', 'danger')
+            flash('All required fields must be filled', 'danger')
             return render_template('register.html')
         
         if password != confirm_password:
@@ -67,11 +67,131 @@ def register():
             flash('Username already exists', 'danger')
             return render_template('register.html')
         
-        # Create new patient user
-        User.create_user(username, password, 'patient', email)
-        
-        flash('Registration successful! Please login.', 'success')
-        return redirect(url_for('login'))
+        try:
+            # Create new patient user
+            User.create_user(username, password, 'patient', email)
+            
+            # Collect comprehensive medical data
+            patient_data = {
+                'patient_id': f"P{username}",
+                'patient_name': request.form.get('full_name'),
+                'username': username,
+                'age': int(request.form.get('age', 0)),
+                'gender': request.form.get('gender'),
+                'blood_type': request.form.get('blood_type', 'N/A'),
+                'phone': request.form.get('phone'),
+                'email': email,
+                'address': request.form.get('address', ''),
+                
+                # Emergency contact
+                'emergency_contact': {
+                    'name': request.form.get('emergency_contact_name', ''),
+                    'phone': request.form.get('emergency_contact_phone', ''),
+                    'relationship': request.form.get('emergency_contact_relationship', '')
+                },
+                
+                # Medical history
+                'hypertension': 1 if request.form.get('hypertension') else 0,
+                'diabetes_mellitus': 1 if request.form.get('diabetes_mellitus') else 0,
+                'coronary_artery_disease': 1 if request.form.get('coronary_artery_disease') else 0,
+                'anemia': 1 if request.form.get('anemia') else 0,
+                'current_medications': request.form.get('current_medications', ''),
+                'allergies': request.form.get('allergies', ''),
+                'family_history_kidney': request.form.get('family_history_kidney', 'No'),
+                'previous_surgeries': request.form.get('previous_surgeries', ''),
+                
+                # Lab values (optional)
+                'bp_systolic': float(request.form.get('bp_systolic')) if request.form.get('bp_systolic') else None,
+                'bp_diastolic': float(request.form.get('bp_diastolic')) if request.form.get('bp_diastolic') else None,
+                'serum_creatinine': float(request.form.get('serum_creatinine')) if request.form.get('serum_creatinine') else None,
+                'blood_urea': float(request.form.get('blood_urea')) if request.form.get('blood_urea') else None,
+                'egfr': float(request.form.get('egfr')) if request.form.get('egfr') else None,
+                'hemoglobin': float(request.form.get('hemoglobin')) if request.form.get('hemoglobin') else None,
+                'blood_glucose': float(request.form.get('blood_glucose')) if request.form.get('blood_glucose') else None,
+                'sodium': float(request.form.get('sodium')) if request.form.get('sodium') else None,
+                'potassium': float(request.form.get('potassium')) if request.form.get('potassium') else None,
+                'specific_gravity': float(request.form.get('specific_gravity')) if request.form.get('specific_gravity') else None,
+                'albumin': float(request.form.get('albumin')) if request.form.get('albumin') else None,
+                'sugar': float(request.form.get('sugar')) if request.form.get('sugar') else None,
+                
+                # Lifestyle
+                'smoking': request.form.get('smoking', 'Never'),
+                'alcohol': request.form.get('alcohol', 'None'),
+                'exercise_frequency': request.form.get('exercise_frequency', 'None'),
+                'water_intake': request.form.get('water_intake', '4-6 glasses'),
+                'sleep_hours': int(request.form.get('sleep_hours')) if request.form.get('sleep_hours') else None,
+                
+                # Symptoms
+                'symptoms': {
+                    'fatigue': 1 if request.form.get('symptom_fatigue') else 0,
+                    'pedal_edema': 1 if request.form.get('symptom_swelling') else 0,
+                    'urination_changes': 1 if request.form.get('symptom_urination') else 0,
+                    'appetite_loss': 1 if request.form.get('symptom_appetite') else 0,
+                    'nausea': 1 if request.form.get('symptom_nausea') else 0,
+                    'sleep_issues': 1 if request.form.get('symptom_sleep') else 0
+                },
+                'additional_comments': request.form.get('additional_comments', ''),
+                
+                # Set pedal_edema and appetite for ML model
+                'pedal_edema': 1 if request.form.get('symptom_swelling') else 0,
+                'appetite': 0 if request.form.get('symptom_appetite') else 1,  # Inverted: 0 = poor, 1 = good
+            }
+            
+            # Calculate CKD risk if we have necessary lab values
+            if patient_data['serum_creatinine'] and patient_data['blood_urea']:
+                from models.ckd_model import ckd_model
+                
+                # Prepare data for ML model (fill missing values with defaults)
+                ml_data = {
+                    'age': patient_data['age'],
+                    'bp_systolic': patient_data['bp_systolic'] or 120,
+                    'bp_diastolic': patient_data['bp_diastolic'] or 80,
+                    'specific_gravity': patient_data['specific_gravity'] or 1.020,
+                    'albumin': patient_data['albumin'] or 0,
+                    'sugar': patient_data['sugar'] or 0,
+                    'red_blood_cells': 1,  # Default normal
+                    'pus_cell': 0,  # Default normal
+                    'bacteria': 0,  # Default normal
+                    'blood_glucose': patient_data['blood_glucose'] or 100,
+                    'blood_urea': patient_data['blood_urea'],
+                    'serum_creatinine': patient_data['serum_creatinine'],
+                    'sodium': patient_data['sodium'] or 140,
+                    'potassium': patient_data['potassium'] or 4.5,
+                    'hemoglobin': patient_data['hemoglobin'] or 14,
+                    'packed_cell_volume': 44,  # Default
+                    'white_blood_cell_count': 8000,  # Default
+                    'red_blood_cell_count': 5,  # Default
+                    'hypertension': patient_data['hypertension'],
+                    'diabetes_mellitus': patient_data['diabetes_mellitus'],
+                    'coronary_artery_disease': patient_data['coronary_artery_disease'],
+                    'appetite': patient_data['appetite'],
+                    'pedal_edema': patient_data['pedal_edema'],
+                    'anemia': patient_data['anemia']
+                }
+                
+                # Get prediction
+                prediction = ckd_model.predict_risk(ml_data)
+                patient_data.update(prediction)
+            else:
+                # Set default risk assessment
+                patient_data['risk_level'] = 'Unknown'
+                patient_data['risk_percentage'] = 0
+                patient_data['stage'] = 'N/A'
+            
+            # Save patient medical data to database
+            save_patient_record(username, patient_data)
+            
+            flash('Registration successful! Your medical profile has been created.', 'success')
+            
+            # Log the user in automatically
+            user = User.get_by_username(username)
+            login_user(user)
+            
+            return redirect(url_for('patient_dashboard'))
+            
+        except Exception as e:
+            flash(f'Error during registration: {str(e)}', 'danger')
+            return render_template('register.html')
         
     return render_template('register.html')
 
@@ -95,22 +215,18 @@ def login():
     
     return render_template('login.html')
 
-@app.route('/doctor/login', methods=['GET', 'POST'])
-def doctor_login():
-    if current_user.is_authenticated:
-        if current_user.is_doctor():
-            return redirect(url_for('doctor_dashboard'))
-        else:
-            flash('You are logged in as a patient. Please logout first.', 'warning')
-            return redirect(url_for('patient_portal'))
-    
-    if request.method == 'POST':
-        username = request.form.get('username') or ''
-        password = request.form.get('password') or ''
-        
+@app.route('/admin/login', methods=['GET', 'POST'])
+def admin_login():
+    if session.get('admin_logged_in'):
+        return redirect(url_for('admin_dashboard'))
+
     if request.method == 'POST':
         admin_id = request.form.get('admin_id')
         admin_password = request.form.get('admin_password')
+        
+        # Hardcoded admin credentials (should be moved to env vars in production)
+        ADMIN_ID = "admin"
+        ADMIN_PASSWORD = "admin123"
         
         if admin_id == ADMIN_ID and admin_password == ADMIN_PASSWORD:
             session['admin_logged_in'] = True
@@ -197,7 +313,7 @@ def doctor_dashboard():
             'stage': data.get('stage', 'N/A'),
             'risk_level': data.get('risk_level', 'Unknown'),
             'age': data.get('age', 'N/A'),
-            'egfr': data.get('egfr', 'N/A')
+            'egfr': data.get('egfr')
         })
     
     return render_template('doctor_dashboard.html', patients=all_patients)
@@ -240,7 +356,7 @@ def get_dashboard_patients():
             'stage': data.get('stage', 'N/A'),
             'risk_level': data.get('risk_level', 'Unknown'),
             'age': data.get('age', 'N/A'),
-            'egfr': data.get('egfr', 'N/A')
+            'egfr': data.get('egfr')
         })
     
     return jsonify({'patients': patients})
@@ -516,6 +632,140 @@ def patient_dashboard():
             dashboard_data['history'] = patient_data['history']
             dashboard_data['lab_reports_count'] = len(patient_data['history'])
     
+    # Generate personalized lifestyle recommendations
+    lifestyle_recommendations = []
+    
+    if patient_data:
+        # Hydration recommendation based on water intake
+        water_intake = patient_data.get('water_intake', '4-6 glasses')
+        if '<4 glasses' in water_intake:
+            lifestyle_recommendations.append({
+                'icon': 'fa-tint',
+                'title': 'Hydration',
+                'description': 'You\'re drinking less than 4 glasses daily. Increase to 8-10 glasses of water daily. Limit fluid intake if advised by doctor.'
+            })
+        elif '4-6 glasses' in water_intake:
+            lifestyle_recommendations.append({
+                'icon': 'fa-tint',
+                'title': 'Hydration',
+                'description': 'Good progress! Aim for 8-10 glasses of water daily. Limit fluid intake if advised by doctor.'
+            })
+        else:
+            lifestyle_recommendations.append({
+                'icon': 'fa-tint',
+                'title': 'Hydration',
+                'description': 'Excellent! You\'re drinking ' + water_intake + ' daily. Maintain this level. Limit fluid intake if advised by doctor.'
+            })
+        
+        # Low Sodium Diet (always recommended for CKD)
+        lifestyle_recommendations.append({
+            'icon': 'fa-carrot',
+            'title': 'Low Sodium Diet',
+            'description': 'Limit sodium intake to less than 2,300mg per day. Avoid processed foods.'
+        })
+        
+        # Exercise recommendation based on exercise frequency
+        exercise_freq = patient_data.get('exercise_frequency', 'None')
+        if exercise_freq == 'None':
+            lifestyle_recommendations.append({
+                'icon': 'fa-dumbbell',
+                'title': 'Regular Exercise',
+                'description': 'Start with 15-20 minutes of light exercise, 3 days a week. Walking, swimming recommended. Gradually increase to 30 minutes, 5 days a week.'
+            })
+        elif '1-2 times/week' in exercise_freq:
+            lifestyle_recommendations.append({
+                'icon': 'fa-dumbbell',
+                'title': 'Regular Exercise',
+                'description': 'Good start! Increase to 30 minutes of moderate exercise, 5 days a week. Walking, swimming recommended.'
+            })
+        elif '3-4 times/week' in exercise_freq:
+            lifestyle_recommendations.append({
+                'icon': 'fa-dumbbell',
+                'title': 'Regular Exercise',
+                'description': 'Great job! Aim for 30 minutes of moderate exercise, 5 days a week. Walking, swimming recommended.'
+            })
+        else:
+            lifestyle_recommendations.append({
+                'icon': 'fa-dumbbell',
+                'title': 'Regular Exercise',
+                'description': 'Excellent! You\'re exercising 5+ times per week. Maintain 30 minutes of moderate exercise. Walking, swimming recommended.'
+            })
+        
+        # Sleep recommendation based on sleep hours
+        sleep_hours = patient_data.get('sleep_hours')
+        if sleep_hours:
+            if sleep_hours < 6:
+                lifestyle_recommendations.append({
+                    'icon': 'fa-bed',
+                    'title': 'Sleep Schedule',
+                    'description': f'You\'re getting only {sleep_hours} hours of sleep. Aim for 7-8 hours of quality sleep. Fixed bedtime routine recommended.'
+                })
+            elif sleep_hours >= 6 and sleep_hours < 7:
+                lifestyle_recommendations.append({
+                    'icon': 'fa-bed',
+                    'title': 'Sleep Schedule',
+                    'description': f'Good! You\'re getting {sleep_hours} hours. Aim for 7-8 hours of quality sleep. Fixed bedtime routine recommended.'
+                })
+            elif sleep_hours >= 7 and sleep_hours <= 8:
+                lifestyle_recommendations.append({
+                    'icon': 'fa-bed',
+                    'title': 'Sleep Schedule',
+                    'description': f'Perfect! You\'re getting {sleep_hours} hours of quality sleep. Maintain this schedule. Fixed bedtime routine recommended.'
+                })
+            else:
+                lifestyle_recommendations.append({
+                    'icon': 'fa-bed',
+                    'title': 'Sleep Schedule',
+                    'description': f'You\'re sleeping {sleep_hours} hours. Aim for 7-8 hours of quality sleep. Fixed bedtime routine recommended.'
+                })
+        else:
+            lifestyle_recommendations.append({
+                'icon': 'fa-bed',
+                'title': 'Sleep Schedule',
+                'description': 'Maintain 7-8 hours of quality sleep. Fixed bedtime routine recommended.'
+            })
+        
+        # Smoking cessation if applicable
+        smoking_status = patient_data.get('smoking', 'Never')
+        if smoking_status == 'Current':
+            lifestyle_recommendations.insert(1, {
+                'icon': 'fa-smoking-ban',
+                'title': 'Quit Smoking',
+                'description': 'Smoking significantly worsens kidney disease. Seek support to quit smoking immediately. Talk to your doctor about cessation programs.'
+            })
+        elif smoking_status == 'Former':
+            lifestyle_recommendations.insert(1, {
+                'icon': 'fa-check-circle',
+                'title': 'Smoke-Free',
+                'description': 'Congratulations on quitting smoking! Stay smoke-free to protect your kidney health.'
+            })
+    else:
+        # Default recommendations if no patient data
+        lifestyle_recommendations = [
+            {
+                'icon': 'fa-tint',
+                'title': 'Hydration',
+                'description': 'Drink 8-10 glasses of water daily. Limit fluid intake if advised by doctor.'
+            },
+            {
+                'icon': 'fa-carrot',
+                'title': 'Low Sodium Diet',
+                'description': 'Limit sodium intake to less than 2,300mg per day. Avoid processed foods.'
+            },
+            {
+                'icon': 'fa-dumbbell',
+                'title': 'Regular Exercise',
+                'description': '30 minutes of moderate exercise, 5 days a week. Walking, swimming recommended.'
+            },
+            {
+                'icon': 'fa-bed',
+                'title': 'Sleep Schedule',
+                'description': 'Maintain 7-8 hours of quality sleep. Fixed bedtime routine recommended.'
+            }
+        ]
+    
+    dashboard_data['lifestyle_recommendations'] = lifestyle_recommendations
+    
     return render_template('patient_dashboard.html', 
                          patient=patient_data, 
                          trials=patient_trials,
@@ -725,6 +975,340 @@ def lab_results():
 @login_required
 def education():
     return render_template('education.html')
+
+@app.route('/patient/diet-plan')
+@login_required
+def diet_plan():
+    """Display detailed diet and lifestyle plan"""
+    if current_user.is_doctor():
+        return redirect(url_for('doctor_dashboard'))
+    
+    # Get patient records
+    patient_data = get_patient_records(current_user.username)
+    
+    # Generate personalized lifestyle recommendations (same logic as dashboard)
+    lifestyle_recommendations = []
+    
+    if patient_data:
+        # Hydration recommendation
+        water_intake = patient_data.get('water_intake', '4-6 glasses')
+        if '<4 glasses' in water_intake:
+            lifestyle_recommendations.append({
+                'icon': 'fa-tint',
+                'title': 'Hydration',
+                'description': 'You\'re drinking less than 4 glasses daily. Increase to 8-10 glasses of water daily. Limit fluid intake if advised by doctor.',
+                'status': 'needs-improvement',
+                'status_text': 'Needs Improvement'
+            })
+        elif '4-6 glasses' in water_intake:
+            lifestyle_recommendations.append({
+                'icon': 'fa-tint',
+                'title': 'Hydration',
+                'description': 'Good progress! Aim for 8-10 glasses of water daily. Limit fluid intake if advised by doctor.',
+                'status': 'good',
+                'status_text': 'Good Progress'
+            })
+        else:
+            lifestyle_recommendations.append({
+                'icon': 'fa-tint',
+                'title': 'Hydration',
+                'description': 'Excellent! You\'re drinking ' + water_intake + ' daily. Maintain this level. Limit fluid intake if advised by doctor.',
+                'status': 'excellent',
+                'status_text': 'Excellent'
+            })
+        
+        # Low Sodium Diet
+        lifestyle_recommendations.append({
+            'icon': 'fa-carrot',
+            'title': 'Low Sodium Diet',
+            'description': 'Limit sodium intake to less than 2,300mg per day. Avoid processed foods.',
+            'status': None,
+            'status_text': None
+        })
+        
+        # Exercise recommendation
+        exercise_freq = patient_data.get('exercise_frequency', 'None')
+        if exercise_freq == 'None':
+            lifestyle_recommendations.append({
+                'icon': 'fa-dumbbell',
+                'title': 'Regular Exercise',
+                'description': 'Start with 15-20 minutes of light exercise, 3 days a week. Walking, swimming recommended. Gradually increase to 30 minutes, 5 days a week.',
+                'status': 'needs-improvement',
+                'status_text': 'Get Started'
+            })
+        elif '1-2 times/week' in exercise_freq:
+            lifestyle_recommendations.append({
+                'icon': 'fa-dumbbell',
+                'title': 'Regular Exercise',
+                'description': 'Good start! Increase to 30 minutes of moderate exercise, 5 days a week. Walking, swimming recommended.',
+                'status': 'good',
+                'status_text': 'Good Start'
+            })
+        elif '3-4 times/week' in exercise_freq:
+            lifestyle_recommendations.append({
+                'icon': 'fa-dumbbell',
+                'title': 'Regular Exercise',
+                'description': 'Great job! Aim for 30 minutes of moderate exercise, 5 days a week. Walking, swimming recommended.',
+                'status': 'good',
+                'status_text': 'Great Progress'
+            })
+        else:
+            lifestyle_recommendations.append({
+                'icon': 'fa-dumbbell',
+                'title': 'Regular Exercise',
+                'description': 'Excellent! You\'re exercising 5+ times per week. Maintain 30 minutes of moderate exercise. Walking, swimming recommended.',
+                'status': 'excellent',
+                'status_text': 'Excellent'
+            })
+        
+        # Sleep recommendation
+        sleep_hours = patient_data.get('sleep_hours')
+        if sleep_hours:
+            if sleep_hours < 6:
+                lifestyle_recommendations.append({
+                    'icon': 'fa-bed',
+                    'title': 'Sleep Schedule',
+                    'description': f'You\'re getting only {sleep_hours} hours of sleep. Aim for 7-8 hours of quality sleep. Fixed bedtime routine recommended.',
+                    'status': 'critical',
+                    'status_text': 'Critical - Too Little'
+                })
+            elif sleep_hours >= 6 and sleep_hours < 7:
+                lifestyle_recommendations.append({
+                    'icon': 'fa-bed',
+                    'title': 'Sleep Schedule',
+                    'description': f'Good! You\'re getting {sleep_hours} hours. Aim for 7-8 hours of quality sleep. Fixed bedtime routine recommended.',
+                    'status': 'good',
+                    'status_text': 'Almost There'
+                })
+            elif sleep_hours >= 7 and sleep_hours <= 8:
+                lifestyle_recommendations.append({
+                    'icon': 'fa-bed',
+                    'title': 'Sleep Schedule',
+                    'description': f'Perfect! You\'re getting {sleep_hours} hours of quality sleep. Maintain this schedule. Fixed bedtime routine recommended.',
+                    'status': 'excellent',
+                    'status_text': 'Perfect'
+                })
+            else:
+                lifestyle_recommendations.append({
+                    'icon': 'fa-bed',
+                    'title': 'Sleep Schedule',
+                    'description': f'You\'re sleeping {sleep_hours} hours. Aim for 7-8 hours of quality sleep. Fixed bedtime routine recommended.',
+                    'status': 'needs-improvement',
+                    'status_text': 'Too Much'
+                })
+        else:
+            lifestyle_recommendations.append({
+                'icon': 'fa-bed',
+                'title': 'Sleep Schedule',
+                'description': 'Maintain 7-8 hours of quality sleep. Fixed bedtime routine recommended.',
+                'status': None,
+                'status_text': None
+            })
+        
+        # Smoking cessation
+        smoking_status = patient_data.get('smoking', 'Never')
+        if smoking_status == 'Current':
+            lifestyle_recommendations.insert(1, {
+                'icon': 'fa-smoking-ban',
+                'title': 'Quit Smoking',
+                'description': 'Smoking significantly worsens kidney disease. Seek support to quit smoking immediately. Talk to your doctor about cessation programs.',
+                'status': 'critical',
+                'status_text': 'Critical Action Needed'
+            })
+        elif smoking_status == 'Former':
+            lifestyle_recommendations.insert(1, {
+                'icon': 'fa-check-circle',
+                'title': 'Smoke-Free',
+                'description': 'Congratulations on quitting smoking! Stay smoke-free to protect your kidney health.',
+                'status': 'excellent',
+                'status_text': 'Excellent Achievement'
+            })
+    else:
+        # Default recommendations
+        lifestyle_recommendations = [
+            {
+                'icon': 'fa-tint',
+                'title': 'Hydration',
+                'description': 'Drink 8-10 glasses of water daily. Limit fluid intake if advised by doctor.',
+                'status': None,
+                'status_text': None
+            },
+            {
+                'icon': 'fa-carrot',
+                'title': 'Low Sodium Diet',
+                'description': 'Limit sodium intake to less than 2,300mg per day. Avoid processed foods.',
+                'status': None,
+                'status_text': None
+            },
+            {
+                'icon': 'fa-dumbbell',
+                'title': 'Regular Exercise',
+                'description': '30 minutes of moderate exercise, 5 days a week. Walking, swimming recommended.',
+                'status': None,
+                'status_text': None
+            },
+            {
+                'icon': 'fa-bed',
+                'title': 'Sleep Schedule',
+                'description': 'Maintain 7-8 hours of quality sleep. Fixed bedtime routine recommended.',
+                'status': None,
+                'status_text': None
+            }
+        ]
+    
+    return render_template('diet_plan.html', lifestyle_recommendations=lifestyle_recommendations)
+
+@app.route('/patient/ai-lifestyle-plan')
+@login_required
+def ai_lifestyle_plan():
+    """AI-powered personalized lifestyle plan page"""
+    if current_user.is_doctor():
+        return redirect(url_for('doctor_dashboard'))
+    
+    # Get patient data
+    patient_data = get_patient_records(current_user.username)
+    
+    # Check for existing AI recommendations
+    from models.database import get_ai_recommendations
+    recommendations = get_ai_recommendations(current_user.username)
+    
+    return render_template('ai_lifestyle_plan.html',
+                         patient=patient_data,
+                         recommendations=recommendations)
+
+@app.route('/patient/generate-ai-recommendations', methods=['POST'])
+@login_required
+def generate_ai_recommendations():
+    """API endpoint to generate AI recommendations"""
+    if current_user.is_doctor():
+        return jsonify({'success': False, 'error': 'Access denied'}), 403
+    
+    try:
+        # Get patient data
+        patient_data = get_patient_records(current_user.username)
+        
+        if not patient_data:
+            return jsonify({
+                'success': False,
+                'error': 'Patient data not found'
+            }), 404
+        
+        # Initialize AI recommender
+        from models.ai_recommender import CKDAIRecommender
+        recommender = CKDAIRecommender()
+        
+        # Generate comprehensive plan
+        recommendations = recommender.generate_comprehensive_plan(patient_data)
+        
+        # Save to database
+        from models.database import save_ai_recommendations
+        save_ai_recommendations(current_user.username, recommendations)
+        
+        return jsonify({
+            'success': True,
+            'recommendations': recommendations
+        })
+    
+    except ValueError as e:
+        # API key not configured
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+    except Exception as e:
+        print(f"Error generating AI recommendations: {e}")
+        return jsonify({
+            'success': False,
+            'error': 'Failed to generate recommendations. Please try again later.'
+        }), 500
+
+
+
+@app.route('/patient/upload-lab', methods=['POST'])
+@login_required
+def upload_lab_report_pdf():
+    """Upload and analyze lab report PDF"""
+    if current_user.is_doctor():
+        return jsonify({'error': 'Access denied'}), 403
+    
+    # Check if file was uploaded
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file uploaded'}), 400
+    
+    file = request.files['file']
+    disease_type = request.form.get('disease_type', 'ckd')
+    use_defaults = request.form.get('use_defaults', 'false') == 'true'
+    
+    if file.filename == '':
+        return jsonify({'error': 'No file selected'}), 400
+    
+    # Check file extension
+    if not file.filename.lower().endswith('.pdf'):
+        return jsonify({'error': 'Only PDF files are allowed'}), 400
+    
+    try:
+        from models.pdf_parser import LabReportParser
+        from models.disease_predictor import KidneyDiseasePredictor
+        from werkzeug.utils import secure_filename
+        import os
+        
+        # Create uploads directory if it doesn't exist
+        upload_folder = 'uploads/lab_reports'
+        os.makedirs(upload_folder, exist_ok=True)
+        
+        # Save uploaded file
+        filename = secure_filename(f"{current_user.username}_{disease_type}_{file.filename}")
+        filepath = os.path.join(upload_folder, filename)
+        file.save(filepath)
+        
+        # Parse PDF and extract values
+        parser = LabReportParser(filepath)
+        
+        if use_defaults:
+            # Use default values for testing
+            lab_values = parser.set_default_values(disease_type)
+        else:
+            # Extract from PDF
+            lab_values = parser.extract_values(disease_type)
+        
+        if not lab_values:
+            # If no values extracted, use defaults
+            lab_values = parser.set_default_values(disease_type)
+        
+        # Predict disease severity
+        predictor = KidneyDiseasePredictor()
+        
+        if disease_type == 'ckd':
+            prediction = predictor.predict_ckd(lab_values)
+        elif disease_type == 'kidney_stone':
+            prediction = predictor.predict_kidney_stone(lab_values)
+        elif disease_type == 'aki':
+            prediction = predictor.predict_aki(lab_values)
+        elif disease_type == 'esrd':
+            prediction = predictor.predict_esrd(lab_values)
+        else:
+            return jsonify({'error': 'Invalid disease type'}), 400
+        
+        # Update patient records with extracted values
+        from models.user import update_patient_lab_values
+        update_patient_lab_values(current_user.username, lab_values, prediction)
+        
+        # Decrement trial count
+        from models.user import decrement_trial_count
+        decrement_trial_count(current_user.username)
+        
+        return jsonify({
+            'success': True,
+            'message': f'{prediction["disease"]} analysis complete!',
+            'extracted_values': lab_values,
+            'prediction': prediction
+        })
+    
+    except Exception as e:
+        print(f"Error processing lab report: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': f'Failed to process lab report: {str(e)}'}), 500
 
 
 

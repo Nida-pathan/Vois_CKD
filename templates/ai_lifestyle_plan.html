@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Lifestyle Plan - Kidney Companion</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .disclaimer {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px 20px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #856404;
+        }
+
+        .generate-section {
+            background: white;
+            padding: 60px 40px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .generate-section i {
+            font-size: 80px;
+            color: #667eea;
+            margin-bottom: 30px;
+        }
+
+        .generate-section h2 {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .generate-section p {
+            color: #666;
+            font-size: 16px;
+            line-height: 1.8;
+            margin-bottom: 30px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .generate-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.5);
+        }
+
+        .generate-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .tabs {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .tab-buttons {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 20px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .tab-btn:hover {
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .tab-btn.active {
+            color: #667eea;
+            background: white;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .section-title {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .info-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+        }
+
+        .info-card h4 {
+            color: #667eea;
+            font-size: 14px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .info-card p {
+            color: #333;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .recipe-card {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .recipe-card h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .recipe-meta {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .recipe-meta span {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .swap-item {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .swap-arrow {
+            color: #667eea;
+            font-size: 24px;
+        }
+
+        .swap-content {
+            flex: 1;
+        }
+
+        .swap-content strong {
+            color: #333;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .swap-content small {
+            color: #666;
+        }
+
+        .exercise-day {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
+
+        .exercise-day h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .back-btn {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+            padding: 12px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            display: inline-block;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .list-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .list-item:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1><i class="fas fa-robot"></i> AI-Powered Lifestyle Plan</h1>
+            <p>Personalized CKD-safe recommendations powered by Google Gemini AI</p>
+        </div>
+
+        <!-- Disclaimer -->
+        <div class="disclaimer">
+            <i class="fas fa-info-circle"></i> <strong>Important:</strong> These AI-generated recommendations are
+            educational and should be reviewed with your healthcare provider before making significant lifestyle
+            changes.
+        </div>
+
+        {% if not recommendations %}
+        <!-- Generate Plan Section -->
+        <div class="generate-section" id="generateSection">
+            <i class="fas fa-magic"></i>
+            <h2>Ready to Get Your Personalized Plan?</h2>
+            <p>
+                Our AI will analyze your health profile and create a comprehensive lifestyle plan tailored specifically
+                for you, including:
+                <br><br>
+                ✓ Low-sodium & low-potassium diet plan<br>
+                ✓ 7 days of CKD-safe recipes<br>
+                ✓ Smart food swaps<br>
+                ✓ Personalized hydration guide<br>
+                ✓ Custom exercise routine based on your kidney function<br>
+                ✓ Daily routine suggestions
+            </p>
+            <button class="generate-btn" onclick="generatePlan()" id="generateBtn">
+                <i class="fas fa-sparkles"></i> Generate My AI Plan
+            </button>
+        </div>
+
+        <!-- Loading State -->
+        <div class="loading" id="loadingSection">
+            <div class="spinner"></div>
+            <h3 style="color: white; margin-bottom: 10px;">Generating Your Personalized Plan...</h3>
+            <p style="color: rgba(255,255,255,0.8);">Our AI is analyzing your health profile and creating custom
+                recommendations. This may take 30-60 seconds.</p>
+        </div>
+
+        {% else %}
+        <!-- Recommendations Display -->
+        <div class="tabs">
+            <div class="tab-buttons">
+                <button class="tab-btn active" onclick="showTab('diet')">
+                    <i class="fas fa-utensils"></i> Diet Plan
+                </button>
+                <button class="tab-btn" onclick="showTab('swaps')">
+                    <i class="fas fa-exchange-alt"></i> Food Swaps
+                </button>
+                <button class="tab-btn" onclick="showTab('hydration')">
+                    <i class="fas fa-tint"></i> Hydration
+                </button>
+                <button class="tab-btn" onclick="showTab('recipes')">
+                    <i class="fas fa-book"></i> Recipes
+                </button>
+                <button class="tab-btn" onclick="showTab('exercise')">
+                    <i class="fas fa-running"></i> Exercise
+                </button>
+                <button class="tab-btn" onclick="showTab('routine')">
+                    <i class="fas fa-clock"></i> Daily Routine
+                </button>
+            </div>
+
+            <!-- Diet Plan Tab -->
+            <div class="tab-content active" id="diet-tab">
+                <div class="section-title">
+                    <i class="fas fa-utensils"></i> Your Personalized Diet Plan
+                </div>
+
+                <div class="info-grid">
+                    <div class="info-card">
+                        <h4>Daily Sodium Limit</h4>
+                        <p>{{ recommendations.diet_plan.daily_sodium_limit_mg }} mg</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>Daily Potassium Limit</h4>
+                        <p>{{ recommendations.diet_plan.daily_potassium_limit_mg }} mg</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>Daily Protein Target</h4>
+                        <p>{{ recommendations.diet_plan.daily_protein_g }} g</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>Daily Fluid Limit</h4>
+                        <p>{{ recommendations.diet_plan.daily_fluid_limit_ml }} ml</p>
+                    </div>
+                </div>
+
+                <h3 style="margin: 30px 0 15px;">Foods to Avoid</h3>
+                <div style="background: #fff3cd; padding: 20px; border-radius: 12px;">
+                    {% for food in recommendations.diet_plan.foods_to_avoid %}
+                    <div class="list-item">❌ {{ food }}</div>
+                    {% endfor %}
+                </div>
+
+                <h3 style="margin: 30px 0 15px;">Recommended Foods</h3>
+                <div style="background: #d4edda; padding: 20px; border-radius: 12px;">
+                    {% for food in recommendations.diet_plan.recommended_foods %}
+                    <div class="list-item">✅ {{ food }}</div>
+                    {% endfor %}
+                </div>
+
+                <h3 style="margin: 30px 0 15px;">Meal Timing</h3>
+                <p>{{ recommendations.diet_plan.meal_timing }}</p>
+
+                <h3 style="margin: 30px 0 15px;">Portion Guidelines</h3>
+                <p>{{ recommendations.diet_plan.portion_guidelines }}</p>
+            </div>
+
+            <!-- Food Swaps Tab -->
+            <div class="tab-content" id="swaps-tab">
+                <div class="section-title">
+                    <i class="fas fa-exchange-alt"></i> Smart Food Swaps
+                </div>
+
+                {% for swap in recommendations.food_swaps %}
+                <div class="swap-item">
+                    <div class="swap-content">
+                        <strong>Instead of: {{ swap.high_item }}</strong>
+                        <strong style="color: #667eea;">Try: {{ swap.low_alternative }}</strong>
+                        <small>{{ swap.reason }}</small>
+                        <br>
+                        <small style="color: #28a745;">Saves: {{ swap.sodium_saved_mg }}mg sodium, {{
+                            swap.potassium_saved_mg }}mg potassium</small>
+                    </div>
+                    <div class="swap-arrow">
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Hydration Tab -->
+            <div class="tab-content" id="hydration-tab">
+                <div class="section-title">
+                    <i class="fas fa-tint"></i> Hydration Plan
+                </div>
+
+                <div class="info-card" style="margin-bottom: 30px;">
+                    <h4>Daily Fluid Limit</h4>
+                    <p>{{ recommendations.hydration_plan.daily_limit_liters }} Liters</p>
+                </div>
+
+                <h3 style="margin-bottom: 15px;">Timing Tips</h3>
+                {% for tip in recommendations.hydration_plan.timing_tips %}
+                <div class="list-item">💧 {{ tip }}</div>
+                {% endfor %}
+
+                <h3 style="margin: 30px 0 15px;">Warning Signs of Overhydration</h3>
+                <div style="background: #f8d7da; padding: 20px; border-radius: 12px;">
+                    {% for sign in recommendations.hydration_plan.warning_signs %}
+                    <div class="list-item">⚠️ {{ sign }}</div>
+                    {% endfor %}
+                </div>
+
+                <h3 style="margin: 30px 0 15px;">Tracking Method</h3>
+                <p>{{ recommendations.hydration_plan.tracking_method }}</p>
+            </div>
+
+            <!-- Recipes Tab -->
+            <div class="tab-content" id="recipes-tab">
+                <div class="section-title">
+                    <i class="fas fa-book"></i> Weekly CKD-Safe Recipes
+                </div>
+
+                {% for recipe in recommendations.weekly_recipes %}
+                <div class="recipe-card">
+                    <h3>{{ recipe.day }}: {{ recipe.recipe_name }}</h3>
+                    <div class="recipe-meta">
+                        <span><i class="fas fa-clock"></i> {{ recipe.prep_time_minutes }} min</span>
+                        <span><i class="fas fa-utensils"></i> {{ recipe.meal_type }}</span>
+                        <span style="color: #28a745;">Sodium: {{ recipe.nutrition_per_serving.sodium_mg }}mg</span>
+                        <span style="color: #ffc107;">Potassium: {{ recipe.nutrition_per_serving.potassium_mg
+                            }}mg</span>
+                        <span>Protein: {{ recipe.nutrition_per_serving.protein_g }}g</span>
+                        <span>Calories: {{ recipe.nutrition_per_serving.calories }}</span>
+                    </div>
+
+                    <h4 style="margin: 15px 0 10px;">Ingredients:</h4>
+                    <ul style="margin-left: 20px;">
+                        {% for ingredient in recipe.ingredients %}
+                        <li>{{ ingredient }}</li>
+                        {% endfor %}
+                    </ul>
+
+                    <h4 style="margin: 15px 0 10px;">Instructions:</h4>
+                    <ol style="margin-left: 20px;">
+                        {% for step in recipe.instructions %}
+                        <li style="margin-bottom: 8px;">{{ step }}</li>
+                        {% endfor %}
+                    </ol>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Exercise Tab -->
+            <div class="tab-content" id="exercise-tab">
+                <div class="section-title">
+                    <i class="fas fa-running"></i> Exercise Plan
+                </div>
+
+                <div class="info-card" style="margin-bottom: 30px;">
+                    <h4>Intensity Level</h4>
+                    <p style="text-transform: capitalize;">{{ recommendations.exercise_plan.intensity_level }}</p>
+                </div>
+
+                <h3 style="margin-bottom: 15px;">Weekly Routine</h3>
+                {% for day in recommendations.exercise_plan.weekly_routine %}
+                <div class="exercise-day">
+                    <h4>{{ day.day }}</h4>
+                    <p><strong>Activity:</strong> {{ day.activity }}</p>
+                    <p><strong>Duration:</strong> {{ day.duration_minutes }} minutes</p>
+                    <p><strong>Intensity:</strong> {{ day.intensity }}</p>
+                    <p><strong>Precautions:</strong> {{ day.precautions }}</p>
+                </div>
+                {% endfor %}
+
+                <h3 style="margin: 30px 0 15px;">General Precautions</h3>
+                {% for precaution in recommendations.exercise_plan.general_precautions %}
+                <div class="list-item">⚠️ {{ precaution }}</div>
+                {% endfor %}
+
+                <h3 style="margin: 30px 0 15px;">When to Stop Exercising</h3>
+                <div style="background: #f8d7da; padding: 20px; border-radius: 12px;">
+                    {% for sign in recommendations.exercise_plan.when_to_stop %}
+                    <div class="list-item">🛑 {{ sign }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Daily Routine Tab -->
+            <div class="tab-content" id="routine-tab">
+                <div class="section-title">
+                    <i class="fas fa-clock"></i> Daily Routine
+                </div>
+
+                <h3 style="margin-bottom: 15px;">Morning Routine</h3>
+                <div style="background: #fff3cd; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+                    {% for activity in recommendations.daily_routine.morning %}
+                    <div class="list-item">🌅 {{ activity }}</div>
+                    {% endfor %}
+                </div>
+
+                <h3 style="margin-bottom: 15px;">Afternoon Routine</h3>
+                <div style="background: #d1ecf1; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+                    {% for activity in recommendations.daily_routine.afternoon %}
+                    <div class="list-item">☀️ {{ activity }}</div>
+                    {% endfor %}
+                </div>
+
+                <h3 style="margin-bottom: 15px;">Evening Routine</h3>
+                <div style="background: #d4edda; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+                    {% for activity in recommendations.daily_routine.evening %}
+                    <div class="list-item">🌙 {{ activity }}</div>
+                    {% endfor %}
+                </div>
+
+                <h3 style="margin-bottom: 15px;">Sleep Schedule</h3>
+                <p style="background: #e7e8ea; padding: 20px; border-radius: 12px;">{{
+                    recommendations.daily_routine.sleep_schedule }}</p>
+
+                <h3 style="margin: 30px 0 15px;">Medication Reminders</h3>
+                {% for reminder in recommendations.daily_routine.medication_reminders %}
+                <div class="list-item">💊 {{ reminder }}</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="{{ url_for('patient_dashboard') }}" class="back-btn">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(tabName + '-tab').classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function generatePlan() {
+            const generateBtn = document.getElementById('generateBtn');
+            const generateSection = document.getElementById('generateSection');
+            const loadingSection = document.getElementById('loadingSection');
+
+            // Disable button and show loading
+            generateBtn.disabled = true;
+            generateSection.style.display = 'none';
+            loadingSection.classList.add('active');
+
+            // Call API to generate recommendations
+            fetch('/patient/generate-ai-recommendations', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Reload page to show recommendations
+                        window.location.reload();
+                    } else {
+                        alert('Error: ' + data.error);
+                        generateSection.style.display = 'block';
+                        loadingSection.classList.remove('active');
+                        generateBtn.disabled = false;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to generate recommendations. Please try again.');
+                    generateSection.style.display = 'block';
+                    loadingSection.classList.remove('active');
+                    generateBtn.disabled = false;
+                });
+        }
+    </script>
+</body>
+
+</html>

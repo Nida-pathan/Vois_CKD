@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Personalized Diet & Lifestyle Plan - KidneyCompanion</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #0d9488;
+            --primary-dark: #0f766e;
+            --secondary-color: #06b6d4;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --bg-light: #f9fafb;
+            --border-color: #e5e7eb;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f0fdfa 0%, #e0f2fe 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 2rem;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            margin-bottom: 1rem;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateX(-5px);
+        }
+
+        .plan-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .plan-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+
+        .plan-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .plan-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .plan-title {
+            flex: 1;
+        }
+
+        .plan-title h2 {
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .plan-title .subtitle {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-excellent {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .status-good {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+
+        .status-needs-improvement {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .status-critical {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .plan-content {
+            color: var(--text-primary);
+            line-height: 1.8;
+        }
+
+        .plan-content h3 {
+            color: var(--primary-color);
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            font-size: 1.2rem;
+        }
+
+        .plan-content ul {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .plan-content li {
+            margin-bottom: 0.5rem;
+        }
+
+        .highlight-box {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+
+        .warning-box {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+
+        .success-box {
+            background: #dcfce7;
+            border-left: 4px solid #10b981;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+
+        .tips-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .tip-card {
+            background: var(--bg-light);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .tip-card h4 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .tip-card p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .plan-card {
+                padding: 1.5rem;
+            }
+
+            .tips-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <a href="{{ url_for('patient_dashboard') }}" class="back-btn">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+
+        <div class="header">
+            <h1><i class="fas fa-apple-alt"></i> Your Personalized Diet & Lifestyle Plan</h1>
+            <p>Tailored recommendations based on your health profile and lifestyle habits</p>
+        </div>
+
+        {% for recommendation in lifestyle_recommendations %}
+        <div class="plan-card">
+            <div class="plan-header">
+                <div class="plan-icon">
+                    <i class="fas {{ recommendation.icon }}"></i>
+                </div>
+                <div class="plan-title">
+                    <h2>{{ recommendation.title }}</h2>
+                    <p class="subtitle">{{ recommendation.description }}</p>
+                </div>
+                {% if recommendation.status %}
+                <span class="status-badge status-{{ recommendation.status }}">
+                    {{ recommendation.status_text }}
+                </span>
+                {% endif %}
+            </div>
+
+            <div class="plan-content">
+                {% if 'Hydration' in recommendation.title %}
+                <h3>Why Hydration Matters for Kidney Health</h3>
+                <p>Proper hydration is crucial for kidney function. Your kidneys filter about 120-150 quarts of blood
+                    daily to produce 1-2 quarts of urine. Adequate water intake helps your kidneys clear sodium, urea,
+                    and toxins from the body.</p>
+
+                <div class="highlight-box">
+                    <strong><i class="fas fa-info-circle"></i> Your Current Status:</strong> {{
+                    recommendation.description }}
+                </div>
+
+                <h3>Detailed Guidelines</h3>
+                <ul>
+                    <li><strong>Daily Target:</strong> 8-10 glasses (64-80 oz) of water for most CKD patients</li>
+                    <li><strong>Timing:</strong> Spread intake throughout the day, not all at once</li>
+                    <li><strong>Monitor:</strong> Your urine should be pale yellow; dark urine indicates dehydration
+                    </li>
+                    <li><strong>Adjust for:</strong> Exercise, hot weather, or if you're sweating more</li>
+                </ul>
+
+                {% if '<4 glasses' in recommendation.description %} <div class="warning-box">
+                    <strong><i class="fas fa-exclamation-triangle"></i> Important:</strong> You're currently drinking
+                    less than recommended. Dehydration can worsen kidney function and increase the risk of kidney
+                    stones.
+            </div>
+            {% endif %}
+
+            <h3>Practical Tips</h3>
+            <div class="tips-grid">
+                <div class="tip-card">
+                    <h4><i class="fas fa-clock"></i> Set Reminders</h4>
+                    <p>Use phone alarms or apps to remind you to drink water every 2 hours</p>
+                </div>
+                <div class="tip-card">
+                    <h4><i class="fas fa-bottle-water"></i> Carry a Bottle</h4>
+                    <p>Keep a reusable water bottle with you throughout the day</p>
+                </div>
+                <div class="tip-card">
+                    <h4><i class="fas fa-lemon"></i> Add Flavor</h4>
+                    <p>Infuse water with lemon, cucumber, or mint for variety</p>
+                </div>
+                <div class="tip-card">
+                    <h4><i class="fas fa-utensils"></i> Eat Water-Rich Foods</h4>
+                    <p>Include watermelon, cucumbers, oranges, and soups in your diet</p>
+                </div>
+            </div>
+
+            <div class="warning-box">
+                <strong><i class="fas fa-user-md"></i> Note:</strong> If your doctor has advised fluid restriction due
+                to advanced CKD or heart failure, follow their specific recommendations instead.
+            </div>
+
+            {% elif 'Low Sodium' in recommendation.title or 'Sodium' in recommendation.title %}
+            <h3>Why Low Sodium is Critical for CKD</h3>
+            <p>Excess sodium causes your body to retain water, increasing blood pressure and putting extra strain on
+                your kidneys. High blood pressure is both a cause and consequence of kidney disease, creating a
+                dangerous cycle.</p>
+
+            <div class="highlight-box">
+                <strong><i class="fas fa-target"></i> Your Goal:</strong> Less than 2,300mg of sodium per day (about 1
+                teaspoon of salt)
+            </div>
+
+            <h3>Hidden Sodium Sources</h3>
+            <ul>
+                <li><strong>Processed Foods:</strong> Canned soups, frozen dinners, deli meats (300-1,500mg per serving)
+                </li>
+                <li><strong>Condiments:</strong> Soy sauce (1,000mg/tbsp), ketchup, salad dressings</li>
+                <li><strong>Restaurant Food:</strong> Often contains 2-3x more sodium than home-cooked meals</li>
+                <li><strong>Bread & Cheese:</strong> Surprising sources with 100-300mg per serving</li>
+                <li><strong>Pickled Foods:</strong> Pickles, olives, sauerkraut are very high in sodium</li>
+            </ul>
+
+            <h3>Smart Substitutions</h3>
+            <div class="tips-grid">
+                <div class="tip-card">
+                    <h4><i class="fas fa-leaf"></i> Use Fresh Herbs</h4>
+                    <p>Basil, oregano, thyme, rosemary add flavor without sodium</p>
+                </div>
+                <div class="tip-card">
+                    <h4><i class="fas fa-pepper-hot"></i> Spice It Up</h4>
+                    <p>Garlic, ginger, black pepper, cumin enhance taste naturally</p>
+                </div>
+                <div class="tip-card">
+                    <h4><i class="fas fa-lemon"></i> Citrus Boost</h4>
+                    <p>Lemon, lime juice brighten flavors without salt</p>
+                </div>
+                <div class="tip-card">
+                    <h4><i class="fas fa-home"></i> Cook at Home</h4>
+                    <p>Control sodium by preparing meals from scratch</p>
+                </div>
+            </div>
+
+            <h3>Reading Food Labels</h3>
+            <ul>
+                <li><strong>Low Sodium:</strong> 140mg or less per serving</li>
+                <li><strong>Reduced Sodium:</strong> At least 25% less than regular version</li>
+                <li><strong>No Salt Added:</strong> No salt during processing (but may have natural sodium)</li>
+                <li><strong>Avoid:</strong> Products with sodium in first 5 ingredients</li>
+            </ul>
+
+            <div class="warning-box">
+                <strong><i class="fas fa-ban"></i> Avoid Salt Substitutes:</strong> Many contain potassium chloride,
+                which can be dangerous for CKD patients. Always consult your doctor first.
+            </div>
+
+            {% elif 'Exercise' in recommendation.title %}
+            <h3>Exercise Benefits for Kidney Health</h3>
+            <p>Regular physical activity helps control blood pressure, manage blood sugar, maintain healthy weight, and
+                improve overall cardiovascular health—all crucial for protecting your kidneys.</p>
+
+            <div class="highlight-box">
+                <strong><i class="fas fa-heartbeat"></i> Your Current Status:</strong> {{ recommendation.description }}
+            </div>
+
+            <h3>Recommended Activities</h3>
+            <ul>
+                <li><strong>Walking:</strong> Low-impact, easy to start, can be done anywhere (30 min/day)</li>
+                <li><strong>Swimming:</strong> Excellent full-body workout, gentle on joints</li>
+                <li><strong>Cycling:</strong> Stationary or outdoor, builds endurance</li>
+                <li><strong>Yoga:</strong> Improves flexibility, reduces stress, gentle on body</li>
+                <li><strong>Tai Chi:</strong> Low-impact, improves balance and mental health</li>
+            </ul>
+
+            {% if 'None' in recommendation.description or 'Start with' in recommendation.description %}
+            <div class="success-box">
+                <strong><i class="fas fa-flag-checkered"></i> Getting Started:</strong> Begin slowly with 10-15 minutes
+                of walking, 3 days per week. Gradually increase duration and frequency as you build stamina.
+            </div>
+            {% endif %}
+
+            <h3>Exercise Safety Guidelines</h3>
+            <div class="tips-grid">
+                <div class="tip-card">
+                    <h4><i class="fas fa-user-md"></i> Consult Your Doctor</h4>
+                    <p>Get clearance before starting any new exercise program</p>
+                </div>
+                <div class="tip-card">
+                    <h4><i class="fas fa-thermometer-half"></i> Stay Hydrated</h4>
+                    <p>Drink water before, during, and after exercise</p>
+                </div>
+                <div class="tip-card">
+                    <h4><i class="fas fa-shoe-prints"></i> Proper Footwear</h4>
+                    <p>Wear supportive, comfortable shoes to prevent injury</p>
+                </div>
+                <div class="tip-card">
+                    <h4><i class="fas fa-stopwatch"></i> Start Slow</h4>
+                    <p>Warm up for 5 minutes, cool down for 5 minutes</p>
+                </div>
+            </div>
+
+            <h3>Warning Signs to Stop</h3>
+            <div class="warning-box">
+                <strong><i class="fas fa-exclamation-circle"></i> Stop exercising if you experience:</strong>
+                <ul style="margin-top: 0.5rem; margin-bottom: 0;">
+                    <li>Chest pain or pressure</li>
+                    <li>Severe shortness of breath</li>
+                    <li>Dizziness or lightheadedness</li>
+                    <li>Unusual fatigue or weakness</li>
+                    <li>Seek medical attention immediately if symptoms persist</li>
+                </ul>
+            </div>
+
+            {% elif 'Sleep' in recommendation.title %}
+            <h3>Sleep's Role in Kidney Health</h3>
+            <p>Quality sleep is essential for kidney function. During sleep, your kidneys regulate fluid balance and
+                blood pressure. Poor sleep is linked to faster decline in kidney function and increased risk of kidney
+                disease.</p>
+
+            <div class="highlight-box">
+                <strong><i class="fas fa-moon"></i> Your Current Status:</strong> {{ recommendation.description }}
+            </div>
+
+            <h3>Optimal Sleep Guidelines</h3>
+            <ul>
+                <li><strong>Duration:</strong> 7-8 hours per night for adults</li>
+                <li><strong>Consistency:</strong> Go to bed and wake up at the same time daily</li>
+                <li><strong>Quality:</strong> Uninterrupted sleep is more restorative</li>
+                <li><strong>Environment:</strong> Cool (60-67°F), dark, and quiet bedroom</li>
+            </ul>
+
+            {% if 'only' in recommendation.description or '<6' in recommendation.description %} <div
+                class="warning-box">
+                <strong><i class="fas fa-exclamation-triangle"></i> Sleep Deprivation Risks:</strong> Getting less than
+                6 hours of sleep is associated with faster kidney function decline and increased risk of CKD
+                progression.
+        </div>
+        {% endif %}
+
+        <h3>Better Sleep Habits</h3>
+        <div class="tips-grid">
+            <div class="tip-card">
+                <h4><i class="fas fa-mobile-alt"></i> Digital Detox</h4>
+                <p>Avoid screens 1 hour before bed; blue light disrupts sleep</p>
+            </div>
+            <div class="tip-card">
+                <h4><i class="fas fa-coffee"></i> Limit Caffeine</h4>
+                <p>No caffeine after 2 PM; it stays in your system 6-8 hours</p>
+            </div>
+            <div class="tip-card">
+                <h4><i class="fas fa-book-reader"></i> Bedtime Routine</h4>
+                <p>Read, meditate, or take a warm bath to wind down</p>
+            </div>
+            <div class="tip-card">
+                <h4><i class="fas fa-bed"></i> Comfortable Bed</h4>
+                <p>Invest in a supportive mattress and pillows</p>
+            </div>
+        </div>
+
+        <h3>Foods That Help Sleep</h3>
+        <ul>
+            <li><strong>Magnesium-rich:</strong> Almonds, spinach, bananas (in moderation for CKD)</li>
+            <li><strong>Tryptophan sources:</strong> Turkey, chicken, eggs</li>
+            <li><strong>Herbal teas:</strong> Chamomile, valerian root (consult doctor first)</li>
+            <li><strong>Avoid:</strong> Heavy meals, alcohol, spicy foods before bed</li>
+        </ul>
+
+        <div class="warning-box">
+            <strong><i class="fas fa-user-md"></i> Sleep Apnea Alert:</strong> If you snore loudly, gasp for air during
+            sleep, or feel tired despite sleeping 7-8 hours, talk to your doctor about sleep apnea—it's common in CKD
+            patients.
+        </div>
+
+        {% elif 'Smoking' in recommendation.title or 'Smoke' in recommendation.title %}
+        <h3>Smoking and Kidney Disease</h3>
+        <p>Smoking is one of the most harmful habits for kidney health. It damages blood vessels, raises blood pressure,
+            reduces blood flow to kidneys, and accelerates kidney disease progression by up to 3 times.</p>
+
+        {% if 'Quit' in recommendation.title %}
+        <div class="warning-box">
+            <strong><i class="fas fa-exclamation-triangle"></i> Critical Action Needed:</strong> Quitting smoking is the
+            single most important thing you can do to protect your kidneys and overall health.
+        </div>
+
+        <h3>Health Benefits Timeline</h3>
+        <ul>
+            <li><strong>20 minutes:</strong> Heart rate and blood pressure drop</li>
+            <li><strong>12 hours:</strong> Carbon monoxide level in blood returns to normal</li>
+            <li><strong>2-12 weeks:</strong> Circulation improves, lung function increases</li>
+            <li><strong>1 year:</strong> Heart disease risk cut in half</li>
+            <li><strong>5 years:</strong> Kidney disease progression significantly slowed</li>
+        </ul>
+
+        <h3>Quit Smoking Resources</h3>
+        <div class="tips-grid">
+            <div class="tip-card">
+                <h4><i class="fas fa-pills"></i> Nicotine Replacement</h4>
+                <p>Patches, gum, lozenges can double your success rate</p>
+            </div>
+            <div class="tip-card">
+                <h4><i class="fas fa-prescription"></i> Medications</h4>
+                <p>Varenicline (Chantix) or Bupropion (Zyban) - ask your doctor</p>
+            </div>
+            <div class="tip-card">
+                <h4><i class="fas fa-users"></i> Support Groups</h4>
+                <p>Join local or online quit-smoking communities</p>
+            </div>
+            <div class="tip-card">
+                <h4><i class="fas fa-phone"></i> Quitline</h4>
+                <p>Call 1-800-QUIT-NOW for free counseling and support</p>
+            </div>
+        </div>
+
+        {% elif 'Smoke-Free' in recommendation.title or 'Congratulations' in recommendation.description %}
+        <div class="success-box">
+            <strong><i class="fas fa-trophy"></i> Excellent Achievement:</strong> Quitting smoking is one of the best
+            decisions you've made for your kidney health. Your kidneys are already benefiting!
+        </div>
+
+        <h3>Staying Smoke-Free</h3>
+        <ul>
+            <li><strong>Avoid Triggers:</strong> Identify and avoid situations that make you want to smoke</li>
+            <li><strong>Stay Active:</strong> Exercise helps reduce cravings and manage stress</li>
+            <li><strong>Healthy Snacks:</strong> Keep carrot sticks, gum, or mints handy</li>
+            <li><strong>Support System:</strong> Stay connected with people who support your quit journey</li>
+            <li><strong>Celebrate Milestones:</strong> Reward yourself for staying smoke-free</li>
+        </ul>
+        {% endif %}
+
+        <h3>Additional Support</h3>
+        <ul>
+            <li><strong>Smokefree.gov:</strong> Free quit plan, text support, and mobile app</li>
+            <li><strong>American Lung Association:</strong> Freedom From Smoking program</li>
+            <li><strong>Your Healthcare Team:</strong> Ask about cessation programs and medications</li>
+        </ul>
+        {% endif %}
+    </div>
+    </div>
+    {% endfor %}
+
+    <div class="plan-card">
+        <div class="plan-header">
+            <div class="plan-icon">
+                <i class="fas fa-calendar-check"></i>
+            </div>
+            <div class="plan-title">
+                <h2>Next Steps</h2>
+                <p class="subtitle">Track your progress and stay on course</p>
+            </div>
+        </div>
+        <div class="plan-content">
+            <h3>Action Items</h3>
+            <ul>
+                <li>Print or save this plan for easy reference</li>
+                <li>Discuss these recommendations with your healthcare provider</li>
+                <li>Set weekly goals for each lifestyle area</li>
+                <li>Track your progress in a journal or app</li>
+                <li>Schedule regular check-ins with your doctor</li>
+                <li>Update your lifestyle information on the dashboard as you make changes</li>
+            </ul>
+
+            <div class="highlight-box">
+                <strong><i class="fas fa-lightbulb"></i> Remember:</strong> Small, consistent changes are more
+                sustainable than drastic overhauls. Focus on one or two areas at a time, and celebrate your progress!
+            </div>
+        </div>
+    </div>
+    </div>
+</body>
+
+</html>

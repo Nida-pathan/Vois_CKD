@@ -8,6 +8,29 @@
         margin-top: 2rem;
         margin-bottom: 1.5rem;
     }
+
+    .btn-secondary {
+        background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s;
+        text-align: center;
+    }
+
+    .btn-secondary:hover {
+        background: linear-gradient(135deg, #b91c1c 0%, #dc2626 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(220, 38, 38, 0.4);
+    }
+
+    .btn-secondary i {
+        margin-right: 0.5rem;
+    }
 </style>
 <div class="login-container">
     <div class="login-card">
@@ -28,7 +51,11 @@
             <button type="submit" class="btn btn-primary btn-block">Login</button>
         </form>
 
-
+        <div class="admin-login">
+            <a href="{{ url_for('admin_login') }}" class="btn btn-secondary btn-block">
+                <i class="fas fa-user-shield"></i> Admin Login
+            </a>
+        </div>
 
         <div class="demo-credentials">
             <h4>Demo Credentials:</h4>
