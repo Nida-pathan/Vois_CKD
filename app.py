@@ -1299,6 +1299,14 @@ def generate_ai_recommendations():
 
 
 
+@app.route('/patient/lab-analysis')
+@login_required
+def lab_analysis():
+    """Render the lab analysis page with disease selection"""
+    if current_user.is_doctor():
+        return redirect(url_for('doctor_dashboard'))
+    return render_template('lab_analysis.html')
+
 @app.route('/patient/upload-lab', methods=['POST'])
 @login_required
 def upload_lab_report_pdf():

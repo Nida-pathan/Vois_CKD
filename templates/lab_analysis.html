@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab Report Analysis - Kidney Companion</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #0d9488;
+            --secondary-color: #0f766e;
+            --accent-color: #f0fdfa;
+            --text-primary: #111827;
+            --text-secondary: #4b5563;
+            --bg-light: #f3f4f6;
+            --white: #ffffff;
+            --border-radius: 12px;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: var(--white);
+            padding: 20px 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .back-btn {
+            text-decoration: none;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .back-btn:hover {
+            color: var(--primary-color);
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--text-primary);
+        }
+
+        .disease-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .disease-card {
+            background: var(--white);
+            padding: 30px 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .disease-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .disease-card.selected {
+            border-color: var(--primary-color);
+            background: var(--accent-color);
+        }
+
+        .disease-icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+
+        .disease-name {
+            font-weight: 600;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .disease-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* Card Colors */
+        .card-ckd .disease-icon {
+            color: #667eea;
+        }
+
+        .card-stone .disease-icon {
+            color: #f5576c;
+        }
+
+        .card-aki .disease-icon {
+            color: #fa709a;
+        }
+
+        .card-esrd .disease-icon {
+            color: #30cfd0;
+        }
+
+        .upload-section {
+            background: var(--white);
+            padding: 40px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            text-align: center;
+            display: none;
+            /* Hidden initially */
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .upload-box {
+            border: 2px dashed #cbd5e1;
+            border-radius: var(--border-radius);
+            padding: 40px;
+            margin: 20px 0;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+
+        .upload-box:hover {
+            border-color: var(--primary-color);
+            background: var(--accent-color);
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            color: #94a3b8;
+            margin-bottom: 15px;
+        }
+
+        .btn-upload {
+            background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-top: 20px;
+        }
+
+        .btn-upload:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-upload:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        /* Results Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #9ca3af;
+        }
+
+        .result-header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .severity-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .severity-low {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .severity-moderate {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .severity-high {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .severity-critical {
+            background: #7f1d1d;
+            color: #fef2f2;
+        }
+
+        .recommendations-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .recommendations-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid #f3f4f6;
+            display: flex;
+            gap: 10px;
+        }
+
+        .recommendations-list li:before {
+            content: "•";
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .loading-spinner {
+            display: none;
+            margin: 20px auto;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-flask"></i> Lab Report Analysis</h1>
+            <a href="{{ url_for('patient_dashboard') }}" class="back-btn">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+
+        <h2 class="section-title">Select Disease Type for Analysis</h2>
+
+        <div class="disease-grid">
+            <div class="disease-card card-ckd" onclick="selectDisease('ckd', this)">
+                <div class="disease-icon"><i class="fas fa-kidney"></i></div>
+                <div class="disease-name">Chronic Kidney Disease</div>
+                <div class="disease-desc">Analyze kidney function markers (Creatinine, eGFR)</div>
+            </div>
+            <div class="disease-card card-stone" onclick="selectDisease('kidney_stone', this)">
+                <div class="disease-icon"><i class="fas fa-gem"></i></div>
+                <div class="disease-name">Kidney Stone</div>
+                <div class="disease-desc">Calcium, Uric Acid & Stone Risk Analysis</div>
+            </div>
+            <div class="disease-card card-aki" onclick="selectDisease('aki', this)">
+                <div class="disease-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                <div class="disease-name">Acute Kidney Injury</div>
+                <div class="disease-desc">Rapid function decline detection</div>
+            </div>
+            <div class="disease-card card-esrd" onclick="selectDisease('esrd', this)">
+                <div class="disease-icon"><i class="fas fa-heartbeat"></i></div>
+                <div class="disease-name">ESRD</div>
+                <div class="disease-desc">End-Stage Renal Disease Assessment</div>
+            </div>
+        </div>
+
+        <div class="upload-section" id="uploadSection">
+            <h3 id="selectedDiseaseTitle">Upload Lab Report</h3>
+            <p>Please upload your lab report in PDF format for AI analysis.</p>
+
+            <div class="upload-box" onclick="document.getElementById('fileInput').click()">
+                <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                <p>Click to browse or drag & drop PDF here</p>
+                <p style="font-size: 12px; color: #9ca3af; margin-top: 5px;">Max file size: 10MB</p>
+            </div>
+            <input type="file" id="fileInput" accept=".pdf" style="display: none" onchange="handleFileSelect(this)">
+
+            <div id="fileName" style="margin: 10px 0; font-weight: 500; color: var(--primary-color);"></div>
+
+            <div style="margin-top: 20px;">
+                <label style="display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;">
+                    <input type="checkbox" id="useDefaults">
+                    <span style="font-size: 14px; color: var(--text-secondary);">Use default values (Test Mode - No PDF
+                        needed)</span>
+                </label>
+            </div>
+
+            <button class="btn-upload" onclick="uploadFile()" id="uploadBtn">Analyze Report</button>
+            <div class="loading-spinner" id="spinner"></div>
+        </div>
+    </div>
+
+    <!-- Results Modal -->
+    <div class="modal" id="resultModal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <div class="result-header">
+                <h2 id="resultDisease">Analysis Result</h2>
+                <div id="resultSeverity" class="severity-badge"></div>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <h4 style="margin-bottom: 10px;">Stage / Status</h4>
+                <p id="resultStage" style="font-size: 18px; font-weight: 500;"></p>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <h4 style="margin-bottom: 10px;">Key Recommendations</h4>
+                <ul class="recommendations-list" id="resultRecommendations">
+                    <!-- Populated by JS -->
+                </ul>
+            </div>
+
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="btn-upload" onclick="closeModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedDisease = null;
+
+        function selectDisease(type, element) {
+            selectedDisease = type;
+
+            // Update UI
+            document.querySelectorAll('.disease-card').forEach(card => card.classList.remove('selected'));
+            element.classList.add('selected');
+
+            // Show upload section
+            const uploadSection = document.getElementById('uploadSection');
+            uploadSection.style.display = 'block';
+
+            // Scroll to upload section
+            uploadSection.scrollIntoView({ behavior: 'smooth' });
+
+            // Update title
+            const titles = {
+                'ckd': 'Chronic Kidney Disease Analysis',
+                'kidney_stone': 'Kidney Stone Risk Analysis',
+                'aki': 'Acute Kidney Injury Analysis',
+                'esrd': 'End-Stage Renal Disease Analysis'
+            };
+            document.getElementById('selectedDiseaseTitle').textContent = titles[type];
+        }
+
+        function handleFileSelect(input) {
+            const fileName = input.files[0]?.name;
+            if (fileName) {
+                document.getElementById('fileName').textContent = 'Selected: ' + fileName;
+            }
+        }
+
+        function uploadFile() {
+            const fileInput = document.getElementById('fileInput');
+            const useDefaults = document.getElementById('useDefaults').checked;
+
+            if (!selectedDisease) {
+                alert('Please select a disease type first.');
+                return;
+            }
+
+            if (!fileInput.files[0] && !useDefaults) {
+                alert('Please select a PDF file or check "Use default values".');
+                return;
+            }
+
+            const formData = new FormData();
+            if (fileInput.files[0]) {
+                formData.append('file', fileInput.files[0]);
+            } else if (useDefaults) {
+                // Create a dummy file for the backend check
+                const blob = new Blob(["dummy"], { type: "application/pdf" });
+                formData.append('file', blob, "test_report.pdf");
+            }
+
+            formData.append('disease_type', selectedDisease);
+            formData.append('use_defaults', useDefaults);
+
+            // Show loading
+            document.getElementById('uploadBtn').style.display = 'none';
+            document.getElementById('spinner').style.display = 'block';
+
+            fetch('/patient/upload-lab', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('uploadBtn').style.display = 'inline-block';
+                    document.getElementById('spinner').style.display = 'none';
+
+                    if (data.error) {
+                        alert('Error: ' + data.error);
+                        return;
+                    }
+
+                    if (data.success) {
+                        showResults(data.prediction);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred during upload.');
+                    document.getElementById('uploadBtn').style.display = 'inline-block';
+                    document.getElementById('spinner').style.display = 'none';
+                });
+        }
+
+        function showResults(prediction) {
+            document.getElementById('resultDisease').textContent = prediction.disease;
+            document.getElementById('resultStage').textContent = prediction.stage;
+
+            const severityEl = document.getElementById('resultSeverity');
+            severityEl.textContent = prediction.severity + ' Severity';
+
+            // Reset classes
+            severityEl.className = 'severity-badge';
+            if (prediction.severity.toLowerCase().includes('low')) severityEl.classList.add('severity-low');
+            else if (prediction.severity.toLowerCase().includes('moderate')) severityEl.classList.add('severity-moderate');
+            else if (prediction.severity.toLowerCase().includes('high')) severityEl.classList.add('severity-high');
+            else severityEl.classList.add('severity-critical');
+
+            const recList = document.getElementById('resultRecommendations');
+            recList.innerHTML = '';
+            if (prediction.recommendations) {
+                prediction.recommendations.forEach(rec => {
+                    const li = document.createElement('li');
+                    li.textContent = rec;
+                    recList.appendChild(li);
+                });
+            }
+
+            document.getElementById('resultModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('resultModal').style.display = 'none';
+        }
+
+        // Close modal on outside click
+        window.onclick = function (event) {
+            const modal = document.getElementById('resultModal');
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    </script>
+
+</body>
+
+</html>

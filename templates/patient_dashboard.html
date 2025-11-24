@@ -633,13 +633,12 @@
                             <i class="fas fa-gift"></i> {{ trials.remaining }} Free Trials Left
                         </div>
                     </div>
-                    <div class="upload-area" onclick="document.getElementById('labUpload').click()">
+                    <div class="upload-area" onclick="window.location.href='{{ url_for('lab_analysis') }}'" style="cursor: pointer;">
                         <div class="upload-icon">
                             <i class="fas fa-cloud-upload-alt"></i>
                         </div>
                         <div class="upload-text">Upload your lab reports for AI analysis</div>
-                        <div class="upload-subtext">Supports PDF, CSV, and Excel formats • Maximum file size: 10MB</div>
-                        <input type="file" id="labUpload" style="display: none;" accept=".pdf,.csv,.xlsx,.xls" multiple>
+                        <div class="upload-subtext">Supports PDF format • Select Disease Type</div>
                     </div>
                 </div>
 
