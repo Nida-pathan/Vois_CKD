@@ -12,6 +12,8 @@ from models.user import (
     get_appointments_for_patient, save_feedback, get_all_feedbacks
 )
 from dotenv import load_dotenv
+import atexit
+import threading
 
 load_dotenv()
 
@@ -29,6 +31,19 @@ login_manager.login_view = 'login'
 @login_manager.user_loader
 def load_user(user_id):
     return User.get_by_id(user_id)
+
+# Store active threads for cleanup
+active_threads = set()
+
+# Cleanup function
+def cleanup():
+    # Wait for active threads to finish
+    for thread in active_threads:
+        if thread.is_alive():
+            thread.join(timeout=1.0)  # Wait max 1 second per thread
+
+# Register cleanup function to run at exit
+atexit.register(cleanup)
 
 @app.route('/test')
 def test():
@@ -494,283 +509,343 @@ def patient_dashboard():
     if current_user.is_doctor():
         return redirect(url_for('doctor_dashboard'))
     
-    # Get patient records
-    patient_data = get_patient_records(current_user.username)
-    
-    # Get patient trial information
-    patient_trials = get_patient_trials(current_user.username)
-    
-    # Get available doctors
-    doctors_list = get_all_doctors()
-    available_doctors = []
-    for doc in doctors_list:
-        available_doctors.append({
-            'name': f"Dr. {doc.username}",
-            'specialty': doc.specialization or 'General',
-            'experience': 'Experienced',
-            'avatar': doc.username[:2].upper()
-        })
-    
-    # Prepare dashboard data with defaults
-    dashboard_data = {
-        'patient_id': patient_data.get('patient_id', 'N/A') if patient_data else 'N/A',
-        'age': patient_data.get('age', 'N/A') if patient_data else 'N/A',
-        'gender': patient_data.get('gender', 'N/A') if patient_data else 'N/A',
-        'blood_type': patient_data.get('blood_type', 'N/A') if patient_data else 'N/A',
-        'ckd_stage': 'N/A',
-        'stage_class': 'stage-1',
-        'risk_level': 'Unknown',
-        'risk_class': '',
-        'next_checkup': 'Not scheduled',
-        'lab_reports_count': 0,
-        'current_metrics': {
-            'bp_systolic': 'N/A',
-            'bp_diastolic': 'N/A',
-            'blood_glucose': 'N/A',
-            'serum_creatinine': 'N/A',
-            'egfr': 'N/A',
-            'hemoglobin': 'N/A',
-            'blood_urea': 'N/A',
-            'sodium': 'N/A',
-            'potassium': 'N/A',
-            'bp_status': 'unknown',
-            'glucose_status': 'unknown',
-            'creatinine_status': 'unknown',
-            'egfr_status': 'unknown'
-        },
-        'has_history': False,
-        'history': []
-    }
-    
-    if patient_data:
-        # Calculate CKD stage from eGFR
-        egfr = patient_data.get('egfr')
-        if egfr:
-            if egfr >= 90:
-                dashboard_data['ckd_stage'] = 'Stage 1'
-                dashboard_data['stage_class'] = 'stage-1'
-            elif egfr >= 60:
-                dashboard_data['ckd_stage'] = 'Stage 2'
-                dashboard_data['stage_class'] = 'stage-2'
-            elif egfr >= 30:
-                dashboard_data['ckd_stage'] = 'Stage 3'
-                dashboard_data['stage_class'] = 'stage-3'
-            elif egfr >= 15:
-                dashboard_data['ckd_stage'] = 'Stage 4'
-                dashboard_data['stage_class'] = 'stage-4'
-            else:
-                dashboard_data['ckd_stage'] = 'Stage 5'
-                dashboard_data['stage_class'] = 'stage-5'
+    try:
+        # Get patient records
+        patient_data = get_patient_records(current_user.username)
         
-        # Get risk level
-        risk_level = patient_data.get('risk_level', 'Unknown')
-        dashboard_data['risk_level'] = risk_level
-        if risk_level == 'High':
-            dashboard_data['risk_class'] = 'status-critical'
-        elif risk_level == 'Moderate':
-            dashboard_data['risk_class'] = 'status-warning'
-        elif risk_level == 'Low':
-            dashboard_data['risk_class'] = 'status-normal'
+        # Get patient trial information
+        patient_trials = get_patient_trials(current_user.username)
         
-        # Current metrics
-        dashboard_data['current_metrics'] = {
-            'bp_systolic': patient_data.get('bp_systolic', 'N/A'),
-            'bp_diastolic': patient_data.get('bp_diastolic', 'N/A'),
-            'blood_glucose': patient_data.get('blood_glucose', 'N/A'),
-            'serum_creatinine': patient_data.get('serum_creatinine', 'N/A'),
-            'egfr': patient_data.get('egfr', 'N/A'),
-            'hemoglobin': patient_data.get('hemoglobin', 'N/A'),
-            'blood_urea': patient_data.get('blood_urea', 'N/A'),
-            'sodium': patient_data.get('sodium', 'N/A'),
-            'potassium': patient_data.get('potassium', 'N/A')
+        # Get available doctors
+        doctors_list = get_all_doctors()
+        available_doctors = []
+        for doc in doctors_list:
+            available_doctors.append({
+                'name': f"Dr. {doc.username}",
+                'specialty': doc.specialization or 'General',
+                'experience': 'Experienced',
+                'avatar': doc.username[:2].upper()
+            })
+        
+        # Prepare dashboard data with defaults
+        dashboard_data = {
+            'patient_id': patient_data.get('patient_id', 'N/A') if patient_data else 'N/A',
+            'age': patient_data.get('age', 'N/A') if patient_data else 'N/A',
+            'gender': patient_data.get('gender', 'N/A') if patient_data else 'N/A',
+            'blood_type': patient_data.get('blood_type', 'N/A') if patient_data else 'N/A',
+            'ckd_stage': 'N/A',
+            'stage_class': 'stage-1',
+            'risk_level': 'Unknown',
+            'risk_class': '',
+            'next_checkup': 'Not scheduled',
+            'lab_reports_count': 0,
+            'current_metrics': {
+                'bp_systolic': 'N/A',
+                'bp_diastolic': 'N/A',
+                'blood_glucose': 'N/A',
+                'serum_creatinine': 'N/A',
+                'egfr': 'N/A',
+                'hemoglobin': 'N/A',
+                'blood_urea': 'N/A',
+                'sodium': 'N/A',
+                'potassium': 'N/A',
+                'bp_status': 'unknown',
+                'glucose_status': 'unknown',
+                'creatinine_status': 'unknown',
+                'egfr_status': 'unknown'
+            },
+            'has_history': False,
+            'history': []
         }
         
-        # Determine status for each metric
-        # Blood Pressure
-        bp_sys = patient_data.get('bp_systolic')
-        bp_dia = patient_data.get('bp_diastolic')
-        if bp_sys and bp_dia:
-            if bp_sys < 120 and bp_dia < 80:
-                dashboard_data['current_metrics']['bp_status'] = 'normal'
-            elif bp_sys < 140 and bp_dia < 90:
-                dashboard_data['current_metrics']['bp_status'] = 'warning'
-            else:
-                dashboard_data['current_metrics']['bp_status'] = 'critical'
+        if patient_data:
+            # Calculate CKD stage from eGFR
+            egfr = patient_data.get('egfr')
+            if egfr:
+                if egfr >= 90:
+                    dashboard_data['ckd_stage'] = 'Stage 1'
+                    dashboard_data['stage_class'] = 'stage-1'
+                elif egfr >= 60:
+                    dashboard_data['ckd_stage'] = 'Stage 2'
+                    dashboard_data['stage_class'] = 'stage-2'
+                elif egfr >= 30:
+                    dashboard_data['ckd_stage'] = 'Stage 3'
+                    dashboard_data['stage_class'] = 'stage-3'
+                elif egfr >= 15:
+                    dashboard_data['ckd_stage'] = 'Stage 4'
+                    dashboard_data['stage_class'] = 'stage-4'
+                else:
+                    dashboard_data['ckd_stage'] = 'Stage 5'
+                    dashboard_data['stage_class'] = 'stage-5'
+            
+            # Get risk level
+            risk_level = patient_data.get('risk_level', 'Unknown')
+            dashboard_data['risk_level'] = risk_level
+            if risk_level == 'High':
+                dashboard_data['risk_class'] = 'status-critical'
+            elif risk_level == 'Moderate':
+                dashboard_data['risk_class'] = 'status-warning'
+            elif risk_level == 'Low':
+                dashboard_data['risk_class'] = 'status-normal'
+            
+            # Current metrics
+            dashboard_data['current_metrics'] = {
+                'bp_systolic': patient_data.get('bp_systolic', 'N/A'),
+                'bp_diastolic': patient_data.get('bp_diastolic', 'N/A'),
+                'blood_glucose': patient_data.get('blood_glucose', 'N/A'),
+                'serum_creatinine': patient_data.get('serum_creatinine', 'N/A'),
+                'egfr': patient_data.get('egfr', 'N/A'),
+                'hemoglobin': patient_data.get('hemoglobin', 'N/A'),
+                'blood_urea': patient_data.get('blood_urea', 'N/A'),
+                'sodium': patient_data.get('sodium', 'N/A'),
+                'potassium': patient_data.get('potassium', 'N/A')
+            }
+            
+            # Determine status for each metric
+            # Blood Pressure
+            bp_sys = patient_data.get('bp_systolic')
+            bp_dia = patient_data.get('bp_diastolic')
+            if bp_sys and bp_dia:
+                if bp_sys < 120 and bp_dia < 80:
+                    dashboard_data['current_metrics']['bp_status'] = 'normal'
+                elif bp_sys < 140 and bp_dia < 90:
+                    dashboard_data['current_metrics']['bp_status'] = 'warning'
+                else:
+                    dashboard_data['current_metrics']['bp_status'] = 'critical'
+            
+            # Blood Glucose
+            glucose = patient_data.get('blood_glucose')
+            if glucose:
+                if glucose < 100:
+                    dashboard_data['current_metrics']['glucose_status'] = 'normal'
+                elif glucose < 126:
+                    dashboard_data['current_metrics']['glucose_status'] = 'warning'
+                else:
+                    dashboard_data['current_metrics']['glucose_status'] = 'critical'
+            
+            # Creatinine
+            creatinine = patient_data.get('serum_creatinine')
+            if creatinine:
+                if creatinine <= 1.2:
+                    dashboard_data['current_metrics']['creatinine_status'] = 'normal'
+                elif creatinine <= 2.0:
+                    dashboard_data['current_metrics']['creatinine_status'] = 'warning'
+                else:
+                    dashboard_data['current_metrics']['creatinine_status'] = 'critical'
+            
+            # eGFR
+            if egfr:
+                if egfr >= 60:
+                    dashboard_data['current_metrics']['egfr_status'] = 'normal'
+                elif egfr >= 30:
+                    dashboard_data['current_metrics']['egfr_status'] = 'warning'
+                else:
+                    dashboard_data['current_metrics']['egfr_status'] = 'critical'
+            
+            # History data for charts
+            if 'history' in patient_data and patient_data['history']:
+                dashboard_data['has_history'] = True
+                dashboard_data['history'] = patient_data['history']
+                dashboard_data['lab_reports_count'] = len(patient_data['history'])
         
-        # Blood Glucose
-        glucose = patient_data.get('blood_glucose')
-        if glucose:
-            if glucose < 100:
-                dashboard_data['current_metrics']['glucose_status'] = 'normal'
-            elif glucose < 126:
-                dashboard_data['current_metrics']['glucose_status'] = 'warning'
-            else:
-                dashboard_data['current_metrics']['glucose_status'] = 'critical'
+        # Generate personalized lifestyle recommendations
+        lifestyle_recommendations = []
         
-        # Creatinine
-        creatinine = patient_data.get('serum_creatinine')
-        if creatinine:
-            if creatinine <= 1.2:
-                dashboard_data['current_metrics']['creatinine_status'] = 'normal'
-            elif creatinine <= 2.0:
-                dashboard_data['current_metrics']['creatinine_status'] = 'warning'
-            else:
-                dashboard_data['current_metrics']['creatinine_status'] = 'critical'
-        
-        # eGFR
-        if egfr:
-            if egfr >= 60:
-                dashboard_data['current_metrics']['egfr_status'] = 'normal'
-            elif egfr >= 30:
-                dashboard_data['current_metrics']['egfr_status'] = 'warning'
-            else:
-                dashboard_data['current_metrics']['egfr_status'] = 'critical'
-        
-        # History data for charts
-        if 'history' in patient_data and patient_data['history']:
-            dashboard_data['has_history'] = True
-            dashboard_data['history'] = patient_data['history']
-            dashboard_data['lab_reports_count'] = len(patient_data['history'])
-    
-    # Generate personalized lifestyle recommendations
-    lifestyle_recommendations = []
-    
-    if patient_data:
-        # Hydration recommendation based on water intake
-        water_intake = patient_data.get('water_intake', '4-6 glasses')
-        if '<4 glasses' in water_intake:
-            lifestyle_recommendations.append({
-                'icon': 'fa-tint',
-                'title': 'Hydration',
-                'description': 'You\'re drinking less than 4 glasses daily. Increase to 8-10 glasses of water daily. Limit fluid intake if advised by doctor.'
-            })
-        elif '4-6 glasses' in water_intake:
-            lifestyle_recommendations.append({
-                'icon': 'fa-tint',
-                'title': 'Hydration',
-                'description': 'Good progress! Aim for 8-10 glasses of water daily. Limit fluid intake if advised by doctor.'
-            })
-        else:
-            lifestyle_recommendations.append({
-                'icon': 'fa-tint',
-                'title': 'Hydration',
-                'description': 'Excellent! You\'re drinking ' + water_intake + ' daily. Maintain this level. Limit fluid intake if advised by doctor.'
-            })
-        
-        # Low Sodium Diet (always recommended for CKD)
-        lifestyle_recommendations.append({
-            'icon': 'fa-carrot',
-            'title': 'Low Sodium Diet',
-            'description': 'Limit sodium intake to less than 2,300mg per day. Avoid processed foods.'
-        })
-        
-        # Exercise recommendation based on exercise frequency
-        exercise_freq = patient_data.get('exercise_frequency', 'None')
-        if exercise_freq == 'None':
-            lifestyle_recommendations.append({
-                'icon': 'fa-dumbbell',
-                'title': 'Regular Exercise',
-                'description': 'Start with 15-20 minutes of light exercise, 3 days a week. Walking, swimming recommended. Gradually increase to 30 minutes, 5 days a week.'
-            })
-        elif '1-2 times/week' in exercise_freq:
-            lifestyle_recommendations.append({
-                'icon': 'fa-dumbbell',
-                'title': 'Regular Exercise',
-                'description': 'Good start! Increase to 30 minutes of moderate exercise, 5 days a week. Walking, swimming recommended.'
-            })
-        elif '3-4 times/week' in exercise_freq:
-            lifestyle_recommendations.append({
-                'icon': 'fa-dumbbell',
-                'title': 'Regular Exercise',
-                'description': 'Great job! Aim for 30 minutes of moderate exercise, 5 days a week. Walking, swimming recommended.'
-            })
-        else:
-            lifestyle_recommendations.append({
-                'icon': 'fa-dumbbell',
-                'title': 'Regular Exercise',
-                'description': 'Excellent! You\'re exercising 5+ times per week. Maintain 30 minutes of moderate exercise. Walking, swimming recommended.'
-            })
-        
-        # Sleep recommendation based on sleep hours
-        sleep_hours = patient_data.get('sleep_hours')
-        if sleep_hours:
-            if sleep_hours < 6:
+        if patient_data:
+            # Hydration recommendation based on water intake
+            water_intake = patient_data.get('water_intake', '4-6 glasses')
+            if '<4 glasses' in water_intake:
                 lifestyle_recommendations.append({
-                    'icon': 'fa-bed',
-                    'title': 'Sleep Schedule',
-                    'description': f'You\'re getting only {sleep_hours} hours of sleep. Aim for 7-8 hours of quality sleep. Fixed bedtime routine recommended.'
+                    'icon': 'fa-tint',
+                    'title': 'Hydration',
+                    'description': 'You\'re drinking less than 4 glasses daily. Increase to 8-10 glasses of water daily. Limit fluid intake if advised by doctor.'
                 })
-            elif sleep_hours >= 6 and sleep_hours < 7:
+            elif '4-6 glasses' in water_intake:
                 lifestyle_recommendations.append({
-                    'icon': 'fa-bed',
-                    'title': 'Sleep Schedule',
-                    'description': f'Good! You\'re getting {sleep_hours} hours. Aim for 7-8 hours of quality sleep. Fixed bedtime routine recommended.'
-                })
-            elif sleep_hours >= 7 and sleep_hours <= 8:
-                lifestyle_recommendations.append({
-                    'icon': 'fa-bed',
-                    'title': 'Sleep Schedule',
-                    'description': f'Perfect! You\'re getting {sleep_hours} hours of quality sleep. Maintain this schedule. Fixed bedtime routine recommended.'
+                    'icon': 'fa-tint',
+                    'title': 'Hydration',
+                    'description': 'Good progress! Aim for 8-10 glasses of water daily. Limit fluid intake if advised by doctor.'
                 })
             else:
                 lifestyle_recommendations.append({
-                    'icon': 'fa-bed',
-                    'title': 'Sleep Schedule',
-                    'description': f'You\'re sleeping {sleep_hours} hours. Aim for 7-8 hours of quality sleep. Fixed bedtime routine recommended.'
+                    'icon': 'fa-tint',
+                    'title': 'Hydration',
+                    'description': 'Excellent! You\'re drinking ' + water_intake + ' daily. Maintain this level. Limit fluid intake if advised by doctor.'
                 })
-        else:
+            
+            # Low Sodium Diet (always recommended for CKD)
             lifestyle_recommendations.append({
-                'icon': 'fa-bed',
-                'title': 'Sleep Schedule',
-                'description': 'Maintain 7-8 hours of quality sleep. Fixed bedtime routine recommended.'
-            })
-        
-        # Smoking cessation if applicable
-        smoking_status = patient_data.get('smoking', 'Never')
-        if smoking_status == 'Current':
-            lifestyle_recommendations.insert(1, {
-                'icon': 'fa-smoking-ban',
-                'title': 'Quit Smoking',
-                'description': 'Smoking significantly worsens kidney disease. Seek support to quit smoking immediately. Talk to your doctor about cessation programs.'
-            })
-        elif smoking_status == 'Former':
-            lifestyle_recommendations.insert(1, {
-                'icon': 'fa-check-circle',
-                'title': 'Smoke-Free',
-                'description': 'Congratulations on quitting smoking! Stay smoke-free to protect your kidney health.'
-            })
-    else:
-        # Default recommendations if no patient data
-        lifestyle_recommendations = [
-            {
-                'icon': 'fa-tint',
-                'title': 'Hydration',
-                'description': 'Drink 8-10 glasses of water daily. Limit fluid intake if advised by doctor.'
-            },
-            {
                 'icon': 'fa-carrot',
                 'title': 'Low Sodium Diet',
                 'description': 'Limit sodium intake to less than 2,300mg per day. Avoid processed foods.'
-            },
-            {
-                'icon': 'fa-dumbbell',
-                'title': 'Regular Exercise',
-                'description': '30 minutes of moderate exercise, 5 days a week. Walking, swimming recommended.'
-            },
-            {
-                'icon': 'fa-bed',
-                'title': 'Sleep Schedule',
-                'description': 'Maintain 7-8 hours of quality sleep. Fixed bedtime routine recommended.'
-            }
-        ]
+            })
+            
+            # Exercise recommendation based on exercise frequency
+            exercise_freq = patient_data.get('exercise_frequency', 'None')
+            if exercise_freq == 'None':
+                lifestyle_recommendations.append({
+                    'icon': 'fa-dumbbell',
+                    'title': 'Regular Exercise',
+                    'description': 'Start with 15-20 minutes of light exercise, 3 days a week. Walking, swimming recommended. Gradually increase to 30 minutes, 5 days a week.'
+                })
+            elif '1-2 times/week' in exercise_freq:
+                lifestyle_recommendations.append({
+                    'icon': 'fa-dumbbell',
+                    'title': 'Regular Exercise',
+                    'description': 'Good start! Increase to 30 minutes of moderate exercise, 5 days a week. Walking, swimming recommended.'
+                })
+            elif '3-4 times/week' in exercise_freq:
+                lifestyle_recommendations.append({
+                    'icon': 'fa-dumbbell',
+                    'title': 'Regular Exercise',
+                    'description': 'Great job! Aim for 30 minutes of moderate exercise, 5 days a week. Walking, swimming recommended.'
+                })
+            else:
+                lifestyle_recommendations.append({
+                    'icon': 'fa-dumbbell',
+                    'title': 'Regular Exercise',
+                    'description': 'Excellent! You\'re exercising 5+ times per week. Maintain 30 minutes of moderate exercise. Walking, swimming recommended.'
+                })
+            
+            # Sleep recommendation based on sleep hours
+            sleep_hours = patient_data.get('sleep_hours')
+            if sleep_hours:
+                if sleep_hours < 6:
+                    lifestyle_recommendations.append({
+                        'icon': 'fa-bed',
+                        'title': 'Sleep Schedule',
+                        'description': f'You\'re getting only {sleep_hours} hours of sleep. Aim for 7-8 hours of quality sleep. Fixed bedtime routine recommended.'
+                    })
+                elif sleep_hours >= 6 and sleep_hours < 7:
+                    lifestyle_recommendations.append({
+                        'icon': 'fa-bed',
+                        'title': 'Sleep Schedule',
+                        'description': f'Good! You\'re getting {sleep_hours} hours. Aim for 7-8 hours of quality sleep. Fixed bedtime routine recommended.'
+                    })
+                elif sleep_hours >= 7 and sleep_hours <= 8:
+                    lifestyle_recommendations.append({
+                        'icon': 'fa-bed',
+                        'title': 'Sleep Schedule',
+                        'description': f'Perfect! You\'re getting {sleep_hours} hours of quality sleep. Maintain this schedule. Fixed bedtime routine recommended.'
+                    })
+                else:
+                    lifestyle_recommendations.append({
+                        'icon': 'fa-bed',
+                        'title': 'Sleep Schedule',
+                        'description': f'You\'re sleeping {sleep_hours} hours. Aim for 7-8 hours of quality sleep. Fixed bedtime routine recommended.'
+                    })
+            else:
+                lifestyle_recommendations.append({
+                    'icon': 'fa-bed',
+                    'title': 'Sleep Schedule',
+                    'description': 'Maintain 7-8 hours of quality sleep. Fixed bedtime routine recommended.'
+                })
+            
+            # Smoking cessation if applicable
+            smoking_status = patient_data.get('smoking', 'Never')
+            if smoking_status == 'Current':
+                lifestyle_recommendations.insert(1, {
+                    'icon': 'fa-smoking-ban',
+                    'title': 'Quit Smoking',
+                    'description': 'Smoking significantly worsens kidney disease. Seek support to quit smoking immediately. Talk to your doctor about cessation programs.'
+                })
+            elif smoking_status == 'Former':
+                lifestyle_recommendations.insert(1, {
+                    'icon': 'fa-check-circle',
+                    'title': 'Smoke-Free',
+                    'description': 'Congratulations on quitting smoking! Stay smoke-free to protect your kidney health.'
+                })
+        else:
+            # Default recommendations if no patient data
+            lifestyle_recommendations = [
+                {
+                    'icon': 'fa-tint',
+                    'title': 'Hydration',
+                    'description': 'Drink 8-10 glasses of water daily. Limit fluid intake if advised by doctor.'
+                },
+                {
+                    'icon': 'fa-carrot',
+                    'title': 'Low Sodium Diet',
+                    'description': 'Limit sodium intake to less than 2,300mg per day. Avoid processed foods.'
+                },
+                {
+                    'icon': 'fa-dumbbell',
+                    'title': 'Regular Exercise',
+                    'description': '30 minutes of moderate exercise, 5 days a week. Walking, swimming recommended.'
+                },
+                {
+                    'icon': 'fa-bed',
+                    'title': 'Sleep Schedule',
+                    'description': 'Maintain 7-8 hours of quality sleep. Fixed bedtime routine recommended.'
+                }
+            ]
+        
+        dashboard_data['lifestyle_recommendations'] = lifestyle_recommendations
+        
+        return render_template('patient_dashboard.html', 
+                             patient=patient_data, 
+                             trials=patient_trials,
+                             doctors=available_doctors,
+                             dashboard=dashboard_data)
     
-    dashboard_data['lifestyle_recommendations'] = lifestyle_recommendations
-    
-    return render_template('patient_dashboard.html', 
-                         patient=patient_data, 
-                         trials=patient_trials,
-                         doctors=available_doctors,
-                         dashboard=dashboard_data)
+    except Exception as e:
+        print(f"Error in patient_dashboard: {e}")
+        # Return a simplified dashboard in case of errors
+        return render_template('patient_dashboard.html', 
+                             patient=None, 
+                             trials={'remaining': 2, 'used': 0},
+                             doctors=[],
+                             dashboard={
+                                 'patient_id': 'N/A',
+                                 'age': 'N/A',
+                                 'gender': 'N/A',
+                                 'blood_type': 'N/A',
+                                 'ckd_stage': 'N/A',
+                                 'stage_class': 'stage-1',
+                                 'risk_level': 'Unknown',
+                                 'risk_class': '',
+                                 'next_checkup': 'Not scheduled',
+                                 'lab_reports_count': 0,
+                                 'current_metrics': {
+                                     'bp_systolic': 'N/A',
+                                     'bp_diastolic': 'N/A',
+                                     'blood_glucose': 'N/A',
+                                     'serum_creatinine': 'N/A',
+                                     'egfr': 'N/A',
+                                     'hemoglobin': 'N/A',
+                                     'blood_urea': 'N/A',
+                                     'sodium': 'N/A',
+                                     'potassium': 'N/A',
+                                     'bp_status': 'unknown',
+                                     'glucose_status': 'unknown',
+                                     'creatinine_status': 'unknown',
+                                     'egfr_status': 'unknown'
+                                 },
+                                 'has_history': False,
+                                 'history': [],
+                                 'lifestyle_recommendations': [
+                                     {
+                                         'icon': 'fa-tint',
+                                         'title': 'Hydration',
+                                         'description': 'Drink 8-10 glasses of water daily. Limit fluid intake if advised by doctor.'
+                                     },
+                                     {
+                                         'icon': 'fa-carrot',
+                                         'title': 'Low Sodium Diet',
+                                         'description': 'Limit sodium intake to less than 2,300mg per day. Avoid processed foods.'
+                                     },
+                                     {
+                                         'icon': 'fa-dumbbell',
+                                         'title': 'Regular Exercise',
+                                         'description': '30 minutes of moderate exercise, 5 days a week. Walking, swimming recommended.'
+                                     },
+                                     {
+                                         'icon': 'fa-bed',
+                                         'title': 'Sleep Schedule',
+                                         'description': 'Maintain 7-8 hours of quality sleep. Fixed bedtime routine recommended.'
+                                     }
+                                 ]
+                             })
 
 @app.route('/patient/upload-lab', methods=['POST'])
 @login_required
@@ -1638,7 +1713,13 @@ def handler(event, context):
 
 # For local development
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=True)# Patient Intake Form Routes
+    try:
+        app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=True)
+    except KeyboardInterrupt:
+        print("Shutting down gracefully...")
+    finally:
+        # Ensure cleanup
+        cleanup()# Patient Intake Form Routes
 @app.route('/patient/intake')
 @login_required
 def patient_intake():

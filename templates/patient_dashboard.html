@@ -615,7 +615,6 @@
             <div class="stat-card">
                 <div class="stat-icon"><i class="fas fa-file-medical"></i></div>
                 <div class="stat-label">Lab Reports</div>
-
                 <div class="stat-number">{{ dashboard.lab_reports_count }}</div>
             </div>
         </div>
@@ -689,33 +688,24 @@
                     </div>
                     <div class="metric-item">
                         <span class="metric-label">Blood Sugar</span>
-
                         <div>
-
                             <span class="metric-value">{{ dashboard.current_metrics.blood_glucose }} mg/dL</span>
-
                             <span class="metric-status status-{{ dashboard.current_metrics.glucose_status }}">{{
                                 dashboard.current_metrics.glucose_status|capitalize }}</span>
                         </div>
                     </div>
                     <div class="metric-item">
                         <span class="metric-label">Creatinine</span>
-
                         <div>
-
                             <span class="metric-value">{{ dashboard.current_metrics.serum_creatinine }} mg/dL</span>
-
                             <span class="metric-status status-{{ dashboard.current_metrics.creatinine_status }}">{{
                                 dashboard.current_metrics.creatinine_status|capitalize }}</span>
                         </div>
                     </div>
                     <div class="metric-item">
                         <span class="metric-label">GFR</span>
-
                         <div>
-
                             <span class="metric-value">{{ dashboard.current_metrics.egfr }} mL/min</span>
-
                             <span class="metric-status status-{{ dashboard.current_metrics.egfr_status }}">{{
                                 dashboard.current_metrics.egfr_status|capitalize }}</span>
                         </div>
@@ -880,49 +870,92 @@
                 </div>
 
                 <!-- Diet & Lifestyle Changes -->
-                // Health Trends Chart - only initialize if there's data
-                const chartElement = document.getElementById('healthTrendsChart');
-                if (chartElement) {
-                const ctx = chartElement.getContext('2d');
-                const healthTrendsChart = new Chart(ctx, {
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-heartbeat"></i> Diet & Lifestyle Recommendations
+                        </div>
+                        <a href="#" class="card-action">View Full Plan</a>
+                    </div>
+                    <div class="lifestyle-item">
+                        <div class="lifestyle-icon">
+                            <i class="fas fa-utensils"></i>
+                        </div>
+                        <div class="lifestyle-content">
+                            <div class="lifestyle-title">Low Sodium Diet</div>
+                            <div class="lifestyle-description">Limit sodium intake to less than 2,300mg per day.
+                                Avoid processed foods and use herbs for flavoring.</div>
+                        </div>
+                    </div>
+                    <div class="lifestyle-item">
+                        <div class="lifestyle-icon">
+                            <i class="fas fa-tint"></i>
+                        </div>
+                        <div class="lifestyle-content">
+                            <div class="lifestyle-title">Hydration</div>
+                            <div class="lifestyle-description">Drink 8-10 glasses of water daily. Consult your
+                                doctor for personalized fluid intake recommendations.</div>
+                        </div>
+                    </div>
+                    <div class="lifestyle-item">
+                        <div class="lifestyle-icon">
+                            <i class="fas fa-running"></i>
+                        </div>
+                        <div class="lifestyle-content">
+                            <div class="lifestyle-title">Regular Exercise</div>
+                            <div class="lifestyle-description">Engage in 30 minutes of moderate exercise 5 days a
+                                week. Walking, yoga, and swimming are excellent choices.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Health Trends Chart - only initialize if there's data
+        const chartElement = document.getElementById('healthTrendsChart');
+        if (chartElement) {
+            const ctx = chartElement.getContext('2d');
+            const healthTrendsChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                datasets: [{
-                label: 'GFR (mL/min)',
-                data: [88, 86, 87, 85, 84, 85],
-                borderColor: '#0d9488',
-                backgroundColor: 'rgba(13, 148, 136, 0.1)',
-                tension: 0.4
-                }, {
-                label: 'Creatinine (mg/dL)',
-                data: [1.0, 1.1, 1.0, 1.1, 1.2, 1.1],
-                borderColor: '#f59e0b',
-                backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                tension: 0.4
-                }]
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'GFR (mL/min)',
+                        data: [88, 86, 87, 85, 84, 85],
+                        borderColor: '#0d9488',
+                        backgroundColor: 'rgba(13, 148, 136, 0.1)',
+                        tension: 0.4
+                    }, {
+                        label: 'Creatinine (mg/dL)',
+                        data: [1.0, 1.1, 1.0, 1.1, 1.2, 1.1],
+                        borderColor: '#f59e0b',
+                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                        tension: 0.4
+                    }]
                 },
                 options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                legend: {
-                position: 'top',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false
+                        }
+                    }
                 }
-                },
-                scales: {
-                y: {
-                beginAtZero: false
-                }
-                }
-                }
-                });
-                }
+            });
+        }
 
-                // File Upload Handler
-                document.getElementById('labUpload').addEventListener('change', function (e) {
-                const files = e.target.files;
-                if (files.length > 0) {
+        // File Upload Handler
+        document.getElementById('labUpload').addEventListener('change', function (e) {
+            const files = e.target.files;
+            if (files.length > 0) {
                 const formData = new FormData();
                 formData.append('file', files[0]);
 
@@ -938,36 +971,36 @@
                 `;
 
                 fetch('/patient/upload-lab', {
-                method: 'POST',
-                body: formData
+                    method: 'POST',
+                    body: formData
                 })
-                .then(response => response.json())
-                .then(data => {
-                if (data.error) {
-                alert(data.error);
-                uploadArea.innerHTML = originalHTML;
-                } else {
-                alert(data.message);
-                // Update trial count display
-                const trialCount = document.querySelector('.trial-count');
-                const currentCount = parseInt(trialCount.textContent.match(/\d+/)[0]);
-                trialCount.innerHTML = `<i class="fas fa-gift"></i> ${currentCount - 1} Free Trials Left`;
-                uploadArea.innerHTML = originalHTML;
-                }
-                })
-                .catch(error => {
-                console.error('Error:', error);
-                alert('Error uploading file. Please try again.');
-                uploadArea.innerHTML = originalHTML;
-                });
-                }
-                });
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            alert(data.error);
+                            uploadArea.innerHTML = originalHTML;
+                        } else {
+                            alert(data.message);
+                            // Update trial count display
+                            const trialCount = document.querySelector('.trial-count');
+                            const currentCount = parseInt(trialCount.textContent.match(/\d+/)[0]);
+                            trialCount.innerHTML = `<i class="fas fa-gift"></i> ${currentCount - 1} Free Trials Left`;
+                            uploadArea.innerHTML = originalHTML;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Error uploading file. Please try again.');
+                        uploadArea.innerHTML = originalHTML;
+                    });
+            }
+        });
 
-                // Appointment Booking
-                function bookAppointment(doctorName) {
-                // Create a simple modal for appointment booking
-                const modal = document.createElement('div');
-                modal.style.cssText = `
+        // Appointment Booking
+        function bookAppointment(doctorName) {
+            // Create a simple modal for appointment booking
+            const modal = document.createElement('div');
+            modal.style.cssText = `
                 position: fixed;
                 top: 0;
                 left: 0;
@@ -980,7 +1013,7 @@
                 z-index: 1000;
                 `;
 
-                modal.innerHTML = `
+            modal.innerHTML = `
                 <div style="background: white; padding: 30px; border-radius: 16px; max-width: 400px; width: 90%;">
                     <h3 style="margin-bottom: 20px;">Book Appointment with ${doctorName}</h3>
                     <div style="margin-bottom: 15px;">
@@ -1002,58 +1035,58 @@
                 </div>
                 `;
 
-                document.body.appendChild(modal);
-                }
+            document.body.appendChild(modal);
+        }
 
-                function submitAppointment(doctorName) {
-                const date = document.getElementById('preferredDate').value;
-                const time = document.getElementById('preferredTime').value;
+        function submitAppointment(doctorName) {
+            const date = document.getElementById('preferredDate').value;
+            const time = document.getElementById('preferredTime').value;
 
-                if (!date || !time) {
+            if (!date || !time) {
                 alert('Please select both date and time');
                 return;
-                }
+            }
 
-                fetch('/patient/book-appointment', {
+            fetch('/patient/book-appointment', {
                 method: 'POST',
                 headers: {
-                'Content-Type': 'application/json',
+                    'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                doctor_name: doctorName,
-                preferred_date: date,
-                preferred_time: time
+                    doctor_name: doctorName,
+                    preferred_date: date,
+                    preferred_time: time
                 })
-                })
+            })
                 .then(response => response.json())
                 .then(data => {
-                if (data.error) {
-                alert(data.error);
-                } else {
-                alert(data.message);
-                closeModal();
-                }
+                    if (data.error) {
+                        alert(data.error);
+                    } else {
+                        alert(data.message);
+                        closeModal();
+                    }
                 })
                 .catch(error => {
-                console.error('Error:', error);
-                alert('Error booking appointment. Please try again.');
+                    console.error('Error:', error);
+                    alert('Error booking appointment. Please try again.');
                 });
-                }
+        }
 
-                function closeModal() {
-                const modal = document.querySelector('div[style*="position: fixed"]');
-                if (modal) {
+        function closeModal() {
+            const modal = document.querySelector('div[style*="position: fixed"]');
+            if (modal) {
                 modal.remove();
-                }
-                }
+            }
+        }
 
-                // Search functionality
-                document.querySelector('.search-bar input').addEventListener('input', function (e) {
-                const searchTerm = e.target.value.toLowerCase();
-                // Here you would implement search functionality
-                console.log('Searching for:', searchTerm);
-                });
-                </script>
+        // Search functionality
+        document.querySelector('.search-bar input').addEventListener('input', function (e) {
+            const searchTerm = e.target.value.toLowerCase();
+            // Here you would implement search functionality
+            console.log('Searching for:', searchTerm);
+        });
+    </script>
 </body>
 
 </html>
