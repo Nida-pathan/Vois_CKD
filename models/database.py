@@ -47,7 +47,10 @@ class Database:
     @staticmethod
     def close():
         if Database.client:
-            Database.client.close()
+            try:
+                Database.client.close()
+            except Exception as e:
+                logger.error(f"Error closing database connection: {e}")
 
 
 # AI Recommendations Helper Functions

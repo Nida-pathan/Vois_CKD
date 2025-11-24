@@ -32,18 +32,7 @@ login_manager.login_view = 'login'
 def load_user(user_id):
     return User.get_by_id(user_id)
 
-# Store active threads for cleanup
-active_threads = set()
 
-# Cleanup function
-def cleanup():
-    # Wait for active threads to finish
-    for thread in active_threads:
-        if thread.is_alive():
-            thread.join(timeout=1.0)  # Wait max 1 second per thread
-
-# Register cleanup function to run at exit
-atexit.register(cleanup)
 
 @app.route('/test')
 def test():
@@ -510,8 +499,19 @@ def patient_dashboard():
         return redirect(url_for('doctor_dashboard'))
     
     try:
-        # Get patient records
-        patient_data = get_patient_records(current_user.username)
+        # Get patient records (Lab History)
+        lab_records = get_patient_records(current_user.username)
+        
+        # Get patient intake data (Personal Info)
+        patient_id = f"P{current_user.id}"
+        intake_data = get_patient_data(patient_id)
+        
+        # Merge data: Intake data first, then Lab records override (for metrics/history)
+        patient_data = {}
+        if intake_data:
+            patient_data.update(intake_data)
+        if lab_records:
+            patient_data.update(lab_records)
         
         # Get patient trial information
         patient_trials = get_patient_trials(current_user.username)
@@ -847,45 +847,7 @@ def patient_dashboard():
                                  ]
                              })
 
-@app.route('/patient/upload-lab', methods=['POST'])
-@login_required
-def upload_lab_report():
-    if current_user.is_doctor():
-        return jsonify({'error': 'Access denied'}), 403
-    
-    # Check if patient has free trials remaining
-    trials = get_patient_trials(current_user.username)
-    
-    if trials['remaining'] <= 0:
-        return jsonify({'error': 'No free trials remaining. Please upgrade to continue.'}), 400
-    
-    # Handle file upload (simplified for now)
-    if 'file' not in request.files:
-        return jsonify({'error': 'No file uploaded'}), 400
-    
-    file = request.files['file']
-    if file.filename == '':
-        return jsonify({'error': 'No file selected'}), 400
-    
-    # Update trial count
-    new_remaining = trials['remaining'] - 1
-    new_used = trials['used'] + 1
-    update_patient_trials(current_user.username, new_remaining, new_used)
-    
-    # Process the lab report (simplified - would integrate with actual ML model)
-    try:
-        if file.filename.endswith('.csv'):
-            df = pd.read_csv(file)
-            # Process CSV data
-            results = {'status': 'success', 'message': 'Lab report analyzed successfully', 'data_points': len(df)}
-        else:
-            # For PDF/Excel files, would need additional processing
-            results = {'status': 'success', 'message': 'Lab report uploaded successfully', 'file_type': file.filename.split('.')[-1]}
-        
-        return jsonify(results)
-    
-    except Exception as e:
-        return jsonify({'error': f'Error processing file: {str(e)}'}), 500
+
 
 @app.route('/patient/book-appointment', methods=['POST'])
 @login_required
@@ -1376,9 +1338,7 @@ def upload_lab_report_pdf():
         from models.user import update_patient_lab_values
         update_patient_lab_values(current_user.username, lab_values, prediction)
         
-        # Decrement trial count
-        from models.user import decrement_trial_count
-        decrement_trial_count(current_user.username)
+        # Trial count logic removed as per request
         
         return jsonify({
             'success': True,
@@ -1725,9 +1685,19 @@ if __name__ == '__main__':
         app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=True)
     except KeyboardInterrupt:
         print("Shutting down gracefully...")
+    except SystemExit:
+        # This is normal during Flask reloading
+        pass
     finally:
         # Ensure cleanup
-        cleanup()# Patient Intake Form Routes
+        try:
+            cleanup()
+        except NameError:
+            # cleanup function may not be available during reload
+            pass
+        except Exception as e:
+            print(f"Warning: Error during cleanup: {e}")
+
 @app.route('/patient/intake')
 @login_required
 def patient_intake():

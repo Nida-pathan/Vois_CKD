@@ -627,13 +627,11 @@
                 <div class="trial-section">
                     <div class="trial-header">
                         <div class="trial-title">
-                            <i class="fas fa-flask"></i> Free Lab Report Analysis
-                        </div>
-                        <div class="trial-count">
-                            <i class="fas fa-gift"></i> {{ trials.remaining }} Free Trials Left
+                            <i class="fas fa-flask"></i> Lab Report Analysis
                         </div>
                     </div>
-                    <div class="upload-area" onclick="window.location.href='{{ url_for('lab_analysis') }}'" style="cursor: pointer;">
+                    <div class="upload-area" onclick="window.location.href='{{ url_for('lab_analysis') }}'"
+                        style="cursor: pointer;">
                         <div class="upload-icon">
                             <i class="fas fa-cloud-upload-alt"></i>
                         </div>
@@ -975,21 +973,6 @@
                 })
                     .then(response => response.json())
                     .then(data => {
-                        if (data.error) {
-                            alert(data.error);
-                            uploadArea.innerHTML = originalHTML;
-                        } else {
-                            alert(data.message);
-                            // Update trial count display
-                            const trialCount = document.querySelector('.trial-count');
-                            const currentCount = parseInt(trialCount.textContent.match(/\d+/)[0]);
-                            trialCount.innerHTML = `<i class="fas fa-gift"></i> ${currentCount - 1} Free Trials Left`;
-                            uploadArea.innerHTML = originalHTML;
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('Error uploading file. Please try again.');
                         uploadArea.innerHTML = originalHTML;
                     });
             }
