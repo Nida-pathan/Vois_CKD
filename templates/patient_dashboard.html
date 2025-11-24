@@ -597,25 +597,25 @@
 
         <!-- Stats Overview -->
         <div class="stats-grid">
-            <div class="stat-card {{ dashboard.stage_class }}">
+            <div class="stat-card {{ patient_data.stage_class }}">
                 <div class="stat-icon"><i class="fas fa-kidney"></i></div>
                 <div class="stat-label">CKD Stage</div>
-                <div class="stat-number">{{ dashboard.ckd_stage }}</div>
+                <div class="stat-number">{{ patient_data.ckd_stage }}</div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon"><i class="fas fa-heart"></i></div>
                 <div class="stat-label">Risk Level</div>
-                <div class="stat-number">{{ dashboard.risk_level }}</div>
+                <div class="stat-number">{{ patient_data.risk_level }}</div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
                 <div class="stat-label">Next Checkup</div>
-                <div class="stat-number">{{ dashboard.next_checkup }}</div>
+                <div class="stat-number">{{ patient_data.next_checkup }}</div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon"><i class="fas fa-file-medical"></i></div>
                 <div class="stat-label">Lab Reports</div>
-                <div class="stat-number">{{ dashboard.lab_reports_count }}</div>
+                <div class="stat-number">{{ patient_data.lab_reports_count }}</div>
             </div>
         </div>
 
@@ -654,15 +654,15 @@
                     </div>
                     <div class="metric-item">
                         <span class="metric-label">Age</span>
-                        <span class="metric-value">{{ dashboard.age }}</span>
+                        <span class="metric-value">{{ patient_data.age }}</span>
                     </div>
                     <div class="metric-item">
                         <span class="metric-label">Blood Type</span>
-                        <span class="metric-value">{{ dashboard.blood_type }}</span>
+                        <span class="metric-value">{{ patient_data.blood_type }}</span>
                     </div>
                     <div class="metric-item">
                         <span class="metric-label">Patient ID</span>
-                        <span class="metric-value">{{ dashboard.patient_id }}</span>
+                        <span class="metric-value">{{ patient_data.patient_id }}</span>
                     </div>
                 </div>
 
@@ -677,34 +677,29 @@
                     <div class="metric-item">
                         <span class="metric-label">Blood Pressure</span>
                         <div>
-                            <span class="metric-value">{{ dashboard.current_metrics.bp_systolic }}/{{
-                                dashboard.current_metrics.bp_diastolic }} mmHg</span>
-                            <span class="metric-status status-{{ dashboard.current_metrics.bp_status }}">{{
-                                dashboard.current_metrics.bp_status|capitalize }}</span>
+                            <span class="metric-value">{{ patient_data.current_metrics.bp_systolic }}/{{ patient_data.current_metrics.bp_diastolic }} mmHg</span>
+                            <span class="metric-status status-{{ patient_data.current_metrics.bp_status }}">{{ patient_data.current_metrics.bp_status|capitalize }}</span>
                         </div>
                     </div>
                     <div class="metric-item">
                         <span class="metric-label">Blood Sugar</span>
                         <div>
-                            <span class="metric-value">{{ dashboard.current_metrics.blood_glucose }} mg/dL</span>
-                            <span class="metric-status status-{{ dashboard.current_metrics.glucose_status }}">{{
-                                dashboard.current_metrics.glucose_status|capitalize }}</span>
+                            <span class="metric-value">{{ patient_data.current_metrics.blood_glucose }} mg/dL</span>
+                            <span class="metric-status status-{{ patient_data.current_metrics.glucose_status }}">{{ patient_data.current_metrics.glucose_status|capitalize }}</span>
                         </div>
                     </div>
                     <div class="metric-item">
                         <span class="metric-label">Creatinine</span>
                         <div>
-                            <span class="metric-value">{{ dashboard.current_metrics.serum_creatinine }} mg/dL</span>
-                            <span class="metric-status status-{{ dashboard.current_metrics.creatinine_status }}">{{
-                                dashboard.current_metrics.creatinine_status|capitalize }}</span>
+                            <span class="metric-value">{{ patient_data.current_metrics.serum_creatinine }} mg/dL</span>
+                            <span class="metric-status status-{{ patient_data.current_metrics.creatinine_status }}">{{ patient_data.current_metrics.creatinine_status|capitalize }}</span>
                         </div>
                     </div>
                     <div class="metric-item">
                         <span class="metric-label">GFR</span>
                         <div>
-                            <span class="metric-value">{{ dashboard.current_metrics.egfr }} mL/min</span>
-                            <span class="metric-status status-{{ dashboard.current_metrics.egfr_status }}">{{
-                                dashboard.current_metrics.egfr_status|capitalize }}</span>
+                            <span class="metric-value">{{ patient_data.current_metrics.egfr }} mL/min</span>
+                            <span class="metric-status status-{{ patient_data.current_metrics.egfr_status }}">{{ patient_data.current_metrics.egfr_status|capitalize }}</span>
                         </div>
                     </div>
                 </div>
@@ -718,7 +713,7 @@
                         <a href="#" class="card-action">View All</a>
                     </div>
 
-                    {% if dashboard.has_history %}
+                    {% if patient_data.has_history %}
                     <div style="height: 300px;">
                         <canvas id="healthTrendsChart"></canvas>
                     </div>
@@ -744,89 +739,177 @@
                         <a href="#" class="card-action">View All</a>
                     </div>
 
-                    {% if dashboard.current_metrics.hemoglobin != 'N/A' or dashboard.current_metrics.sodium != 'N/A' %}
+                    {% if patient_data.current_metrics.hemoglobin != 'N/A' or patient_data.current_metrics.sodium != 'N/A' %}
                     <div class="lab-result-item">
                         <div class="lab-date">Current Values</div>
                         <div class="lab-title">Complete Blood Count & Metabolic Panel</div>
                         <div class="lab-metrics">
-                            {% if dashboard.current_metrics.hemoglobin != 'N/A' %}
+                            {% if patient_data.current_metrics.hemoglobin != 'N/A' %}
                             <div class="lab-metric">
                                 <span class="lab-metric-label">Hemoglobin:</span>
-                                <span class="lab-metric-value">{{ dashboard.current_metrics.hemoglobin }} g/dL</span>
+                                <span class="lab-metric-value">{{ patient_data.current_metrics.hemoglobin }} g/dL</span>
                             </div>
                             {% endif %}
-                            {% if dashboard.current_metrics.sodium != 'N/A' %}
+                            {% if patient_data.current_metrics.sodium != 'N/A' %}
                             <div class="lab-metric">
                                 <span class="lab-metric-label">Sodium:</span>
-                                <span class="lab-metric-value">{{ dashboard.current_metrics.sodium }} mEq/L</span>
+                                <span class="lab-metric-value">{{ patient_data.current_metrics.sodium }} mEq/L</span>
                             </div>
                             {% endif %}
-                            {% if dashboard.current_metrics.potassium != 'N/A' %}
+                            {% if patient_data.current_metrics.potassium != 'N/A' %}
                             <div class="lab-metric">
                                 <span class="lab-metric-label">Potassium:</span>
-                                <span class="lab-metric-value">{{ dashboard.current_metrics.potassium }} mEq/L</span>
+                                <span class="lab-metric-value">{{ patient_data.current_metrics.potassium }} mEq/L</span>
                             </div>
                             {% endif %}
                         </div>
                     </div>
                     {% endif %}
 
-                    {% if dashboard.current_metrics.serum_creatinine != 'N/A' or dashboard.current_metrics.blood_urea !=
+                    {% if patient_data.current_metrics.serum_creatinine != 'N/A' or patient_data.current_metrics.blood_urea !=
                     'N/A' %}
                     <div class="lab-result-item">
                         <div class="lab-date">Current Values</div>
                         <div class="lab-title">Kidney Function Panel</div>
                         <div class="lab-metrics">
-                            {% if dashboard.current_metrics.blood_urea != 'N/A' %}
+                            {% if patient_data.current_metrics.blood_urea != 'N/A' %}
                             <div class="lab-metric">
                                 <span class="lab-metric-label">BUN:</span>
-                                <span class="lab-metric-value">{{ dashboard.current_metrics.blood_urea }} mg/dL</span>
+                                <span class="lab-metric-value">{{ patient_data.current_metrics.blood_urea }} mg/dL</span>
                             </div>
                             {% endif %}
-                            {% if dashboard.current_metrics.serum_creatinine != 'N/A' %}
+                            {% if patient_data.current_metrics.serum_creatinine != 'N/A' %}
                             <div class="lab-metric">
                                 <span class="lab-metric-label">Creatinine:</span>
-                                <span class="lab-metric-value">{{ dashboard.current_metrics.serum_creatinine }}
+                                <span class="lab-metric-value">{{ patient_data.current_metrics.serum_creatinine }}
                                     mg/dL</span>
                             </div>
                             {% endif %}
-                            {% if dashboard.current_metrics.egfr != 'N/A' %}
+                            {% if patient_data.current_metrics.egfr != 'N/A' %}
                             <div class="lab-metric">
                                 <span class="lab-metric-label">eGFR:</span>
-                                <span class="lab-metric-value">{{ dashboard.current_metrics.egfr }} mL/min</span>
+                                <span class="lab-metric-value">{{ patient_data.current_metrics.egfr }} mL/min</span>
                             </div>
                             {% endif %}
                         </div>
                     </div>
                     {% endif %}
 
-                    {% if dashboard.current_metrics.hemoglobin == 'N/A' and dashboard.current_metrics.sodium == 'N/A'
-                    and dashboard.current_metrics.serum_creatinine == 'N/A' %}
+                    {% if patient_data.current_metrics.hemoglobin == 'N/A' and patient_data.current_metrics.sodium == 'N/A'
+                    and patient_data.current_metrics.serum_creatinine == 'N/A' %}
                     <div style="text-align: center; padding: 40px 20px; color: #666;">
                         <i class="fas fa-file-medical"
                             style="font-size: 48px; margin-bottom: 20px; color: #0d9488;"></i>
-                        <h3 style="margin-bottom: 15px; color: #333;">No Lab Results Yet</h3>
-                        <p style="margin-bottom: 20px;">Upload your lab reports to see your kidney health analysis.</p>
-                        <button onclick="document.getElementById('labUpload').click()" style="background: #0d9488; color: white; border: none; padding: 12px 24px; 
+                        <h3 style="margin-bottom: 15px; color: #333;">No Lab Results Data</h3>
+                        <p style="margin-bottom: 20px;">Upload your lab reports to see your latest results.</p>
+                        <button onclick="document.getElementById('labUpload').click()"
+                            style="background: #0d9488; color: white; border: none; padding: 12px 24px; 
                                            border-radius: 8px; cursor: pointer; font-weight: 500;">
                             <i class="fas fa-upload"></i> Upload Lab Report
                         </button>
                     </div>
                     {% endif %}
                 </div>
+
+                <!-- Therapy Recommendations -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-prescription-bottle"></i> Therapy Recommendations
+                        </div>
+                        <a href="{{ url_for('prescriptions') }}" class="card-action">View All</a>
+                    </div>
+
+                    <div class="therapy-card">
+                        <div class="therapy-name">Diet Management</div>
+                        <div class="therapy-description">Follow a low-sodium, low-protein diet to reduce kidney workload.
+                            Limit phosphorus and potassium intake.</div>
+                        <div class="therapy-duration">Ongoing</div>
+                    </div>
+
+                    <div class="therapy-card">
+                        <div class="therapy-name">Blood Pressure Control</div>
+                        <div class="therapy-description">Maintain BP below 130/80 mmHg. Take prescribed medications
+                            regularly.</div>
+                        <div class="therapy-duration">Daily</div>
+                    </div>
+
+                    <div class="therapy-card">
+                        <div class="therapy-name">Regular Monitoring</div>
+                        <div class="therapy-description">Monthly checkups for creatinine, eGFR, and electrolytes.</div>
+                        <div class="therapy-duration">Monthly</div>
+                    </div>
+                </div>
             </div>
 
-            <!-- Right Sidebar -->
+            <!-- Right Column -->
             <div class="sidebar">
-                <!-- Doctors List -->
+                <!-- Risk Level Indicator -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-exclamation-triangle"></i> Risk Assessment
+                        </div>
+                    </div>
+                    <div class="risk-indicator {{ patient_data.risk_class }}">
+                        <div class="risk-level">{{ patient_data.risk_level }}</div>
+                        <div class="risk-description">Based on your latest lab results and medical history</div>
+                    </div>
+                </div>
+
+                <!-- AI Lifestyle Recommendations -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-robot"></i> AI Lifestyle Recommendations
+                        </div>
+                        <a href="{{ url_for('ai_lifestyle_plan') }}" class="card-action">View Plan</a>
+                    </div>
+
+                    <div class="lifestyle-item">
+                        <div class="lifestyle-icon">
+                            <i class="fas fa-tint"></i>
+                        </div>
+                        <div class="lifestyle-content">
+                            <div class="lifestyle-title">Hydration</div>
+                            <div class="lifestyle-description">Drink 8-10 glasses of water daily. Limit fluid intake if
+                                advised by doctor.</div>
+                        </div>
+                    </div>
+
+                    <div class="lifestyle-item">
+                        <div class="lifestyle-icon">
+                            <i class="fas fa-carrot"></i>
+                        </div>
+                        <div class="lifestyle-content">
+                            <div class="lifestyle-title">Low Sodium Diet</div>
+                            <div class="lifestyle-description">Limit sodium intake to less than 2,300mg per day. Avoid
+                                processed foods.</div>
+                        </div>
+                    </div>
+
+                    <div class="lifestyle-item">
+                        <div class="lifestyle-icon">
+                            <i class="fas fa-dumbbell"></i>
+                        </div>
+                        <div class="lifestyle-content">
+                            <div class="lifestyle-title">Regular Exercise</div>
+                            <div class="lifestyle-description">30 minutes of moderate exercise, 5 days a week. Walking,
+                                swimming recommended.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Available Doctors -->
                 <div class="card">
                     <div class="card-header">
                         <div class="card-title">
                             <i class="fas fa-user-md"></i> Available Doctors
                         </div>
-                        <a href="#" class="card-action">View All</a>
+                        <a href="{{ url_for('appointments') }}" class="card-action">Book</a>
                     </div>
-                    {% for doctor in doctors %}
+
+                    {% for doctor in available_doctors %}
                     <div class="doctor-item">
                         <div class="doctor-avatar">{{ doctor.avatar }}</div>
                         <div class="doctor-info">
@@ -834,76 +917,34 @@
                             <div class="doctor-specialty">{{ doctor.specialty }}</div>
                             <div class="doctor-experience">{{ doctor.experience }}</div>
                         </div>
-                        <button class="book-btn"
-                            onclick="bookAppointment('{{ doctor.username }}', '{{ doctor.name }}')">Book</button>
+                        <button class="book-btn" onclick="bookAppointment('{{ doctor.username }}')">Book</button>
                     </div>
                     {% endfor %}
                 </div>
 
-                <!-- Panchakarma Therapies -->
+                <!-- Patient Trial Status -->
                 <div class="card">
                     <div class="card-header">
                         <div class="card-title">
-                            <i class="fas fa-spa"></i> Panchakarma Therapies
-                        </div>
-                        <a href="#" class="card-action">Learn More</a>
-                    </div>
-                    <div class="therapy-card">
-                        <div class="therapy-name">Abhyanga (Oil Massage)</div>
-                        <div class="therapy-description">Therapeutic oil massage to improve circulation and
-                            detoxification</div>
-                        <div class="therapy-duration">Duration: 45 minutes • Recommended: Weekly</div>
-                    </div>
-                    <div class="therapy-card">
-                        <div class="therapy-name">Swedana (Herbal Steam)</div>
-                        <div class="therapy-description">Herbal steam therapy to eliminate toxins through sweating</div>
-                        <div class="therapy-duration">Duration: 30 minutes • Recommended: Bi-weekly</div>
-                    </div>
-                    <div class="therapy-card">
-                        <div class="therapy-name">Basti (Medicated Enema)</div>
-                        <div class="therapy-description">Specialized treatment for kidney health and detoxification
-                        </div>
-                        <div class="therapy-duration">Duration: 60 minutes • Recommended: Monthly</div>
-                    </div>
-                </div>
-
-                <!-- Diet & Lifestyle Changes -->
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-title">
-                            <i class="fas fa-heartbeat"></i> Diet & Lifestyle Recommendations
-                        </div>
-                        <a href="#" class="card-action">View Full Plan</a>
-                    </div>
-                    <div class="lifestyle-item">
-                        <div class="lifestyle-icon">
-                            <i class="fas fa-utensils"></i>
-                        </div>
-                        <div class="lifestyle-content">
-                            <div class="lifestyle-title">Low Sodium Diet</div>
-                            <div class="lifestyle-description">Limit sodium intake to less than 2,300mg per day.
-                                Avoid processed foods and use herbs for flavoring.</div>
+                            <i class="fas fa-star"></i> Free Trial Status
                         </div>
                     </div>
-                    <div class="lifestyle-item">
-                        <div class="lifestyle-icon">
-                            <i class="fas fa-tint"></i>
-                        </div>
-                        <div class="lifestyle-content">
-                            <div class="lifestyle-title">Hydration</div>
-                            <div class="lifestyle-description">Drink 8-10 glasses of water daily. Consult your
-                                doctor for personalized fluid intake recommendations.</div>
-                        </div>
+                    {% for trial in patient_trials %}
+                    <div class="metric-item">
+                        <span class="metric-label">Remaining Reports</span>
+                        <span class="metric-value">{{ trial.remaining }}</span>
                     </div>
-                    <div class="lifestyle-item">
-                        <div class="lifestyle-icon">
-                            <i class="fas fa-running"></i>
-                        </div>
-                        <div class="lifestyle-content">
-                            <div class="lifestyle-title">Regular Exercise</div>
-                            <div class="lifestyle-description">Engage in 30 minutes of moderate exercise 5 days a
-                                week. Walking, yoga, and swimming are excellent choices.</div>
-                        </div>
+                    <div class="metric-item">
+                        <span class="metric-label">Used Reports</span>
+                        <span class="metric-value">{{ trial.used }}</span>
+                    </div>
+                    {% endfor %}
+                    <div style="text-align: center; margin-top: 15px;">
+                        <button onclick="document.getElementById('labUpload').click()"
+                            style="background: #0d9488; color: white; border: none; padding: 10px 20px; 
+                                           border-radius: 8px; cursor: pointer; font-weight: 500; width: 100%;">
+                            <i class="fas fa-upload"></i> Upload Lab Report
+                        </button>
                     </div>
                 </div>
             </div>
@@ -911,26 +952,31 @@
     </div>
 
     <script>
-        // Health Trends Chart - only initialize if there's data
-        const chartElement = document.getElementById('healthTrendsChart');
-        if (chartElement) {
-            const ctx = chartElement.getContext('2d');
+        // Health Trends Chart
+        document.addEventListener('DOMContentLoaded', function () {
+            {% if patient_data.has_history %}
+            const ctx = document.getElementById('healthTrendsChart').getContext('2d');
             const healthTrendsChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    labels: [{% for item in patient_data.history %}'{{ item.date }}'{% if not loop.last %},{% endif %}{% endfor %}],
                     datasets: [{
-                        label: 'GFR (mL/min)',
-                        data: [88, 86, 87, 85, 84, 85],
+                        label: 'eGFR (mL/min)',
+                        data: [{% for item in patient_data.history %}{{ item.egfr }}{% if not loop.last %},{% endif %}{% endfor %}],
                         borderColor: '#0d9488',
                         backgroundColor: 'rgba(13, 148, 136, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
                         tension: 0.4
                     }, {
                         label: 'Creatinine (mg/dL)',
-                        data: [1.0, 1.1, 1.0, 1.1, 1.2, 1.1],
-                        borderColor: '#f59e0b',
-                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                        tension: 0.4
+                        data: [{% for item in patient_data.history %}{{ item.creatinine }}{% if not loop.last %},{% endif %}{% endfor %}],
+                        borderColor: '#ef4444',
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4,
+                        yAxisID: 'y1'
                     }]
                 },
                 options: {
@@ -939,135 +985,49 @@
                     plugins: {
                         legend: {
                             position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Kidney Function Trends'
                         }
                     },
                     scales: {
                         y: {
-                            beginAtZero: false
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: 'eGFR (mL/min)'
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: {
+                                display: true,
+                                text: 'Creatinine (mg/dL)'
+                            },
+                            grid: {
+                                drawOnChartArea: false,
+                            },
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Date'
+                            }
                         }
                     }
                 }
             });
-        }
-
-        // File Upload Handler
-        document.getElementById('labUpload').addEventListener('change', function (e) {
-            const files = e.target.files;
-            if (files.length > 0) {
-                const formData = new FormData();
-                formData.append('file', files[0]);
-
-                // Show loading state
-                const uploadArea = document.querySelector('.upload-area');
-                const originalHTML = uploadArea.innerHTML;
-                uploadArea.innerHTML = `
-                        <div class="upload-icon">
-                            <i class="fas fa-spinner fa-spin"></i>
-                        </div>
-                        <div class="upload-text">Uploading and analyzing...</div>
-                        <div class="upload-subtext">Please wait while we process your lab report</div>
-                        `;
-
-                fetch('/patient/upload-lab', {
-                    method: 'POST',
-                    body: formData
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        uploadArea.innerHTML = originalHTML;
-                        if (data.success) {
-                            alert('Lab report uploaded successfully!');
-                            location.reload();
-                        } else {
-                            alert('Error: ' + data.error);
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        uploadArea.innerHTML = originalHTML;
-                        alert('Upload failed');
-                    });
-            }
+            {% endif %}
         });
 
-        // Appointment Booking
-        function bookAppointment(doctorUsername, doctorName) {
-            // Create a simple modal for appointment booking
-            const modal = document.createElement('div');
-            modal.style.cssText = `
-                        position: fixed;
-                        top: 0;
-                        left: 0;
-                        width: 100%;
-                        height: 100%;
-                        background: rgba(0,0,0,0.5);
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        z-index: 1000;
-                        `;
-
-            modal.innerHTML = `
-                        <div
-                            style="background: white; padding: 30px; border-radius: 16px; max-width: 400px; width: 90%;">
-                            <h3 style="margin-bottom: 20px;">Book Appointment with ${doctorName}</h3>
-                            <div style="margin-bottom: 15px;">
-                                <label style="display: block; margin-bottom: 5px; font-weight: 500;">Preferred
-                                    Date:</label>
-                                <input type="date" id="preferredDate"
-                                    style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 8px;">
-                            </div>
-                            <div style="margin-bottom: 20px;">
-                                <label style="display: block; margin-bottom: 5px; font-weight: 500;">Preferred
-                                    Time:</label>
-                                <input type="time" id="preferredTime"
-                                    style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 8px;">
-                            </div>
-                            <div style="display: flex; gap: 10px;">
-                                <button onclick="submitAppointment('${doctorUsername}')"
-                                    style="flex: 1; padding: 10px; background: #0d9488; color: white; border: none; border-radius: 8px; cursor: pointer;">Book</button>
-                                <button onclick="closeModal()"
-                                    style="flex: 1; padding: 10px; background: #6b7280; color: white; border: none; border-radius: 8px; cursor: pointer;">Cancel</button>
-                            </div>
-                        </div>
-                        `;
-
-            document.body.appendChild(modal);
-        }
-
-        function submitAppointment(doctorName) {
-            const date = document.getElementById('preferredDate').value;
-            const time = document.getElementById('preferredTime').value;
-
-            if (!date || !time) {
-                alert('Please select both date and time');
-                return;
-            }
-
-            fetch('/patient/book-appointment', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    doctor_name: doctorName,
-                    preferred_date: date,
-                    preferred_time: time
-                })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.error) {
-                        alert(data.error);
-                    } else {
-                        alert(data.message);
-                        closeModal();
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Error booking appointment. Please try again.');
-                });
+        function bookAppointment(doctorUsername) {
+            // Here you would implement the appointment booking functionality
+            alert('Booking appointment with Dr. ' + doctorUsername);
         }
 
         function closeModal() {

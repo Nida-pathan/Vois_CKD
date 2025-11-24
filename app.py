@@ -786,6 +786,65 @@ def patient_portal():
     # Redirect to the new patient dashboard
     return redirect(url_for('patient_dashboard'))
 
+@app.route('/test/patient-dashboard')
+def test_patient_dashboard():
+    """Test route to check if patient dashboard is accessible"""
+    try:
+        # Try to render the template with minimal data
+        return render_template('patient_dashboard.html', 
+                             patient_data={},
+                             patient_trials=[],
+                             available_doctors=[])
+    except Exception as e:
+        return f"Error rendering patient dashboard: {str(e)}", 500
+
+@app.route('/test/patient-dashboard-debug')
+def test_patient_dashboard_debug():
+    """Debug route to check patient dashboard with detailed error info"""
+    try:
+        # Try to render the template with sample data
+        sample_data = {
+            'patient_id': 'P123',
+            'age': 45,
+            'gender': 'Male',
+            'blood_type': 'O+',
+            'ckd_stage': 'Stage 2',
+            'stage_class': 'stage-2',
+            'risk_level': 'Moderate',
+            'risk_class': 'medium-risk',
+            'next_checkup': '2025-12-15',
+            'lab_reports_count': 3,
+            'current_metrics': {
+                'bp_systolic': 130,
+                'bp_diastolic': 85,
+                'blood_glucose': 95,
+                'serum_creatinine': 1.2,
+                'egfr': 75,
+                'hemoglobin': 14.2,
+                'blood_urea': 25,
+                'sodium': 140,
+                'potassium': 4.2,
+                'bp_status': 'warning',
+                'glucose_status': 'normal',
+                'creatinine_status': 'warning',
+                'egfr_status': 'normal'
+            },
+            'has_history': True,
+            'history': [
+                {'date': '2025-10-15', 'egfr': 78, 'creatinine': 1.1},
+                {'date': '2025-09-15', 'egfr': 80, 'creatinine': 1.0},
+                {'date': '2025-08-15', 'egfr': 82, 'creatinine': 0.9}
+            ]
+        }
+        
+        return render_template('patient_dashboard.html', 
+                             patient_data=sample_data,
+                             patient_trials=[{'remaining': 5, 'used': 3}],
+                             available_doctors=[{'name': 'Dr. Smith', 'specialty': 'Nephrology'}])
+    except Exception as e:
+        import traceback
+        return f"Error rendering patient dashboard: {str(e)}<br><pre>{traceback.format_exc()}</pre>", 500
+
 @app.route('/patient/dashboard')
 @login_required
 def patient_dashboard():
