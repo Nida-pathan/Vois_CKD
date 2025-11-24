@@ -834,7 +834,8 @@
                             <div class="doctor-specialty">{{ doctor.specialty }}</div>
                             <div class="doctor-experience">{{ doctor.experience }}</div>
                         </div>
-                        <button class="book-btn" onclick="bookAppointment('{{ doctor.name }}')">Book</button>
+                        <button class="book-btn"
+                            onclick="bookAppointment('{{ doctor.username }}', '{{ doctor.name }}')">Book</button>
                     </div>
                     {% endfor %}
                 </div>
@@ -960,12 +961,12 @@
                 const uploadArea = document.querySelector('.upload-area');
                 const originalHTML = uploadArea.innerHTML;
                 uploadArea.innerHTML = `
-                <div class="upload-icon">
-                    <i class="fas fa-spinner fa-spin"></i>
-                </div>
-                <div class="upload-text">Uploading and analyzing...</div>
-                <div class="upload-subtext">Please wait while we process your lab report</div>
-                `;
+                        <div class="upload-icon">
+                            <i class="fas fa-spinner fa-spin"></i>
+                        </div>
+                        <div class="upload-text">Uploading and analyzing...</div>
+                        <div class="upload-subtext">Please wait while we process your lab report</div>
+                        `;
 
                 fetch('/patient/upload-lab', {
                     method: 'POST',
@@ -974,48 +975,62 @@
                     .then(response => response.json())
                     .then(data => {
                         uploadArea.innerHTML = originalHTML;
+                        if (data.success) {
+                            alert('Lab report uploaded successfully!');
+                            location.reload();
+                        } else {
+                            alert('Error: ' + data.error);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        uploadArea.innerHTML = originalHTML;
+                        alert('Upload failed');
                     });
             }
         });
 
         // Appointment Booking
-        function bookAppointment(doctorName) {
+        function bookAppointment(doctorUsername, doctorName) {
             // Create a simple modal for appointment booking
             const modal = document.createElement('div');
             modal.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0,0,0,0.5);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                z-index: 1000;
-                `;
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        background: rgba(0,0,0,0.5);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        z-index: 1000;
+                        `;
 
             modal.innerHTML = `
-                <div style="background: white; padding: 30px; border-radius: 16px; max-width: 400px; width: 90%;">
-                    <h3 style="margin-bottom: 20px;">Book Appointment with ${doctorName}</h3>
-                    <div style="margin-bottom: 15px;">
-                        <label style="display: block; margin-bottom: 5px; font-weight: 500;">Preferred Date:</label>
-                        <input type="date" id="preferredDate"
-                            style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 8px;">
-                    </div>
-                    <div style="margin-bottom: 20px;">
-                        <label style="display: block; margin-bottom: 5px; font-weight: 500;">Preferred Time:</label>
-                        <input type="time" id="preferredTime"
-                            style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 8px;">
-                    </div>
-                    <div style="display: flex; gap: 10px;">
-                        <button onclick="submitAppointment('${doctorName}')"
-                            style="flex: 1; padding: 10px; background: #0d9488; color: white; border: none; border-radius: 8px; cursor: pointer;">Book</button>
-                        <button onclick="closeModal()"
-                            style="flex: 1; padding: 10px; background: #6b7280; color: white; border: none; border-radius: 8px; cursor: pointer;">Cancel</button>
-                    </div>
-                </div>
-                `;
+                        <div
+                            style="background: white; padding: 30px; border-radius: 16px; max-width: 400px; width: 90%;">
+                            <h3 style="margin-bottom: 20px;">Book Appointment with ${doctorName}</h3>
+                            <div style="margin-bottom: 15px;">
+                                <label style="display: block; margin-bottom: 5px; font-weight: 500;">Preferred
+                                    Date:</label>
+                                <input type="date" id="preferredDate"
+                                    style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 8px;">
+                            </div>
+                            <div style="margin-bottom: 20px;">
+                                <label style="display: block; margin-bottom: 5px; font-weight: 500;">Preferred
+                                    Time:</label>
+                                <input type="time" id="preferredTime"
+                                    style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 8px;">
+                            </div>
+                            <div style="display: flex; gap: 10px;">
+                                <button onclick="submitAppointment('${doctorUsername}')"
+                                    style="flex: 1; padding: 10px; background: #0d9488; color: white; border: none; border-radius: 8px; cursor: pointer;">Book</button>
+                                <button onclick="closeModal()"
+                                    style="flex: 1; padding: 10px; background: #6b7280; color: white; border: none; border-radius: 8px; cursor: pointer;">Cancel</button>
+                            </div>
+                        </div>
+                        `;
 
             document.body.appendChild(modal);
         }

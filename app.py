@@ -308,19 +308,148 @@ def doctor_dashboard():
         return redirect(url_for('patient_portal'))
     
     all_patients_data = get_all_patients_data()
-    all_patients = []
-    for data in all_patients_data:
-        all_patients.append({
-            'patient_id': data.get('patient_id'),
-            'name': data.get('patient_name', 'Unknown'),
-            'risk_percentage': data.get('risk_percentage', 0),
-            'stage': data.get('stage', 'N/A'),
-            'risk_level': data.get('risk_level', 'Unknown'),
-            'age': data.get('age', 'N/A'),
-            'egfr': data.get('egfr')
-        })
+    appointments = get_appointments_for_doctor(current_user.username)
     
-    return render_template('doctor_dashboard.html', patients=all_patients)
+    with open('debug_log.txt', 'a') as f:
+        f.write(f"DEBUG: Doctor: {current_user.username}\n")
+        f.write(f"DEBUG: Appointments found: {len(appointments)}\n")
+        if appointments:
+            f.write(f"DEBUG: First appointment: {appointments[0]}\n")
+    
+    # Filter patients: Only show those who have an appointment with this doctor
+    patient_usernames_with_appointments = set(apt['patient'] for apt in appointments)
+    
+    # Also include patients manually assigned to this doctor (if any)
+    if hasattr(current_user, 'patients') and current_user.patients:
+        patient_usernames_with_appointments.update(current_user.patients)
+    
+    with open('debug_log.txt', 'a') as f:
+        f.write(f"DEBUG: Patients with appointments: {patient_usernames_with_appointments}\n")
+        
+    try:
+        # Create a lookup for patient data
+        patient_data_lookup = {}
+        for data in all_patients_data:
+            p_username = data.get('username')
+            if not p_username and data.get('patient_id', '').startswith('P'):
+                 p_username = data.get('patient_id')[1:]
+            if p_username:
+                patient_data_lookup[p_username] = data
+                
+        filtered_patients = []
+        for username in patient_usernames_with_appointments:
+            if username in patient_data_lookup:
+                data = patient_data_lookup[username]
+                
+                # Ensure egfr is a number or None
+                egfr = data.get('egfr')
+                if isinstance(egfr, str):
+                    try:
+                        egfr = float(egfr)
+                    except ValueError:
+                        egfr = None
+                        
+                filtered_patients.append({
+                    'patient_id': data.get('patient_id'),
+                    'username': username,  # Add username to the patient data
+                    'name': data.get('patient_name', 'Unknown'),
+                    'risk_percentage': data.get('risk_percentage', 0),
+                    'stage': data.get('stage', 'N/A'),
+                    'risk_level': data.get('risk_level', 'Unknown'),
+                    'age': data.get('age', 'N/A'),
+                    'egfr': egfr
+                })
+            else:
+                # Patient has appointment but no health data yet
+                # Fetch basic user info
+                user = User.get_by_username(username)
+                if user:
+                    filtered_patients.append({
+                        'patient_id': f"P{user.id}",
+                        'username': username,  # Add username to the patient data
+                        'name': username, # Fallback to username if real name not available
+                        'risk_percentage': 0,
+                        'stage': 'New',
+                        'risk_level': 'Pending Intake',
+                        'age': 'N/A',
+                        'egfr': None  # Must be None, not 'N/A', to avoid template formatting error
+                    })
+    except Exception as e:
+        import traceback
+        with open('debug_log.txt', 'a') as f:
+            f.write(f"Error in doctor_dashboard filtering: {str(e)}\n")
+            f.write(traceback.format_exc())
+        filtered_patients = [] # Fallback to empty list
+    
+    return render_template('doctor_dashboard.html', patients=filtered_patients, appointments=appointments)
+
+@app.route('/test_buttons')
+@login_required
+def test_buttons():
+    """Test route to check button functionality"""
+    # Get sample patient data for testing
+    patients = get_all_patients_data()
+    sample_patient = patients[0] if patients else None
+    
+    return render_template('doctor_dashboard.html', 
+                         patients=patients if patients else [],
+                         appointments=[],
+                         sample_patient=sample_patient)
+
+@app.route('/debug/patient_ids')
+@login_required
+def debug_patient_ids():
+    """Debug route to check patient IDs"""
+    patients = get_all_patients_data()
+    patient_ids = [p.get('patient_id') for p in patients if p.get('patient_id')]
+    
+    return jsonify({
+        'total_patients': len(patients),
+        'patient_ids': patient_ids[:10],  # Show first 10 IDs
+        'sample_patient': patients[0] if patients else None
+    })
+
+@app.route('/debug/patient_list')
+@login_required
+def debug_patient_list():
+    """Debug route to see what patient data is available"""
+    from models.user import get_all_patients_data
+    patients = get_all_patients_data()
+    
+    # Log patient data for debugging
+    print("Debug - All patients data:")
+    for i, patient in enumerate(patients):
+        print(f"  Patient {i}: {patient}")
+    
+    return jsonify({
+        'total_patients': len(patients),
+        'patients': patients[:5]  # Show first 5 patients
+    })
+
+@app.route('/debug/patient_data')
+@login_required
+def debug_patient_data():
+    """Debug route to check what patient data is available"""
+    patients = get_all_patients_data()
+    
+    # Let's also check what the current user can access
+    appointments = []
+    allowed_patients = set()
+    
+    if hasattr(current_user, 'is_doctor') and current_user.is_doctor():
+        appointments = get_appointments_for_doctor(current_user.username)
+        allowed_patients = set(apt['patient'] for apt in appointments)
+        if hasattr(current_user, 'patients') and current_user.patients:
+            allowed_patients.update(current_user.patients)
+    
+    return jsonify({
+        'current_user': str(current_user),
+        'is_doctor': hasattr(current_user, 'is_doctor') and current_user.is_doctor(),
+        'total_patients': len(patients),
+        'sample_patients': patients[:3] if patients else [],
+        'appointments': appointments,
+        'allowed_patients': list(allowed_patients)
+    })
 
 @app.route('/api/doctor/dashboard/stats')
 @login_required
@@ -469,6 +598,11 @@ def process_pdf_upload(file):
 @app.route('/results/<patient_id>')
 @login_required
 def results(patient_id):
+    # This route is for patients viewing their own results
+    if current_user.is_doctor():
+        # Redirect doctors to the doctor-specific route
+        return redirect(url_for('doctor_patient_details', patient_id=patient_id))
+    
     patient_data = get_patient_data(patient_id)
     
     if not patient_data:
@@ -479,9 +613,169 @@ def results(patient_id):
     
     if not patient_data:
         flash('Patient not found', 'danger')
-        return redirect(url_for('doctor_dashboard'))
+        return redirect(url_for('patient_portal'))
     
     return render_template('results.html', patient=patient_data)
+
+@app.route('/doctor/patient/<patient_id>')
+@login_required
+def doctor_patient_details(patient_id):
+    if not current_user.is_doctor():
+        flash('Access denied. Doctors only.', 'danger')
+        return redirect(url_for('patient_portal'))
+    
+    print(f"Doctor accessing patient details for ID: {patient_id}")  # Debug log
+    
+    # Get patient data
+    patient_data = get_patient_data(patient_id)
+    
+    # If not found in patients_data collection, try patient_records
+    if not patient_data:
+        # Try to find in patient records
+        all_patients = get_all_patients_data()
+        for patient in all_patients:
+            if patient.get('patient_id') == patient_id:
+                patient_data = patient
+                break
+    
+    # If still not found, try to get from patient_records collection
+    if not patient_data:
+        # Try to get patient records by username
+        # We need to find the username associated with this patient_id
+        all_patients_data = get_all_patients_data()
+        patient_username = None
+        for patient in all_patients_data:
+            if patient.get('patient_id') == patient_id:
+                patient_username = patient.get('username')
+                break
+        
+        if patient_username:
+            patient_records = get_patient_records(patient_username)
+            # Merge with patient data if needed
+            patient_info = get_patient_data(patient_id)
+            if patient_info:
+                if patient_records:
+                    patient_records.update(patient_info)
+                    patient_data = patient_records
+                else:
+                    patient_data = patient_info
+            elif patient_records:
+                patient_data = patient_records
+    
+    # If we still don't have patient data, create a minimal patient object
+    if not patient_data:
+        # Create a minimal patient object for display
+        patient_data = {
+            'patient_id': patient_id,
+            'name': 'Unknown Patient',
+            'risk_level': 'Unknown',
+            'risk_percentage': 0,
+            'stage': 'N/A',
+            'egfr': 'N/A'
+        }
+        flash(f'Patient data not found for ID: {patient_id}. Displaying minimal information.', 'warning')
+    
+    # Get prescriptions for this patient
+    from models.database import Database
+    db = Database.get_db()
+    prescriptions = []
+    lab_results = []
+    if db is not None:
+        # Get prescriptions
+        prescriptions_cursor = db.prescriptions.find({'patient': patient_username if patient_username else patient_id})
+        prescriptions = list(prescriptions_cursor)
+        
+        # Get lab results
+        lab_results_cursor = db.lab_results.find({'patient_id': patient_id})
+        lab_results = list(lab_results_cursor)
+    
+    # Access Control for Doctors - TEMPORARILY DISABLED FOR DEBUGGING
+    # appointments = get_appointments_for_doctor(current_user.username)
+    # allowed_patients = set(apt['patient'] for apt in appointments)
+    # if hasattr(current_user, 'patients') and current_user.patients:
+    #     allowed_patients.update(current_user.patients)
+    #     
+    # # Check if this patient is in the allowed list
+    # p_username = patient_data.get('username') if patient_data else None
+    # if not p_username and patient_id.startswith('P'):
+    #     p_username = patient_id[1:]
+    #     
+    # if p_username and p_username not in allowed_patients:
+    #     flash('Access denied. You can only view reports for your booked patients.', 'danger')
+    #     return redirect(url_for('doctor_dashboard'))
+
+    print(f"Patient data being sent to template: {patient_data}")  # Debug log
+
+    # Additional debugging - let's also print the patient_id to make sure it's correct
+    print(f"Final patient_id: {patient_id}")
+    print(f"Final patient_data keys: {list(patient_data.keys()) if patient_data else 'None'}")
+
+    return render_template('results.html', 
+                         patient=patient_data,
+                         prescriptions=prescriptions,
+                         lab_results=lab_results)
+
+@app.route('/test/route/debug')
+def test_route_debug():
+    """Simple test route to verify the server is working"""
+    return "Test route is working!"
+
+@app.route('/doctor/patient/test123')
+@login_required
+def doctor_patient_test():
+    """Test route to verify doctor patient route is working"""
+    if not current_user.is_doctor():
+        return "Not a doctor"
+    return "Doctor patient route is working!"
+
+@app.route('/test_direct_access/<patient_id>')
+def test_direct_access(patient_id):
+    """Test route to verify direct access works"""
+    return f"Direct access test successful! Patient ID: {patient_id}"
+
+@app.route('/test_route/<patient_id>')
+def test_route(patient_id):
+    """Simple test route to verify routing is working"""
+    return f"Test route working! Patient ID: {patient_id}"
+
+@app.route('/test_patient_data/<patient_id>')
+def test_patient_data(patient_id):
+    """Test route to debug patient data retrieval"""
+    from models.user import get_patient_data, get_all_patients_data, get_patient_records
+    
+    # Try different methods to get patient data
+    patient_data = get_patient_data(patient_id)
+    
+    if not patient_data:
+        # Try to find in patient records
+        all_patients = get_all_patients_data()
+        for patient in all_patients:
+            if patient.get('patient_id') == patient_id:
+                patient_data = patient
+                break
+    
+    # Try to get patient records by username
+    if not patient_data:
+        all_patients_data = get_all_patients_data()
+        patient_username = None
+        for patient in all_patients_data:
+            if patient.get('patient_id') == patient_id:
+                patient_username = patient.get('username')
+                break
+        
+        if patient_username:
+            patient_records = get_patient_records(patient_username)
+            patient_info = get_patient_data(patient_id)
+            if patient_info:
+                if patient_records:
+                    patient_records.update(patient_info)
+                    patient_data = patient_records
+                else:
+                    patient_data = patient_info
+            elif patient_records:
+                patient_data = patient_records
+    
+    return {'patient_id': patient_id, 'patient_data': patient_data}
 
 @app.route('/patient/portal')
 @login_required
@@ -522,10 +816,237 @@ def patient_dashboard():
         for doc in doctors_list:
             available_doctors.append({
                 'name': f"Dr. {doc.username}",
+                'username': doc.username,
                 'specialty': doc.specialization or 'General',
                 'experience': 'Experienced',
                 'avatar': doc.username[:2].upper()
             })
+        
+        # Prepare dashboard data with defaults
+        dashboard_data = {
+            'patient_id': patient_data.get('patient_id', 'N/A') if patient_data else 'N/A',
+            'age': patient_data.get('age', 'N/A') if patient_data else 'N/A',
+            'gender': patient_data.get('gender', 'N/A') if patient_data else 'N/A',
+            'blood_type': patient_data.get('blood_type', 'N/A') if patient_data else 'N/A',
+            'ckd_stage': 'N/A',
+            'stage_class': 'stage-1',
+            'risk_level': 'Unknown',
+            'risk_class': '',
+            'next_checkup': 'Not scheduled',
+            'lab_reports_count': 0,
+            'current_metrics': {
+                'bp_systolic': 'N/A',
+                'bp_diastolic': 'N/A',
+                'blood_glucose': 'N/A',
+                'serum_creatinine': 'N/A',
+                'egfr': 'N/A',
+                'hemoglobin': 'N/A',
+                'blood_urea': 'N/A',
+                'sodium': 'N/A',
+                'potassium': 'N/A',
+                'bp_status': 'unknown',
+                'glucose_status': 'unknown',
+                'creatinine_status': 'unknown',
+                'egfr_status': 'unknown'
+            },
+            'has_history': False,
+            'history': []
+        }
+        
+        if patient_data:
+            # Calculate CKD stage from eGFR
+            egfr = patient_data.get('egfr')
+            if egfr:
+                if egfr >= 90:
+                    dashboard_data['ckd_stage'] = 'Stage 1'
+                    dashboard_data['stage_class'] = 'stage-1'
+                elif egfr >= 60:
+                    dashboard_data['ckd_stage'] = 'Stage 2'
+                    dashboard_data['stage_class'] = 'stage-2'
+                elif egfr >= 30:
+                    dashboard_data['ckd_stage'] = 'Stage 3'
+                    dashboard_data['stage_class'] = 'stage-3'
+                elif egfr >= 15:
+                    dashboard_data['ckd_stage'] = 'Stage 4'
+                    dashboard_data['stage_class'] = 'stage-4'
+                else:
+                    dashboard_data['ckd_stage'] = 'Stage 5'
+                    dashboard_data['stage_class'] = 'stage-5'
+            
+            # Get risk level
+            risk_level = patient_data.get('risk_level', 'Unknown')
+            dashboard_data['risk_level'] = risk_level
+            if risk_level == 'High':
+                dashboard_data['risk_class'] = 'high-risk'
+            elif risk_level == 'Medium':
+                dashboard_data['risk_class'] = 'medium-risk'
+            elif risk_level == 'Low':
+                dashboard_data['risk_class'] = 'low-risk'
+            
+            # Get next checkup date
+            next_checkup = patient_data.get('next_checkup', 'Not scheduled')
+            dashboard_data['next_checkup'] = next_checkup
+            
+            # Get lab reports count
+            lab_reports_count = patient_data.get('lab_reports_count', 0)
+            dashboard_data['lab_reports_count'] = lab_reports_count
+            
+            # Get current metrics
+            current_metrics = {
+                'bp_systolic': patient_data.get('bp_systolic', 'N/A'),
+                'bp_diastolic': patient_data.get('bp_diastolic', 'N/A'),
+                'blood_glucose': patient_data.get('blood_glucose', 'N/A'),
+                'serum_creatinine': patient_data.get('serum_creatinine', 'N/A'),
+                'egfr': patient_data.get('egfr', 'N/A'),
+                'hemoglobin': patient_data.get('hemoglobin', 'N/A'),
+                'blood_urea': patient_data.get('blood_urea', 'N/A'),
+                'sodium': patient_data.get('sodium', 'N/A'),
+                'potassium': patient_data.get('potassium', 'N/A'),
+                'bp_status': patient_data.get('bp_status', 'unknown'),
+                'glucose_status': patient_data.get('glucose_status', 'unknown'),
+                'creatinine_status': patient_data.get('creatinine_status', 'unknown'),
+                'egfr_status': patient_data.get('egfr_status', 'unknown')
+            }
+            dashboard_data['current_metrics'] = current_metrics
+            
+            # Get history
+            history = patient_data.get('history', [])
+            dashboard_data['history'] = history
+            if history:
+                dashboard_data['has_history'] = True
+        
+        return render_template('patient_dashboard.html', 
+                             patient_data=dashboard_data,
+                             patient_trials=patient_trials,
+                             available_doctors=available_doctors)
+    
+    except Exception as e:
+        print(f"Error fetching patient data for dashboard: {e}")
+        return render_template('patient_dashboard.html', 
+                             patient_data={},
+                             patient_trials=[],
+                             available_doctors=[])
+
+@app.route('/api/doctor/patient/<patient_id>/health-trends')
+@login_required
+def get_patient_health_trends(patient_id):
+    if not current_user.is_doctor():
+        return jsonify({'error': 'Access denied. Doctors only.'}), 403
+    
+    try:
+        # Get patient data
+        patient_data = get_patient_data(patient_id)
+        
+        # Get lab results for this patient
+        from models.database import Database
+        db = Database.get_db()
+        lab_results = []
+        if db is not None:
+            lab_results_cursor = db.lab_results.find({'patient_id': patient_id})
+            lab_results = list(lab_results_cursor)
+        
+        # Process data for health trends
+        egfr_history = []
+        bp_history = []
+        creatinine_history = []
+        
+        # Add current patient data point
+        if patient_data:
+            # eGFR history
+            if patient_data.get('egfr') is not None:
+                egfr_history.append({
+                    'date': 'Current',
+                    'value': patient_data['egfr']
+                })
+            
+            # Blood pressure history
+            if patient_data.get('bp_systolic') is not None and patient_data.get('bp_diastolic') is not None:
+                bp_history.append({
+                    'date': 'Current',
+                    'systolic': patient_data['bp_systolic'],
+                    'diastolic': patient_data['bp_diastolic']
+                })
+            
+            # Serum creatinine history
+            if patient_data.get('serum_creatinine') is not None:
+                creatinine_history.append({
+                    'date': 'Current',
+                    'value': patient_data['serum_creatinine']
+                })
+        
+        # Process lab results for historical data
+        for result in lab_results:
+            # Try to extract relevant data from lab results
+            test_type = result.get('test_type', '').lower()
+            results = result.get('results', '')
+            test_date = result.get('test_date', 'Unknown Date')
+            
+            # Parse results for numerical values
+            try:
+                if 'egfr' in test_type or 'glomerular' in test_type:
+                    # Extract numerical value from results string
+                    import re
+                    numbers = re.findall(r'[\d.]+', results)
+                    if numbers:
+                        egfr_history.append({
+                            'date': test_date,
+                            'value': float(numbers[0])
+                        })
+                elif 'blood pressure' in test_type or 'bp' in test_type:
+                    # Extract systolic and diastolic values
+                    import re
+                    numbers = re.findall(r'[\d.]+', results)
+                    if len(numbers) >= 2:
+                        bp_history.append({
+                            'date': test_date,
+                            'systolic': float(numbers[0]),
+                            'diastolic': float(numbers[1])
+                        })
+                elif 'creatinine' in test_type:
+                    # Extract numerical value from results string
+                    import re
+                    numbers = re.findall(r'[\d.]+', results)
+                    if numbers:
+                        creatinine_history.append({
+                            'date': test_date,
+                            'value': float(numbers[0])
+                        })
+            except (ValueError, IndexError):
+                # Skip malformed data
+                continue
+        
+        # Sort history by date (newest first)
+        egfr_history.sort(key=lambda x: x['date'], reverse=True)
+        bp_history.sort(key=lambda x: x['date'], reverse=True)
+        creatinine_history.sort(key=lambda x: x['date'], reverse=True)
+        
+        # Limit to last 10 entries for cleaner display
+        egfr_history = egfr_history[:10]
+        bp_history = bp_history[:10]
+        creatinine_history = creatinine_history[:10]
+        
+        return jsonify({
+            'patient_id': patient_id,
+            'patient_name': patient_data.get('patient_name', 'Unknown Patient') if patient_data else 'Unknown Patient',
+            'egfr_history': egfr_history,
+            'bp_history': bp_history,
+            'creatinine_history': creatinine_history,
+            'lab_results': lab_results
+        })
+    
+    except Exception as e:
+        print(f"Error fetching health trends for patient {patient_id}: {e}")
+        return jsonify({'error': 'Failed to fetch health trends data'}), 500
+
+@app.route('/api/doctor/patient/<patient_id>/dashboard')
+@login_required
+def get_patient_dashboard_data(patient_id):
+    if not current_user.is_doctor():
+        return jsonify({'error': 'Access denied. Doctors only.'}), 403
+    
+    try:
+        # Get patient data
+        patient_data = get_patient_data(patient_id)
         
         # Prepare dashboard data with defaults
         dashboard_data = {
@@ -860,27 +1381,43 @@ def book_appointment():
     preferred_date = data.get('preferred_date')
     preferred_time = data.get('preferred_time')
     
-    if not doctor_name:
-        return jsonify({'error': 'Doctor name is required'}), 400
-    
-    # Create appointment record (simplified)
-    appointment = {
-        'patient': current_user.username,
-        'doctor': doctor_name,
-        'preferred_date': preferred_date,
-        'preferred_time': preferred_time,
-        'status': 'pending',
-        'created_at': pd.Timestamp.now().isoformat()
-    }
-    
-    # Save to database
-    create_appointment(appointment)
-    
-    return jsonify({
-        'status': 'success', 
-        'message': f'Appointment request sent to {doctor_name}. You will be notified shortly.',
-        'appointment': appointment
-    })
+    try:
+        with open('debug_log.txt', 'a') as f:
+            f.write(f"Booking request received: {data}\n")
+            f.write(f"Doctor name: {doctor_name}\n")
+            
+        if not doctor_name:
+            return jsonify({'error': 'Doctor name is required'}), 400
+        
+        # Create appointment record (simplified)
+        appointment = {
+            'patient': current_user.username,
+            'doctor': doctor_name,
+            'preferred_date': preferred_date,
+            'preferred_time': preferred_time,
+            'status': 'pending',
+            'created_at': pd.Timestamp.now().isoformat()
+        }
+        
+        # Save to database
+        create_appointment(appointment)
+        
+        # Convert ObjectId to string for JSON serialization
+        if '_id' in appointment:
+            appointment['_id'] = str(appointment['_id'])
+        
+        with open('debug_log.txt', 'a') as f:
+            f.write(f"Appointment created successfully: {appointment}\n")
+        
+        return jsonify({
+            'status': 'success', 
+            'message': f'Appointment request sent to {doctor_name}. You will be notified shortly.',
+            'appointment': appointment
+        })
+    except Exception as e:
+        with open('debug_log.txt', 'a') as f:
+            f.write(f"Error in book_appointment: {str(e)}\n")
+        return jsonify({'error': str(e)}), 500
 
 
 # Phase 2: Communication & Scheduling Routes

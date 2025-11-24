@@ -1,128 +1,542 @@
 {% extends "base.html" %}
 
-{% block title %}Analysis Results - CKD Diagnostic System{% endblock %}
+{% block title %}Patient Details - CKD Diagnostic System{% endblock %}
 
 {% block content %}
-<div class="results-container">
-    <div class="results-header">
-        <h2>CKD Risk Assessment Results</h2>
+<style>
+    .patient-details-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 16px;
+        padding: 20px 30px;
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+    }
+    
+    .back-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        background: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .section {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 16px;
+        padding: 25px;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+    }
+    
+    .section-title {
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 20px;
+        color: #333;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+    }
+    
+    .info-item {
+        margin-bottom: 15px;
+    }
+    
+    .info-label {
+        font-size: 12px;
+        color: #666;
+        margin-bottom: 5px;
+        font-weight: 500;
+    }
+    
+    .info-value {
+        font-size: 16px;
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .badge {
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+    
+    .badge-low {
+        background: #dcfce7;
+        color: #16a34a;
+    }
+    
+    .badge-moderate {
+        background: #fef3c7;
+        color: #d97706;
+    }
+    
+    .badge-high {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+    
+    .badge-critical {
+        background: #7f1d1d;
+        color: white;
+    }
+    
+    .lab-results-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+    }
+    
+    .lab-card {
+        background: #f9fafb;
+        border-radius: 8px;
+        padding: 20px;
+        border-left: 4px solid #0d9488;
+    }
+    
+    .lab-card-title {
+        font-weight: 600;
+        margin-bottom: 15px;
+        color: #333;
+    }
+    
+    .lab-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .lab-item:last-child {
+        border-bottom: none;
+    }
+    
+    .lab-label {
+        color: #666;
+    }
+    
+    .lab-value {
+        font-weight: 600;
+    }
+    
+    .risk-card {
+        text-align: center;
+        padding: 30px;
+    }
+    
+    .risk-percentage-large {
+        font-size: 48px;
+        font-weight: 700;
+        margin: 20px 0;
+    }
+    
+    .risk-level-badge {
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 20px;
+    }
+    
+    .risk-bar {
+        height: 12px;
+        background: #e5e7eb;
+        border-radius: 6px;
+        overflow: hidden;
+        margin-bottom: 10px;
+    }
+    
+    .risk-fill {
+        height: 100%;
+        border-radius: 6px;
+    }
+    
+    .stage-display {
+        text-align: center;
+        padding: 20px;
+    }
+    
+    .stage-number {
+        font-size: 48px;
+        font-weight: 700;
+        margin: 20px 0;
+        color: #0d9488;
+    }
+    
+    .stage-description {
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 20px;
+    }
+    
+    .egfr-display {
+        font-size: 18px;
+        font-weight: 600;
+    }
+    
+    .prescription-item {
+        padding: 15px;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        background: #f9fafb;
+    }
+    
+    .prescription-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .prescription-date {
+        font-weight: 600;
+        color: #0d9488;
+    }
+    
+    .medication-item {
+        padding: 10px;
+        background: rgba(13, 148, 136, 0.05);
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+    
+    .medication-name {
+        font-weight: 600;
+        color: #0d9488;
+    }
+    
+    .medication-details {
+        font-size: 0.9rem;
+        color: #666;
+        margin-top: 5px;
+    }
+    
+    .lab-result-item {
+        padding: 15px;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        background: #f9fafb;
+    }
+    
+    .lab-result-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .lab-result-date {
+        font-weight: 600;
+        color: #0d9488;
+    }
+    
+    .upload-section {
+        text-align: center;
+        padding: 30px;
+        background: #f0fdfa;
+        border-radius: 16px;
+        border: 2px dashed #0d9488;
+    }
+    
+    .btn-upload {
+        background: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 30px;
+        font-weight: 500;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 15px;
+    }
+    
+    .btn-upload:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3);
+    }
+</style>
+
+<div class="patient-details-container">
+    <div class="header">
+        <h1>Patient Details</h1>
         {% if current_user.is_doctor() %}
-        <a href="{{ url_for('doctor_dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+        <a href="{{ url_for('doctor_dashboard') }}" class="back-btn">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
         {% else %}
-        <a href="{{ url_for('patient_portal') }}" class="btn btn-secondary">Back to Portal</a>
+        <a href="{{ url_for('patient_portal') }}" class="back-btn">
+            <i class="fas fa-arrow-left"></i> Back to Portal
+        </a>
         {% endif %}
     </div>
-
-    <div class="patient-summary">
-        <h3>Patient: {{ patient.patient_name if patient.patient_name else patient.name }}</h3>
-        <p>Patient ID: {{ patient.patient_id }}</p>
+    
+    {% if patient %}
+    <!-- Patient Information -->
+    <div class="section">
+        <div class="section-title">
+            <i class="fas fa-user"></i> Patient Information
+        </div>
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="info-label">Patient ID</div>
+                <div class="info-value">{{ patient.patient_id }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Full Name</div>
+                <div class="info-value">{{ patient.patient_name if patient.patient_name else patient.name }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Age</div>
+                <div class="info-value">{{ patient.age if patient.age else 'N/A' }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Gender</div>
+                <div class="info-value">{{ patient.gender if patient.gender else 'N/A' }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Blood Type</div>
+                <div class="info-value">{{ patient.blood_type if patient.blood_type else 'N/A' }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Phone</div>
+                <div class="info-value">{{ patient.phone if patient.phone else 'N/A' }}</div>
+            </div>
+        </div>
     </div>
-
-    <div class="results-grid">
-        <div class="result-card risk-card risk-{{ patient.risk_level.lower() }}">
-            <h3>CKD Risk Assessment</h3>
-            <div class="risk-meter">
-                <div class="risk-percentage-large">{{ patient.risk_percentage }}%</div>
-                <div class="risk-level-badge">{{ patient.risk_level }} Risk</div>
+    
+    <!-- Risk Assessment -->
+    <div class="section">
+        <div class="section-title">
+            <i class="fas fa-exclamation-triangle"></i> Risk Assessment
+        </div>
+        <div class="risk-card">
+            <div class="risk-percentage-large">{{ patient.risk_percentage }}%</div>
+            <div class="risk-level-badge">
+                <span class="badge badge-{{ patient.risk_level.lower() }}">{{ patient.risk_level }} Risk</span>
             </div>
             <div class="risk-bar">
-                <div class="risk-fill" style="width: {{ patient.risk_percentage }}%"></div>
+                <div class="risk-fill" style="width: {{ patient.risk_percentage }}%; background: {% if patient.risk_level == 'Low' %}#10b981{% elif patient.risk_level == 'Moderate' %}#f59e0b{% elif patient.risk_level == 'High' %}#ef4444{% else %}#7f1d1d{% endif %};"></div>
             </div>
         </div>
-
-        <div class="result-card stage-card">
-            <h3>CKD Stage Classification</h3>
-            <div class="stage-display">
-                <div class="stage-number">Stage {{ patient.stage }}</div>
-                <div class="stage-description">
-                    {% if patient.stage == 1 %}
-                    Normal or high GFR (≥90 mL/min/1.73m²)
-                    {% elif patient.stage == 2 %}
-                    Mild decrease in GFR (60-89 mL/min/1.73m²)
-                    {% elif patient.stage == 3 %}
-                    Moderate decrease in GFR (30-59 mL/min/1.73m²)
-                    {% elif patient.stage == 4 %}
-                    Severe decrease in GFR (15-29 mL/min/1.73m²)
-                    {% elif patient.stage == 5 %}
-                    Kidney failure (GFR <15 mL/min/1.73m²)
-                    {% endif %}
+    </div>
+    
+    <!-- CKD Stage -->
+    <div class="section">
+        <div class="section-title">
+            <i class="fas fa-procedures"></i> CKD Stage
+        </div>
+        <div class="stage-display">
+            <div class="stage-number">Stage {{ patient.stage }}</div>
+            <div class="stage-description">
+                {% if patient.stage == 1 %}
+                Normal or high GFR (≥90 mL/min/1.73m²)
+                {% elif patient.stage == 2 %}
+                Mild decrease in GFR (60-89 mL/min/1.73m²)
+                {% elif patient.stage == 3 %}
+                Moderate decrease in GFR (30-59 mL/min/1.73m²)
+                {% elif patient.stage == 4 %}
+                Severe decrease in GFR (15-29 mL/min/1.73m²)
+                {% elif patient.stage == 5 %}
+                Kidney failure (GFR <15 mL/min/1.73m²)
+                {% else %}
+                Not determined
+                {% endif %}
+            </div>
+            <div class="egfr-display">
+                eGFR: {{ "%.1f"|format(patient.egfr) if patient.egfr else 'N/A' }} mL/min/1.73m²
+            </div>
+        </div>
+    </div>
+    
+    <!-- Lab Results -->
+    <div class="section">
+        <div class="section-title">
+            <i class="fas fa-vial"></i> Lab Results
+        </div>
+        <div class="lab-results-grid">
+            <div class="lab-card">
+                <div class="lab-card-title">Kidney Function</div>
+                <div class="lab-item">
+                    <span class="lab-label">Serum Creatinine</span>
+                    <span class="lab-value">{{ patient.serum_creatinine if patient.serum_creatinine else 'N/A' }} mg/dL</span>
                 </div>
-                <div class="egfr-display">
-                    <span class="label">eGFR:</span>
-                    <span class="value">{{ patient.egfr }} mL/min/1.73m²</span>
+                <div class="lab-item">
+                    <span class="lab-label">Blood Urea Nitrogen</span>
+                    <span class="lab-value">{{ patient.blood_urea if patient.blood_urea else 'N/A' }} mg/dL</span>
+                </div>
+                <div class="lab-item">
+                    <span class="lab-label">eGFR</span>
+                    <span class="lab-value">{{ "%.1f"|format(patient.egfr) if patient.egfr else 'N/A' }} mL/min/1.73m²</span>
+                </div>
+            </div>
+            <div class="lab-card">
+                <div class="lab-card-title">Blood Metrics</div>
+                <div class="lab-item">
+                    <span class="lab-label">Hemoglobin</span>
+                    <span class="lab-value">{{ patient.hemoglobin if patient.hemoglobin else 'N/A' }} g/dL</span>
+                </div>
+                <div class="lab-item">
+                    <span class="lab-label">Sodium</span>
+                    <span class="lab-value">{{ patient.sodium if patient.sodium else 'N/A' }} mEq/L</span>
+                </div>
+                <div class="lab-item">
+                    <span class="lab-label">Potassium</span>
+                    <span class="lab-value">{{ patient.potassium if patient.potassium else 'N/A' }} mEq/L</span>
+                </div>
+            </div>
+            <div class="lab-card">
+                <div class="lab-card-title">Other Metrics</div>
+                <div class="lab-item">
+                    <span class="lab-label">Blood Glucose</span>
+                    <span class="lab-value">{{ patient.blood_glucose if patient.blood_glucose else 'N/A' }} mg/dL</span>
+                </div>
+                <div class="lab-item">
+                    <span class="lab-label">Blood Pressure</span>
+                    <span class="lab-value">{{ patient.bp_systolic if patient.bp_systolic else 'N/A' }}/{{ patient.bp_diastolic if patient.bp_diastolic else 'N/A' }} mmHg</span>
+                </div>
+                <div class="lab-item">
+                    <span class="lab-label">Albumin</span>
+                    <span class="lab-value">{{ patient.albumin if patient.albumin else 'N/A' }} g/dL</span>
                 </div>
             </div>
         </div>
     </div>
-
-    {% if patient.feature_importance %}
-    <div class="factors-card">
-        <h3>Key Contributing Factors</h3>
-        <p class="subtitle">These factors had the most significant impact on the risk assessment</p>
-        
-        <div class="factors-list">
-            {% for factor in patient.feature_importance %}
-            <div class="factor-item">
-                <div class="factor-info">
-                    <span class="factor-name">{{ factor.name }}</span>
-                    <span class="factor-value">Value: {{ factor.value }}</span>
-                </div>
-                <div class="factor-importance">
-                    <div class="importance-bar">
-                        <div class="importance-fill" style="width: {{ factor.importance }}%"></div>
-                    </div>
-                    <span class="importance-label">{{ factor.importance }}% importance</span>
-                </div>
+    
+    <!-- Historical Lab Results -->
+    {% if lab_results and lab_results|length > 0 %}
+    <div class="section">
+        <div class="section-title">
+            <i class="fas fa-history"></i> Historical Lab Results
+        </div>
+        {% for result in lab_results %}
+        <div class="lab-result-item">
+            <div class="lab-result-header">
+                <div class="lab-result-date">{{ result.test_date }}</div>
+                <div>{{ result.test_type }}</div>
             </div>
-            {% endfor %}
+            <div class="lab-results-grid">
+                {% for key, value in result.results.items() %}
+                <div class="lab-item">
+                    <span class="lab-label">{{ key }}</span>
+                    <span class="lab-value">{{ value }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% if result.notes %}
+            <div style="margin-top: 10px; padding: 10px; background: #fffbeb; border-radius: 8px;">
+                <strong>Notes:</strong> {{ result.notes }}
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <!-- Medical History -->
+    {% if patient.history and patient.history|length > 0 %}
+    <div class="section">
+        <div class="section-title">
+            <i class="fas fa-history"></i> Medical History
+        </div>
+        <div>
+            <h3>Previous Records</h3>
+            <ul>
+                {% for record in patient.history %}
+                <li>{{ record.date if record.date else 'Unknown Date' }}</li>
+                {% endfor %}
+            </ul>
         </div>
     </div>
     {% endif %}
-
-    {% if current_user.is_doctor() %}
-    <div class="recommendations-card">
-        <h3>Clinical Recommendations</h3>
-        <div class="recommendations-list">
-            {% if patient.risk_level == 'Critical' or patient.stage >= 4 %}
-            <div class="recommendation urgent">
-                <h4>URGENT ACTION REQUIRED</h4>
-                <ul>
-                    <li>Immediate nephrology consultation recommended</li>
-                    <li>Consider dialysis evaluation if Stage 5</li>
-                    <li>Strict monitoring of kidney function parameters</li>
-                    <li>Review and adjust all medications for renal dosing</li>
-                </ul>
+    
+    <!-- Prescriptions -->
+    <div class="section">
+        <div class="section-title">
+            <i class="fas fa-prescription"></i> Medications & Prescriptions
+        </div>
+        {% if prescriptions and prescriptions|length > 0 %}
+            {% for prescription in prescriptions %}
+            <div class="prescription-item">
+                <div class="prescription-header">
+                    <div class="prescription-date">{{ prescription.date }}</div>
+                    <div>Prescribed by: Dr. {{ prescription.doctor }}</div>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <strong>Medications:</strong>
+                    {% for med in prescription.medications %}
+                    <div class="medication-item">
+                        <div class="medication-name">{{ med.name }}</div>
+                        <div class="medication-details">
+                            Dosage: {{ med.dosage }} | Frequency: {{ med.frequency }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% if prescription.notes %}
+                <div style="padding: 10px; background: #fffbeb; border-radius: 8px;">
+                    <strong>Notes:</strong> {{ prescription.notes }}
+                </div>
+                {% endif %}
             </div>
-            {% elif patient.risk_level == 'High' or patient.stage == 3 %}
-            <div class="recommendation high">
-                <h4>High Priority Actions</h4>
-                <ul>
-                    <li>Refer to nephrologist for specialized care</li>
-                    <li>Intensify blood pressure and diabetes management</li>
-                    <li>Schedule follow-up labs in 3 months</li>
-                    <li>Implement dietary modifications (low protein, sodium restriction)</li>
-                </ul>
-            </div>
-            {% elif patient.risk_level == 'Moderate' %}
-            <div class="recommendation moderate">
-                <h4>Preventive Measures</h4>
-                <ul>
-                    <li>Monitor kidney function every 6 months</li>
-                    <li>Optimize management of hypertension and diabetes</li>
-                    <li>Encourage healthy lifestyle modifications</li>
-                    <li>Patient education on CKD risk factors</li>
-                </ul>
-            </div>
+            {% endfor %}
+        {% else %}
+            <p>No prescriptions found for this patient.</p>
+        {% endif %}
+        
+        <!-- Prescription Upload Button -->
+        <div class="upload-section">
+            <h3><i class="fas fa-file-upload"></i> Upload New Prescription</h3>
+            <p>Upload a new prescription for this patient</p>
+            <button class="btn-upload" onclick="window.location.href='{{ url_for('prescriptions') }}'">
+                <i class="fas fa-plus"></i> Create New Prescription
+            </button>
+        </div>
+    </div>
+    
+    {% else %}
+    <div class="section">
+        <div style="text-align: center; padding: 60px 20px;">
+            <i class="fas fa-user-times" style="font-size: 48px; margin-bottom: 20px; color: #ef4444;"></i>
+            <h3>Patient Not Found</h3>
+            <p>The requested patient information could not be found.</p>
+            {% if current_user.is_doctor() %}
+            <a href="{{ url_for('doctor_dashboard') }}" class="back-btn" style="display: inline-flex; margin-top: 20px;">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
             {% else %}
-            <div class="recommendation low">
-                <h4>General Health Maintenance</h4>
-                <ul>
-                    <li>Annual kidney function screening</li>
-                    <li>Maintain healthy blood pressure and glucose levels</li>
-                    <li>Encourage regular exercise and balanced diet</li>
-                    <li>Monitor for new risk factors</li>
-                </ul>
-            </div>
+            <a href="{{ url_for('patient_portal') }}" class="back-btn" style="display: inline-flex; margin-top: 20px;">
+                <i class="fas fa-arrow-left"></i> Back to Portal
+            </a>
             {% endif %}
         </div>
     </div>
