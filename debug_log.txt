@@ -280,3 +280,46 @@ DEBUG: Doctor: doctor1
 DEBUG: Appointments found: 15
 DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
 DEBUG: Patients with appointments: {'john_smith', 'robert_williams', 'ken', 'Ria', 'mary_johnson'}
+DEBUG: Doctor: doctor2
+DEBUG: Appointments found: 1
+DEBUG: First appointment: {'_id': ObjectId('692044b9953c04c3a1de5908'), 'doctor': 'doctor2', 'patient': 'John Smith', 'patient_name': 'John Smith', 'date': '2025-12-01', 'time': '10:30', 'reason': 'Regular checkup', 'status': 'scheduled'}
+DEBUG: Patients with appointments: {'John Smith'}
+DEBUG: Doctor: doctor2
+DEBUG: Appointments found: 1
+DEBUG: First appointment: {'_id': ObjectId('692044b9953c04c3a1de5908'), 'doctor': 'doctor2', 'patient': 'John Smith', 'patient_name': 'John Smith', 'date': '2025-12-01', 'time': '10:30', 'reason': 'Regular checkup', 'status': 'scheduled'}
+DEBUG: Patients with appointments: {'John Smith'}
+DEBUG: Doctor: doctor2
+DEBUG: Appointments found: 1
+DEBUG: First appointment: {'_id': ObjectId('692044b9953c04c3a1de5908'), 'doctor': 'doctor2', 'patient': 'John Smith', 'patient_name': 'John Smith', 'date': '2025-12-01', 'time': '10:30', 'reason': 'Regular checkup', 'status': 'scheduled'}
+DEBUG: Patients with appointments: {'John Smith'}
+DEBUG: Doctor: doctor2
+DEBUG: Appointments found: 1
+DEBUG: First appointment: {'_id': ObjectId('692044b9953c04c3a1de5908'), 'doctor': 'doctor2', 'patient': 'John Smith', 'patient_name': 'John Smith', 'date': '2025-12-01', 'time': '10:30', 'reason': 'Regular checkup', 'status': 'scheduled'}
+DEBUG: Patients with appointments: {'John Smith'}
+DEBUG: Doctor: doctor2
+DEBUG: Appointments found: 1
+DEBUG: First appointment: {'_id': ObjectId('692044b9953c04c3a1de5908'), 'doctor': 'doctor2', 'patient': 'John Smith', 'patient_name': 'John Smith', 'date': '2025-12-01', 'time': '10:30', 'reason': 'Regular checkup', 'status': 'scheduled'}
+DEBUG: Patients with appointments: {'John Smith'}
+DEBUG: Doctor: doctor2
+DEBUG: Appointments found: 1
+DEBUG: First appointment: {'_id': ObjectId('692044b9953c04c3a1de5908'), 'doctor': 'doctor2', 'patient': 'John Smith', 'patient_name': 'John Smith', 'date': '2025-12-01', 'time': '10:30', 'reason': 'Regular checkup', 'status': 'scheduled'}
+DEBUG: Patients with appointments: {'John Smith'}
+DEBUG: Doctor: doctor2
+DEBUG: Appointments found: 1
+DEBUG: First appointment: {'_id': ObjectId('692044b9953c04c3a1de5908'), 'doctor': 'doctor2', 'patient': 'John Smith', 'patient_name': 'John Smith', 'date': '2025-12-01', 'time': '10:30', 'reason': 'Regular checkup', 'status': 'scheduled'}
+DEBUG: Patients with appointments: {'John Smith'}
+DEBUG: Doctor: doctor2
+DEBUG: Appointments found: 1
+DEBUG: First appointment: {'_id': ObjectId('692044b9953c04c3a1de5908'), 'doctor': 'doctor2', 'patient': 'John Smith', 'patient_name': 'John Smith', 'date': '2025-12-01', 'time': '10:30', 'reason': 'Regular checkup', 'status': 'scheduled'}
+DEBUG: Patients with appointments: {'John Smith'}
+DEBUG: Doctor: doctor2
+DEBUG: Appointments found: 1
+DEBUG: First appointment: {'_id': ObjectId('692044b9953c04c3a1de5908'), 'doctor': 'doctor2', 'patient': 'John Smith', 'patient_name': 'John Smith', 'date': '2025-12-01', 'time': '10:30', 'reason': 'Regular checkup', 'status': 'scheduled'}
+DEBUG: Patients with appointments: {'John Smith'}
+Booking request received: {'doctor_name': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '14:30'}
+Doctor name: doctor1
+Appointment created successfully: {'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '14:30', 'status': 'pending', 'created_at': '2025-11-24T18:30:03.453224', '_id': '692456d394340fa730b0f6bb'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 16
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'Ria', 'john_smith', 'ken', 'mary_johnson', 'robert_williams'}
