@@ -227,21 +227,21 @@
         width: 100%;
         height: 100%;
         overflow: auto;
-        background-color: rgba(0,0,0,0.5);
+        background-color: rgba(0, 0, 0, 0.5);
     }
-    
+
     .modal-content {
         background-color: #fff;
         margin: 2% auto;
         padding: 0;
         border-radius: 10px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         width: 90%;
         max-width: 1200px;
         max-height: 90vh;
         overflow-y: auto;
     }
-    
+
     .modal-header {
         padding: 20px;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -251,12 +251,12 @@
         justify-content: space-between;
         align-items: center;
     }
-    
+
     .modal-header h2 {
         margin: 0;
         font-size: 1.5rem;
     }
-    
+
     .close {
         color: white;
         font-size: 28px;
@@ -264,78 +264,78 @@
         cursor: pointer;
         padding: 0 10px;
     }
-    
+
     .close:hover {
         color: #ddd;
     }
-    
+
     .modal-body {
         padding: 20px;
     }
-    
+
     .trend-charts-container {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
         gap: 20px;
         margin-bottom: 30px;
     }
-    
+
     .chart-card {
         background: #f8f9fa;
         border-radius: 8px;
         padding: 20px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
-    
+
     .chart-card h3 {
         margin-top: 0;
         color: #333;
         text-align: center;
     }
-    
+
     .lab-results-section {
         margin-top: 30px;
     }
-    
+
     .lab-results-section h3 {
         color: #333;
         border-bottom: 2px solid #667eea;
         padding-bottom: 10px;
     }
-    
+
     .lab-results-table {
         width: 100%;
         border-collapse: collapse;
         margin-top: 15px;
     }
-    
+
     .lab-results-table th,
     .lab-results-table td {
         padding: 12px;
         text-align: left;
         border-bottom: 1px solid #ddd;
     }
-    
+
     .lab-results-table th {
         background-color: #f1f3f4;
         font-weight: 600;
     }
-    
+
     .lab-results-table tr:hover {
         background-color: #f5f5f5;
     }
-    
+
     @media (max-width: 768px) {
         .trend-charts-container {
             grid-template-columns: 1fr;
         }
-        
+
         .modal-content {
             width: 95%;
             margin: 5% auto;
         }
     }
-    
+
     /* Stats Grid */
     .stats-grid {
         display: grid;
@@ -748,7 +748,7 @@
         .charts-row {
             grid-template-columns: 1fr;
         }
-        
+
         .chart-container {
             height: 300px;
         }
@@ -758,16 +758,16 @@
         .stats-grid {
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
         }
-        
+
         .filter-controls {
             flex-direction: column;
             align-items: stretch;
         }
-        
+
         .filter-select-container {
             flex-direction: column;
         }
-        
+
         .filter-group select {
             min-width: 100%;
         }
@@ -777,26 +777,26 @@
         body {
             padding: 15px;
         }
-        
+
         .top-bar {
             flex-direction: column;
             gap: 20px;
             padding: 20px;
         }
-        
+
         .top-bar-right {
             width: 100%;
             justify-content: space-between;
         }
-        
+
         .search-bar input {
             width: 100%;
         }
-        
+
         .stats-grid {
             grid-template-columns: 1fr 1fr;
         }
-        
+
         .patients-table {
             display: block;
             overflow-x: auto;
@@ -808,23 +808,23 @@
         .stats-grid {
             grid-template-columns: 1fr;
         }
-        
+
         .card-header {
             flex-direction: column;
             align-items: flex-start;
             gap: 15px;
         }
-        
+
         .card-action-btn {
             width: 100%;
             justify-content: center;
         }
-        
+
         .patient-actions {
             flex-direction: column;
             gap: 5px;
         }
-        
+
         .btn-sm {
             margin-right: 0;
             width: 100%;
@@ -977,7 +977,7 @@
                 <tbody id="patientsTableBody">
                     {% for patient in patients %}
                     <tr data-name="{{ patient.name|lower }}" data-id="{{ patient.patient_id|lower }}"
-                        data-username="{{ patient.username|lower if patient.username else '' }}" 
+                        data-username="{{ patient.username|lower if patient.username else '' }}"
                         data-risk="{{ patient.risk_level }}" data-stage="{{ patient.stage }}"
                         onclick="viewPatientDetails('{{ patient.patient_id }}')" style="cursor: pointer;">
                         <td><strong>{{ patient.patient_id }}</strong></td>
@@ -1189,27 +1189,27 @@
         console.log("Patient ID length:", patientId ? patientId.length : 0);
         console.log("Patient ID is empty:", !patientId);
         console.log("Patient ID is whitespace only:", patientId && patientId.trim() === '');
-        
+
         // Additional debugging
         if (!patientId) {
             console.error("Patient ID is empty or undefined!");
             alert("Error: Patient ID is missing");
             return;
         }
-        
+
         // Check if patientId is valid
         if (typeof patientId !== 'string') {
             console.error("Patient ID is not a string:", patientId);
             alert("Error: Invalid Patient ID type");
             return;
         }
-        
+
         if (patientId.trim() === '') {
             console.error("Patient ID is empty string!");
             alert("Error: Patient ID is empty");
             return;
         }
-        
+
         // Show health trends in modal instead of redirecting
         showHealthTrends(patientId);
     }
@@ -1222,50 +1222,50 @@
         console.log("Patient ID length:", patientId ? patientId.length : 0);
         console.log("Patient ID is empty:", !patientId);
         console.log("Patient ID is whitespace only:", patientId && patientId.trim() === '');
-        
+
         // Additional debugging
         if (!patientId) {
             console.error("Patient ID is empty or undefined!");
             alert("Error: Patient ID is missing");
             return;
         }
-        
+
         // Check if patientId is valid
         if (typeof patientId !== 'string') {
             console.error("Patient ID is not a string:", patientId);
             alert("Error: Invalid Patient ID type");
             return;
         }
-        
+
         if (patientId.trim() === '') {
             console.error("Patient ID is empty string!");
             alert("Error: Patient ID is empty");
             return;
         }
-        
+
         const trimmedId = patientId.trim();
         const url = `/doctor/patient/${encodeURIComponent(trimmedId)}`;
         console.log("Redirecting to:", url);
         alert(`Redirecting to: ${url}`);  // Show user what's happening
         window.location.href = url;
     }
-    
+
     // Show health trends in modal
     function showHealthTrends(patientId) {
         // Show loading state
         document.getElementById('healthTrendsModal').style.display = 'block';
         document.getElementById('trendPatientName').textContent = 'Loading...';
-        
+
         // Fetch patient health data
         fetch(`/api/doctor/patient/${encodeURIComponent(patientId)}/health-trends`)
             .then(response => response.json())
             .then(data => {
                 // Update patient name
                 document.getElementById('trendPatientName').textContent = data.patient_name || 'Unknown Patient';
-                
+
                 // Render charts
                 renderHealthTrendCharts(data);
-                
+
                 // Render lab results table
                 renderLabResultsTable(data.lab_results || []);
             })
@@ -1275,12 +1275,12 @@
                 alert('Error loading health trends data');
             });
     }
-    
+
     // Close health trends modal
     function closeHealthTrends() {
         document.getElementById('healthTrendsModal').style.display = 'none';
     }
-    
+
     // Render health trend charts
     function renderHealthTrendCharts(data) {
         // Clear existing charts
@@ -1291,7 +1291,7 @@
                 window[chartId + 'Chart'].destroy();
             }
         });
-        
+
         // Render eGFR trend chart
         if (data.egfr_history && data.egfr_history.length > 0) {
             const egfrCtx = document.getElementById('egfrTrendChart').getContext('2d');
@@ -1336,7 +1336,7 @@
                 }
             });
         }
-        
+
         // Render Blood Pressure trend chart
         if (data.bp_history && data.bp_history.length > 0) {
             const bpCtx = document.getElementById('bpTrendChart').getContext('2d');
@@ -1392,7 +1392,7 @@
                 }
             });
         }
-        
+
         // Render Serum Creatinine trend chart
         if (data.creatinine_history && data.creatinine_history.length > 0) {
             const creatinineCtx = document.getElementById('creatinineTrendChart').getContext('2d');
@@ -1438,16 +1438,16 @@
             });
         }
     }
-    
+
     // Render lab results table
     function renderLabResultsTable(labResults) {
         const tableContainer = document.getElementById('labResultsTable');
-        
+
         if (!labResults || labResults.length === 0) {
             tableContainer.innerHTML = '<p>No lab results available</p>';
             return;
         }
-        
+
         let tableHTML = `
             <table class="lab-results-table">
                 <thead>
@@ -1460,7 +1460,7 @@
                 </thead>
                 <tbody>
         `;
-        
+
         labResults.forEach(result => {
             tableHTML += `
                 <tr>
@@ -1471,15 +1471,15 @@
                 </tr>
             `;
         });
-        
+
         tableHTML += `
                 </tbody>
             </table>
         `;
-        
+
         tableContainer.innerHTML = tableHTML;
     }
-    
+
     // Refresh patient list
     function refreshPatientList() {
         location.reload();
@@ -1502,164 +1502,164 @@
             labels: ['Low', 'Moderate', 'High', 'Critical'],
             datasets: [{
                 data: [
-                    {{ patients| selectattr('risk_level', 'equalto', 'Low') | list | length }},
-                {{ patients| selectattr('risk_level', 'equalto', 'Moderate') | list | length }},
-    {{ patients| selectattr('risk_level', 'equalto', 'High') | list | length }},
-    {{ patients| selectattr('risk_level', 'equalto', 'Critical') | list | length }}
-                    ],
-        backgroundColor: [
-        '#10b981', // green for low
-        '#f59e0b', // amber for moderate
-        '#ef4444', // red for high
-        '#7f1d1d'  // dark red for critical
-    ],
-        borderColor: [
-        '#047857',
-        '#b45309',
-        '#dc2626',
-        '#450a0a'
-    ],
-        borderWidth: 1,
-        hoverOffset: 15
+                    {{ patients|selectattr('risk_level', 'equalto', 'Low')|list|length }},
+                    {{ patients|selectattr('risk_level', 'equalto', 'Moderate')|list|length }},
+                    {{ patients|selectattr('risk_level', 'equalto', 'High')|list|length }},
+                    {{ patients|selectattr('risk_level', 'equalto', 'Critical')|list|length }}
+                ],
+                backgroundColor: [
+                    '#10b981', // green for low
+                    '#f59e0b', // amber for moderate
+                    '#ef4444', // red for high
+                    '#7f1d1d'  // dark red for critical
+                ],
+                borderColor: [
+                    '#047857',
+                    '#b45309',
+                    '#dc2626',
+                    '#450a0a'
+                ],
+                borderWidth: 1,
+                hoverOffset: 15
             }]
         };
 
-    const riskChart = new Chart(riskCtx, {
-        type: 'doughnut',
-        data: riskData,
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                title: {
-                    display: false
-                },
-                legend: {
-                    position: 'bottom',
-                    labels: {
-                        padding: 15,
-                        usePointStyle: true,
-                        pointStyle: 'circle',
-                        font: {
-                            size: 12
-                        }
-                    }
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function (context) {
-                            const total = context.dataset.data.reduce((acc, data) => acc + data, 0);
-                            const value = context.parsed;
-                            const percentage = Math.round((value / total) * 100);
-                            return `${context.label}: ${value} (${percentage}%)`;
-                        }
-                    }
-                }
-            },
-            animation: {
-                animateRotate: true,
-                animateScale: true
-            },
-            aspectRatio: 1
-        }
-    });
-
-    // Stage Distribution Chart
-    const stageCtx = document.getElementById('stageDistributionChart').getContext('2d');
-    const stageData = {
-        labels: ['Stage 1', 'Stage 2', 'Stage 3', 'Stage 4', 'Stage 5'],
-        datasets: [{
-            label: 'Number of Patients',
-            data: [
-                {{ patients| selectattr('stage', 'equalto', 1) | list | length }},
-            {{ patients| selectattr('stage', 'equalto', 2) | list | length }},
-    {{ patients| selectattr('stage', 'equalto', 3) | list | length }},
-    {{ patients| selectattr('stage', 'equalto', 4) | list | length }},
-    {{ patients| selectattr('stage', 'equalto', 5) | list | length }}
-                    ],
-    backgroundColor: [
-        '#10b981', // green for stage 1
-        '#84cc16', // lime for stage 2
-        '#f59e0b', // amber for stage 3
-        '#f97316', // orange for stage 4
-        '#ef4444'  // red for stage 5
-    ],
-        borderColor: [
-            '#047857',
-            '#65a30d',
-            '#b45309',
-            '#ea580c',
-            '#dc2626'
-        ],
-            borderWidth: 1
-            }]
-        };
-
-    const stageChart = new Chart(stageCtx, {
-        type: 'bar',
-        data: stageData,
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                title: {
-                    display: false
-                },
-                legend: {
-                    display: false
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function (context) {
-                            return `Patients: ${context.parsed.y}`;
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            precision: 0,
-                            stepSize: 1,
-                            font: {
-                                size: 10
-                            }
-                        },
-                        title: {
-                            display: true,
-                            text: 'Patients',
+        const riskChart = new Chart(riskCtx, {
+            type: 'doughnut',
+            data: riskData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: false
+                    },
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 15,
+                            usePointStyle: true,
+                            pointStyle: 'circle',
                             font: {
                                 size: 12
                             }
                         }
                     },
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'CKD Stages',
-                            font: {
-                                size: 12
-                            }
-                        },
-                        ticks: {
-                            font: {
-                                size: 10
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                const total = context.dataset.data.reduce((acc, data) => acc + data, 0);
+                                const value = context.parsed;
+                                const percentage = Math.round((value / total) * 100);
+                                return `${context.label}: ${value} (${percentage}%)`;
                             }
                         }
                     }
                 },
                 animation: {
-                    duration: 1000,
-                    easing: 'easeInOutQuart'
-                }
+                    animateRotate: true,
+                    animateScale: true
+                },
+                aspectRatio: 1
             }
         });
 
-    // Store chart instances for toggling
-    window.riskChart = riskChart;
-    window.stageChart = stageChart;
-    window.riskChartType = 'doughnut';
-    window.stageChartType = 'bar';
+        // Stage Distribution Chart
+        const stageCtx = document.getElementById('stageDistributionChart').getContext('2d');
+        const stageData = {
+            labels: ['Stage 1', 'Stage 2', 'Stage 3', 'Stage 4', 'Stage 5'],
+            datasets: [{
+                label: 'Number of Patients',
+                data: [
+                    {{ patients|selectattr('stage', 'equalto', 1)|list|length }},
+                    {{ patients|selectattr('stage', 'equalto', 2)|list|length }},
+                    {{ patients|selectattr('stage', 'equalto', 3)|list|length }},
+                    {{ patients|selectattr('stage', 'equalto', 4)|list|length }},
+                    {{ patients|selectattr('stage', 'equalto', 5)|list|length }}
+                ],
+                backgroundColor: [
+                    '#10b981', // green for stage 1
+                    '#84cc16', // lime for stage 2
+                    '#f59e0b', // amber for stage 3
+                    '#f97316', // orange for stage 4
+                    '#ef4444'  // red for stage 5
+                ],
+                borderColor: [
+                    '#047857',
+                    '#65a30d',
+                    '#b45309',
+                    '#ea580c',
+                    '#dc2626'
+                ],
+                borderWidth: 1
+            }]
+        };
+
+        const stageChart = new Chart(stageCtx, {
+            type: 'bar',
+            data: stageData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: false
+                    },
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                return `Patients: ${context.parsed.y}`;
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0,
+                                stepSize: 1,
+                                font: {
+                                    size: 10
+                                }
+                            },
+                            title: {
+                                display: true,
+                                text: 'Patients',
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'CKD Stages',
+                                font: {
+                                    size: 12
+                                }
+                            },
+                            ticks: {
+                                font: {
+                                    size: 10
+                                }
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 1000,
+                        easing: 'easeInOutQuart'
+                    }
+                }
+            });
+
+        // Store chart instances for toggling
+        window.riskChart = riskChart;
+        window.stageChart = stageChart;
+        window.riskChartType = 'doughnut';
+        window.stageChartType = 'bar';
     });
 
     // Toggle chart types
@@ -1673,148 +1673,148 @@
                 labels: ['Low', 'Moderate', 'High', 'Critical'],
                 datasets: [{
                     data: [
-                        {{ patients| selectattr('risk_level', 'equalto', 'Low') | list | length }},
-                {{ patients| selectattr('risk_level', 'equalto', 'Moderate') | list | length }},
-    {{ patients| selectattr('risk_level', 'equalto', 'High') | list | length }},
-    {{ patients| selectattr('risk_level', 'equalto', 'Critical') | list | length }}
+                        {{ patients|selectattr('risk_level', 'equalto', 'Low')|list|length }},
+                        {{ patients|selectattr('risk_level', 'equalto', 'Moderate')|list|length }},
+                        {{ patients|selectattr('risk_level', 'equalto', 'High')|list|length }},
+                        {{ patients|selectattr('risk_level', 'equalto', 'Critical')|list|length }}
                     ],
-    backgroundColor: [
-        '#10b981',
-        '#f59e0b',
-        '#ef4444',
-        '#7f1d1d'
-    ],
-        borderColor: [
-            '#047857',
-            '#b45309',
-            '#dc2626',
-            '#450a0a'
-        ],
-            borderWidth: 1,
-                hoverOffset: 15
+                    backgroundColor: [
+                        '#10b981',
+                        '#f59e0b',
+                        '#ef4444',
+                        '#7f1d1d'
+                    ],
+                    borderColor: [
+                        '#047857',
+                        '#b45309',
+                        '#dc2626',
+                        '#450a0a'
+                    ],
+                    borderWidth: 1,
+                    hoverOffset: 15
                 }]
             };
 
-    window.riskChart = new Chart(riskCtx, {
-        type: newType,
-        data: riskData,
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                title: {
-                    display: false
-                },
-                legend: {
-                    position: 'bottom',
-                    labels: {
-                        padding: 20,
-                        usePointStyle: true,
-                        pointStyle: 'circle'
-                    }
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function (context) {
-                            const total = context.dataset.data.reduce((acc, data) => acc + data, 0);
-                            const value = context.parsed;
-                            const percentage = Math.round((value / total) * 100);
-                            return `${context.label}: ${value} (${percentage}%)`;
+            window.riskChart = new Chart(riskCtx, {
+                type: newType,
+                data: riskData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: false
+                        },
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true,
+                                pointStyle: 'circle'
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    const total = context.dataset.data.reduce((acc, data) => acc + data, 0);
+                                    const value = context.parsed;
+                                    const percentage = Math.round((value / total) * 100);
+                                    return `${context.label}: ${value} (${percentage}%)`;
+                                }
+                            }
                         }
-                    }
-                }
-            },
-            animation: {
-                animateRotate: true,
-                animateScale: true
-            }
-        }
-    });
-
-    window.riskChartType = newType;
-        } else if (chartName === 'stage') {
-        const newType = window.stageChartType === 'bar' ? 'line' : 'bar';
-        window.stageChart.destroy();
-
-        const stageCtx = document.getElementById('stageDistributionChart').getContext('2d');
-        const stageData = {
-            labels: ['Stage 1', 'Stage 2', 'Stage 3', 'Stage 4', 'Stage 5'],
-            datasets: [{
-                label: 'Number of Patients',
-                data: [
-                    {{ patients| selectattr('stage', 'equalto', 1) | list | length }},
-            {{ patients| selectattr('stage', 'equalto', 2) | list | length }},
-    {{ patients| selectattr('stage', 'equalto', 3) | list | length }},
-    {{ patients| selectattr('stage', 'equalto', 4) | list | length }},
-    {{ patients| selectattr('stage', 'equalto', 5) | list | length }}
-                    ],
-    backgroundColor: [
-        '#10b981',
-        '#84cc16',
-        '#f59e0b',
-        '#f97316',
-        '#ef4444'
-    ],
-        borderColor: [
-            '#10b981',
-            '#84cc16',
-            '#f59e0b',
-            '#f97316',
-            '#ef4444'
-        ],
-            borderWidth: 2,
-                fill: newType === 'line'
-                }]
-            };
-
-    window.stageChart = new Chart(stageCtx, {
-        type: newType,
-        data: stageData,
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                title: {
-                    display: false
-                },
-                legend: {
-                    display: false
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function (context) {
-                            return `Patients: ${context.parsed.y}`;
-                        }
-                    }
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        precision: 0,
-                        stepSize: 1
                     },
-                    title: {
-                        display: true,
-                        text: 'Number of Patients'
-                    }
-                },
-                x: {
-                    title: {
-                        display: true,
-                        text: 'CKD Stages'
+                    animation: {
+                        animateRotate: true,
+                        animateScale: true
                     }
                 }
-            },
-            animation: {
-                duration: 1000,
-                easing: 'easeInOutQuart'
-            }
-        }
-    });
+            });
 
-    window.stageChartType = newType;
+            window.riskChartType = newType;
+        } else if (chartName === 'stage') {
+            const newType = window.stageChartType === 'bar' ? 'line' : 'bar';
+            window.stageChart.destroy();
+
+            const stageCtx = document.getElementById('stageDistributionChart').getContext('2d');
+            const stageData = {
+                labels: ['Stage 1', 'Stage 2', 'Stage 3', 'Stage 4', 'Stage 5'],
+                datasets: [{
+                    label: 'Number of Patients',
+                    data: [
+                        {{ patients|selectattr('stage', 'equalto', 1)|list|length }},
+                        {{ patients|selectattr('stage', 'equalto', 2)|list|length }},
+                        {{ patients|selectattr('stage', 'equalto', 3)|list|length }},
+                        {{ patients|selectattr('stage', 'equalto', 4)|list|length }},
+                        {{ patients|selectattr('stage', 'equalto', 5)|list|length }}
+                    ],
+                    backgroundColor: [
+                        '#10b981',
+                        '#84cc16',
+                        '#f59e0b',
+                        '#f97316',
+                        '#ef4444'
+                    ],
+                    borderColor: [
+                        '#10b981',
+                        '#84cc16',
+                        '#f59e0b',
+                        '#f97316',
+                        '#ef4444'
+                    ],
+                    borderWidth: 2,
+                    fill: newType === 'line'
+                }]
+            };
+
+            window.stageChart = new Chart(stageCtx, {
+                type: newType,
+                data: stageData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: false
+                        },
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    return `Patients: ${context.parsed.y}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0,
+                                stepSize: 1
+                            },
+                            title: {
+                                display: true,
+                                text: 'Number of Patients'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'CKD Stages'
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 1000,
+                        easing: 'easeInOutQuart'
+                    }
+                }
+            });
+
+            window.stageChartType = newType;
         }
     }
 
