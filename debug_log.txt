@@ -335,3 +335,33 @@ DEBUG: Appointments found: 16
 DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
 DEBUG: Patients with appointments: {'Ria', 'john_smith', 'ken', 'mary_johnson', 'robert_williams'}
 >>>>>>> 96522461017b1dc2c820c9caa8a463838574ac03
+DEBUG: Doctor: doc1
+DEBUG: Appointments found: 0
+DEBUG: Patients with appointments: set()
+Booking request received: {'doctor_name': 'doc1', 'preferred_date': '2025-11-26', 'preferred_time': '21:34'}
+Doctor name: doc1
+Appointment created successfully: {'patient': 'Aditya21', 'doctor': 'doc1', 'preferred_date': '2025-11-26', 'preferred_time': '21:34', 'status': 'pending', 'created_at': '2025-11-24T18:34:41.008524', '_id': '692457e9d10860eeee400f0a'}
+DEBUG: Doctor: doc1
+DEBUG: Appointments found: 1
+DEBUG: First appointment: {'_id': ObjectId('692457e9d10860eeee400f0a'), 'patient': 'Aditya21', 'doctor': 'doc1', 'preferred_date': '2025-11-26', 'preferred_time': '21:34', 'status': 'pending', 'created_at': '2025-11-24T18:34:41.008524'}
+DEBUG: Patients with appointments: {'Aditya21'}
+DEBUG: Doctor: doc1
+DEBUG: Appointments found: 1
+DEBUG: First appointment: {'_id': ObjectId('692457e9d10860eeee400f0a'), 'patient': 'Aditya21', 'doctor': 'doc1', 'preferred_date': '2025-11-26', 'preferred_time': '21:34', 'status': 'pending', 'created_at': '2025-11-24T18:34:41.008524'}
+DEBUG: Patients with appointments: {'Aditya21'}
+DEBUG: Doctor: doc1
+DEBUG: Appointments found: 1
+DEBUG: First appointment: {'_id': ObjectId('692457e9d10860eeee400f0a'), 'patient': 'Aditya21', 'doctor': 'doc1', 'preferred_date': '2025-11-26', 'preferred_time': '21:34', 'status': 'pending', 'created_at': '2025-11-24T18:34:41.008524'}
+DEBUG: Patients with appointments: {'Aditya21'}
+DEBUG: Doctor: doc1
+DEBUG: Appointments found: 1
+DEBUG: First appointment: {'_id': ObjectId('692457e9d10860eeee400f0a'), 'patient': 'Aditya21', 'doctor': 'doc1', 'preferred_date': '2025-11-26', 'preferred_time': '21:34', 'status': 'pending', 'created_at': '2025-11-24T18:34:41.008524'}
+DEBUG: Patients with appointments: {'Aditya21'}
+DEBUG: Doctor: doc1
+DEBUG: Appointments found: 1
+DEBUG: First appointment: {'_id': ObjectId('692457e9d10860eeee400f0a'), 'patient': 'Aditya21', 'doctor': 'doc1', 'preferred_date': '2025-11-26', 'preferred_time': '21:34', 'status': 'pending', 'created_at': '2025-11-24T18:34:41.008524'}
+DEBUG: Patients with appointments: {'Aditya21'}
+DEBUG: Doctor: doc1
+DEBUG: Appointments found: 1
+DEBUG: First appointment: {'_id': ObjectId('692457e9d10860eeee400f0a'), 'patient': 'Aditya21', 'doctor': 'doc1', 'preferred_date': '2025-11-26', 'preferred_time': '21:34', 'status': 'pending', 'created_at': '2025-11-24T18:34:41.008524'}
+DEBUG: Patients with appointments: {'Aditya21'}

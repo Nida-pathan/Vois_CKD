@@ -317,12 +317,206 @@
         @keyframes spin {
             0% {
                 transform: rotate(0deg);
+                color: #667eea;
             }
 
-            100% {
-                transform: rotate(360deg);
+            .card-stone .disease-icon {
+                color: #f5576c;
             }
-        }
+
+            .card-aki .disease-icon {
+                color: #fa709a;
+            }
+
+            .card-esrd .disease-icon {
+                color: #30cfd0;
+            }
+
+            .upload-section {
+                background: var(--white);
+                padding: 40px;
+                border-radius: var(--border-radius);
+                box-shadow: var(--shadow-md);
+                text-align: center;
+                display: none;
+                /* Hidden initially */
+                animation: fadeIn 0.5s ease;
+            }
+
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(10px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .upload-box {
+                border: 2px dashed #cbd5e1;
+                border-radius: var(--border-radius);
+                padding: 40px;
+                margin: 20px 0;
+                cursor: pointer;
+                transition: border-color 0.3s;
+            }
+
+            .upload-box:hover {
+                border-color: var(--primary-color);
+                background: var(--accent-color);
+            }
+
+            .upload-icon {
+                font-size: 48px;
+                color: #94a3b8;
+                margin-bottom: 15px;
+            }
+
+            .btn-upload {
+                background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+                color: white;
+                border: none;
+                padding: 12px 30px;
+                border-radius: 50px;
+                font-size: 16px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: transform 0.2s;
+                margin-top: 20px;
+            }
+
+            .btn-upload:hover {
+                transform: translateY(-2px);
+            }
+
+            .btn-upload:disabled {
+                opacity: 0.7;
+                cursor: not-allowed;
+            }
+
+            /* Results Modal */
+            .modal {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 1000;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .modal-content {
+                background: white;
+                padding: 30px;
+                border-radius: var(--border-radius);
+                width: 90%;
+                max-width: 600px;
+                max-height: 90vh;
+                overflow-y: auto;
+                position: relative;
+                animation: slideUp 0.3s ease;
+            }
+
+            @keyframes slideUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .close-modal {
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                font-size: 24px;
+                cursor: pointer;
+                color: #9ca3af;
+            }
+
+            .result-header {
+                text-align: center;
+                margin-bottom: 25px;
+                padding-bottom: 15px;
+                border-bottom: 1px solid #e5e7eb;
+            }
+
+            .severity-badge {
+                display: inline-block;
+                padding: 6px 12px;
+                border-radius: 20px;
+                font-size: 14px;
+                font-weight: 600;
+                margin-top: 10px;
+            }
+
+            .severity-low {
+                background: #d1fae5;
+                color: #065f46;
+            }
+
+            .severity-moderate {
+                background: #fef3c7;
+                color: #92400e;
+            }
+
+            .severity-high {
+                background: #fee2e2;
+                color: #991b1b;
+            }
+
+            .severity-critical {
+                background: #7f1d1d;
+                color: #fef2f2;
+            }
+
+            .recommendations-list {
+                list-style: none;
+                padding: 0;
+            }
+
+            .recommendations-list li {
+                padding: 10px 0;
+                border-bottom: 1px solid #f3f4f6;
+                display: flex;
+                gap: 10px;
+            }
+
+            .recommendations-list li:before {
+                content: "•";
+                color: var(--primary-color);
+                font-weight: bold;
+            }
+
+            .loading-spinner {
+                display: none;
+                margin: 20px auto;
+                border: 4px solid #f3f3f3;
+                border-top: 4px solid var(--primary-color);
+                border-radius: 50%;
+                width: 40px;
+                height: 40px;
+                animation: spin 1s linear infinite;
+            }
+
+            @keyframes spin {
+                0% {
+                    transform: rotate(0deg);
+                }
+
+                100% {
+                    transform: rotate(360deg);
+                }
     </style>
 </head>
 
@@ -409,7 +603,8 @@
             </div>
 
             <div style="text-align: center; margin-top: 30px;">
-                <button class="btn-upload" onclick="closeModal()">Close</button>
+                <button class="btn-upload" onclick="window.location.href='{{ url_for('patient_dashboard') }}'">Go to
+                    Dashboard</button>
             </div>
         </div>
     </div>
@@ -493,6 +688,7 @@
                     }
 
                     if (data.success) {
+                        // Show results modal
                         showResults(data.prediction);
                     }
                 })
@@ -543,7 +739,6 @@
             }
         }
     </script>
-
 </body>
 
 </html>

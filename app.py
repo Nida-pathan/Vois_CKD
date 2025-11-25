@@ -909,7 +909,8 @@ def patient_dashboard():
                 'egfr_status': 'unknown'
             },
             'has_history': False,
-            'history': []
+            'history': [],
+            'latest_lab_pdf': patient_data.get('latest_lab_pdf') if patient_data else None
         }
         
         if patient_data:
@@ -1894,7 +1895,7 @@ def upload_lab_report_pdf():
         import os
         
         # Create uploads directory if it doesn't exist
-        upload_folder = 'uploads/lab_reports'
+        upload_folder = 'static/uploads/lab_reports'
         os.makedirs(upload_folder, exist_ok=True)
         
         # Save uploaded file
@@ -1932,7 +1933,9 @@ def upload_lab_report_pdf():
         
         # Update patient records with extracted values
         from models.user import update_patient_lab_values
-        update_patient_lab_values(current_user.username, lab_values, prediction)
+        # Store relative path for frontend access
+        relative_path = f"uploads/lab_reports/{filename}"
+        update_patient_lab_values(current_user.username, lab_values, prediction, relative_path)
         
         # Trial count logic removed as per request
         

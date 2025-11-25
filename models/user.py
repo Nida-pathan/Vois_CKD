@@ -210,7 +210,7 @@ def get_all_feedbacks():
     db = Database.get_db()
     return list(db.feedbacks.find())
 
-def update_patient_lab_values(username, lab_values, prediction):
+def update_patient_lab_values(username, lab_values, prediction, pdf_path=None):
     """Update patient lab values and history"""
     db = Database.get_db()
     
@@ -229,22 +229,36 @@ def update_patient_lab_values(username, lab_values, prediction):
     # Add prediction info to metrics for easy access
     if prediction:
         current_metrics['disease_prediction'] = prediction
+        
+    # Add PDF path if provided
+    if pdf_path:
+        record['latest_lab_pdf'] = pdf_path
             
     # Create history entry
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     history_entry = {
         'date': timestamp,
         'metrics': lab_values,
-        'prediction': prediction
+        'prediction': prediction,
+        'pdf_path': pdf_path
     }
     
     # Update database
+    update_data = {
+        '$set': {
+            'current_metrics': current_metrics,
+            'latest_lab_pdf': pdf_path if pdf_path else record.get('latest_lab_pdf')
+        },
+        '$push': {'history': history_entry}
+    }
+    
+    # Remove None values from $set to avoid overwriting with None if not provided
+    if not pdf_path:
+        del update_data['$set']['latest_lab_pdf']
+        
     db.patient_records.update_one(
         {'username': username},
-        {
-            '$set': {'current_metrics': current_metrics},
-            '$push': {'history': history_entry}
-        },
+        update_data,
         upsert=True
     )
 

@@ -670,151 +670,6 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="card-title">
-                            <i class="fas fa-heartbeat"></i> Current Health Status
-                        </div>
-                        <a href="#" class="card-action">View Details</a>
-                    </div>
-                    <div class="metric-item">
-                        <span class="metric-label">Blood Pressure</span>
-                        <div>
-                            <span class="metric-value">{{ patient_data.current_metrics.bp_systolic }}/{{ patient_data.current_metrics.bp_diastolic }} mmHg</span>
-                            <span class="metric-status status-{{ patient_data.current_metrics.bp_status }}">{{ patient_data.current_metrics.bp_status|capitalize }}</span>
-                        </div>
-                    </div>
-                    <div class="metric-item">
-                        <span class="metric-label">Blood Sugar</span>
-                        <div>
-                            <span class="metric-value">{{ patient_data.current_metrics.blood_glucose }} mg/dL</span>
-                            <span class="metric-status status-{{ patient_data.current_metrics.glucose_status }}">{{ patient_data.current_metrics.glucose_status|capitalize }}</span>
-                        </div>
-                    </div>
-                    <div class="metric-item">
-                        <span class="metric-label">Creatinine</span>
-                        <div>
-                            <span class="metric-value">{{ patient_data.current_metrics.serum_creatinine }} mg/dL</span>
-                            <span class="metric-status status-{{ patient_data.current_metrics.creatinine_status }}">{{ patient_data.current_metrics.creatinine_status|capitalize }}</span>
-                        </div>
-                    </div>
-                    <div class="metric-item">
-                        <span class="metric-label">GFR</span>
-                        <div>
-                            <span class="metric-value">{{ patient_data.current_metrics.egfr }} mL/min</span>
-                            <span class="metric-status status-{{ patient_data.current_metrics.egfr_status }}">{{ patient_data.current_metrics.egfr_status|capitalize }}</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Health Trends -->
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-title">
-                            <i class="fas fa-chart-line"></i> Health Trends
-                        </div>
-                        <a href="#" class="card-action">View All</a>
-                    </div>
-
-                    {% if patient_data.has_history %}
-                    <div style="height: 300px;">
-                        <canvas id="healthTrendsChart"></canvas>
-                    </div>
-                    {% else %}
-                    <div style="text-align: center; padding: 40px 20px; color: #666;">
-                        <i class="fas fa-chart-bar" style="font-size: 48px; margin-bottom: 20px; color: #0d9488;"></i>
-                        <h3 style="margin-bottom: 15px; color: #333;">No Health Trends Data</h3>
-                        <p style="margin-bottom: 20px;">Upload your lab reports over time to see your health trends.</p>
-                        <button onclick="document.getElementById('labUpload').click()" style="background: #0d9488; color: white; border: none; padding: 12px 24px; 
-                                           border-radius: 8px; cursor: pointer; font-weight: 500;">
-                            <i class="fas fa-upload"></i> Upload Lab Report
-                        </button>
-                    </div>
-                    {% endif %}
-                </div>
-
-                <!-- Latest Lab Results -->
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-title">
-                            <i class="fas fa-vial"></i> Latest Lab Results
-                        </div>
-                        <a href="#" class="card-action">View All</a>
-                    </div>
-
-                    {% if patient_data.current_metrics.hemoglobin != 'N/A' or patient_data.current_metrics.sodium != 'N/A' %}
-                    <div class="lab-result-item">
-                        <div class="lab-date">Current Values</div>
-                        <div class="lab-title">Complete Blood Count & Metabolic Panel</div>
-                        <div class="lab-metrics">
-                            {% if patient_data.current_metrics.hemoglobin != 'N/A' %}
-                            <div class="lab-metric">
-                                <span class="lab-metric-label">Hemoglobin:</span>
-                                <span class="lab-metric-value">{{ patient_data.current_metrics.hemoglobin }} g/dL</span>
-                            </div>
-                            {% endif %}
-                            {% if patient_data.current_metrics.sodium != 'N/A' %}
-                            <div class="lab-metric">
-                                <span class="lab-metric-label">Sodium:</span>
-                                <span class="lab-metric-value">{{ patient_data.current_metrics.sodium }} mEq/L</span>
-                            </div>
-                            {% endif %}
-                            {% if patient_data.current_metrics.potassium != 'N/A' %}
-                            <div class="lab-metric">
-                                <span class="lab-metric-label">Potassium:</span>
-                                <span class="lab-metric-value">{{ patient_data.current_metrics.potassium }} mEq/L</span>
-                            </div>
-                            {% endif %}
-                        </div>
-                    </div>
-                    {% endif %}
-
-                    {% if patient_data.current_metrics.serum_creatinine != 'N/A' or patient_data.current_metrics.blood_urea !=
-                    'N/A' %}
-                    <div class="lab-result-item">
-                        <div class="lab-date">Current Values</div>
-                        <div class="lab-title">Kidney Function Panel</div>
-                        <div class="lab-metrics">
-                            {% if patient_data.current_metrics.blood_urea != 'N/A' %}
-                            <div class="lab-metric">
-                                <span class="lab-metric-label">BUN:</span>
-                                <span class="lab-metric-value">{{ patient_data.current_metrics.blood_urea }} mg/dL</span>
-                            </div>
-                            {% endif %}
-                            {% if patient_data.current_metrics.serum_creatinine != 'N/A' %}
-                            <div class="lab-metric">
-                                <span class="lab-metric-label">Creatinine:</span>
-                                <span class="lab-metric-value">{{ patient_data.current_metrics.serum_creatinine }}
-                                    mg/dL</span>
-                            </div>
-                            {% endif %}
-                            {% if patient_data.current_metrics.egfr != 'N/A' %}
-                            <div class="lab-metric">
-                                <span class="lab-metric-label">eGFR:</span>
-                                <span class="lab-metric-value">{{ patient_data.current_metrics.egfr }} mL/min</span>
-                            </div>
-                            {% endif %}
-                        </div>
-                    </div>
-                    {% endif %}
-
-                    {% if patient_data.current_metrics.hemoglobin == 'N/A' and patient_data.current_metrics.sodium == 'N/A'
-                    and patient_data.current_metrics.serum_creatinine == 'N/A' %}
-                    <div style="text-align: center; padding: 40px 20px; color: #666;">
-                        <i class="fas fa-file-medical"
-                            style="font-size: 48px; margin-bottom: 20px; color: #0d9488;"></i>
-                        <h3 style="margin-bottom: 15px; color: #333;">No Lab Results Data</h3>
-                        <p style="margin-bottom: 20px;">Upload your lab reports to see your latest results.</p>
-                        <button onclick="document.getElementById('labUpload').click()"
-                            style="background: #0d9488; color: white; border: none; padding: 12px 24px; 
-                                           border-radius: 8px; cursor: pointer; font-weight: 500;">
-                            <i class="fas fa-upload"></i> Upload Lab Report
-                        </button>
-                    </div>
-                    {% endif %}
-                </div>
-
-                <!-- Therapy Recommendations -->
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-title">
                             <i class="fas fa-prescription-bottle"></i> Therapy Recommendations
                         </div>
                         <a href="{{ url_for('prescriptions') }}" class="card-action">View All</a>
@@ -822,7 +677,8 @@
 
                     <div class="therapy-card">
                         <div class="therapy-name">Diet Management</div>
-                        <div class="therapy-description">Follow a low-sodium, low-protein diet to reduce kidney workload.
+                        <div class="therapy-description">Follow a low-sodium, low-protein diet to reduce kidney
+                            workload.
                             Limit phosphorus and potassium intake.</div>
                         <div class="therapy-duration">Ongoing</div>
                     </div>
@@ -836,7 +692,8 @@
 
                     <div class="therapy-card">
                         <div class="therapy-name">Regular Monitoring</div>
-                        <div class="therapy-description">Monthly checkups for creatinine, eGFR, and electrolytes.</div>
+                        <div class="therapy-description">Monthly checkups for creatinine, eGFR, and electrolytes.
+                        </div>
                         <div class="therapy-duration">Monthly</div>
                     </div>
                 </div>
@@ -872,7 +729,8 @@
                         </div>
                         <div class="lifestyle-content">
                             <div class="lifestyle-title">Hydration</div>
-                            <div class="lifestyle-description">Drink 8-10 glasses of water daily. Limit fluid intake if
+                            <div class="lifestyle-description">Drink 8-10 glasses of water daily. Limit fluid intake
+                                if
                                 advised by doctor.</div>
                         </div>
                     </div>
@@ -883,7 +741,8 @@
                         </div>
                         <div class="lifestyle-content">
                             <div class="lifestyle-title">Low Sodium Diet</div>
-                            <div class="lifestyle-description">Limit sodium intake to less than 2,300mg per day. Avoid
+                            <div class="lifestyle-description">Limit sodium intake to less than 2,300mg per day.
+                                Avoid
                                 processed foods.</div>
                         </div>
                     </div>
@@ -894,7 +753,8 @@
                         </div>
                         <div class="lifestyle-content">
                             <div class="lifestyle-title">Regular Exercise</div>
-                            <div class="lifestyle-description">30 minutes of moderate exercise, 5 days a week. Walking,
+                            <div class="lifestyle-description">30 minutes of moderate exercise, 5 days a week.
+                                Walking,
                                 swimming recommended.</div>
                         </div>
                     </div>
@@ -940,8 +800,7 @@
                     </div>
                     {% endfor %}
                     <div style="text-align: center; margin-top: 15px;">
-                        <button onclick="document.getElementById('labUpload').click()"
-                            style="background: #0d9488; color: white; border: none; padding: 10px 20px; 
+                        <button onclick="document.getElementById('labUpload').click()" style="background: #0d9488; color: white; border: none; padding: 10px 20px; 
                                            border-radius: 8px; cursor: pointer; font-weight: 500; width: 100%;">
                             <i class="fas fa-upload"></i> Upload Lab Report
                         </button>
@@ -952,119 +811,50 @@
     </div>
 
     <script>
-        // Health Trends Chart
-        document.addEventListener('DOMContentLoaded', function () {
-            {% if patient_data.has_history %}
-            const ctx = document.getElementById('healthTrendsChart').getContext('2d');
-            const healthTrendsChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: [{% for item in patient_data.history %}'{{ item.date }}'{% if not loop.last %},{% endif %}{% endfor %}],
-                    datasets: [{
-                        label: 'eGFR (mL/min)',
-                        data: [{% for item in patient_data.history %}{{ item.egfr }}{% if not loop.last %},{% endif %}{% endfor %}],
-                        borderColor: '#0d9488',
-                        backgroundColor: 'rgba(13, 148, 136, 0.1)',
-                        borderWidth: 2,
-                        fill: true,
-                        tension: 0.4
-                    }, {
-                        label: 'Creatinine (mg/dL)',
-                        data: [{% for item in patient_data.history %}{{ item.creatinine }}{% if not loop.last %},{% endif %}{% endfor %}],
-                        borderColor: '#ef4444',
-                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                        borderWidth: 2,
-                        fill: true,
-                        tension: 0.4,
-                        yAxisID: 'y1'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                        },
-                        title: {
-                            display: true,
-                            text: 'Kidney Function Trends'
-                        }
-                    },
-                    scales: {
-                        y: {
-                            type: 'linear',
-                            display: true,
-                            position: 'left',
-                            title: {
-                                display: true,
-                                text: 'eGFR (mL/min)'
-                            }
-                        },
-                        y1: {
-                            type: 'linear',
-                            display: true,
-                            position: 'right',
-                            title: {
-                                display: true,
-                                text: 'Creatinine (mg/dL)'
-                            },
-                            grid: {
-                                drawOnChartArea: false,
-                            },
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Date'
-                            }
-                        }
-                    }
-                }
-            });
-            {% endif %}
-        });
-
         function bookAppointment(doctorUsername) {
-            // Create a modal for date/time selection
             const modalHtml = `
-                <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 1000;">
-                    <div style="background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); max-width: 500px; width: 90%;">
-                        <h3 style="margin-top: 0; color: #333;">Book Appointment with Dr. ${doctorUsername}</h3>
-                        <div style="margin-bottom: 20px;">
-                            <label style="display: block; margin-bottom: 8px; font-weight: 500;">Preferred Date:</label>
-                            <input type="date" id="appointmentDate" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box;">
-                        </div>
-                        <div style="margin-bottom: 20px;">
-                            <label style="display: block; margin-bottom: 8px; font-weight: 500;">Preferred Time:</label>
-                            <input type="time" id="appointmentTime" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box;">
-                        </div>
-                        <div style="display: flex; justify-content: flex-end; gap: 10px;">
-                            <button onclick="closeModal()" style="padding: 10px 20px; border: 1px solid #ddd; border-radius: 6px; background: #f5f5f5; cursor: pointer;">Cancel</button>
-                            <button onclick="submitAppointment('${doctorUsername}')" style="padding: 10px 20px; border: none; border-radius: 6px; background: #0d9488; color: white; cursor: pointer;">Book Appointment</button>
-                        </div>
+            <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 1000;">
+                <div style="background: white; padding: 30px; border-radius: 12px; width: 90%; max-width: 500px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
+                    <h3 style="margin-top: 0; color: #333;">Book Appointment with Dr. ${doctorUsername}</h3>
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">Preferred Date:</label>
+                        <input type="date" id="appointmentDate"
+                            style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box;">
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">Preferred Time:</label>
+                        <input type="time" id="appointmentTime"
+                            style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box;">
+                    </div>
+                    <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                        <button onclick="closeModal()"
+                            style="padding: 10px 20px; border: 1px solid #ddd; border-radius: 6px; background: #f5f5f5; cursor: pointer;">Cancel</button>
+                        <button onclick="submitAppointment('${doctorUsername}')"
+                            style="padding: 10px 20px; border: none; border-radius: 6px; background: #0d9488; color: white; cursor: pointer;">Book
+                            Appointment</button>
                     </div>
                 </div>
+            </div>
             `;
-            
+
             // Add modal to body
             const modalDiv = document.createElement('div');
             modalDiv.innerHTML = modalHtml;
             document.body.appendChild(modalDiv);
         }
-        
+
         function submitAppointment(doctorUsername) {
             const dateInput = document.getElementById('appointmentDate');
             const timeInput = document.getElementById('appointmentTime');
-            
+
             const preferredDate = dateInput.value;
             const preferredTime = timeInput.value;
-            
+
             if (!preferredDate || !preferredTime) {
                 alert('Please select both date and time for your appointment.');
                 return;
             }
-            
+
             // Send booking request
             fetch('/patient/book-appointment', {
                 method: 'POST',
@@ -1077,21 +867,21 @@
                     preferred_time: preferredTime
                 })
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    alert(data.message);
-                    closeModal();
-                } else {
-                    alert('Error: ' + (data.error || 'Failed to book appointment'));
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred while booking the appointment.');
-            });
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        alert(data.message);
+                        closeModal();
+                    } else {
+                        alert('Error: ' + (data.error || 'Failed to book appointment'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while booking the appointment.');
+                });
         }
-        
+
         function closeModal() {
             const modal = document.querySelector('div[style*="position: fixed"]');
             if (modal) {
@@ -1100,11 +890,14 @@
         }
 
         // Search functionality
-        document.querySelector('.search-bar input').addEventListener('input', function (e) {
-            const searchTerm = e.target.value.toLowerCase();
-            // Here you would implement search functionality
-            console.log('Searching for:', searchTerm);
-        });
+        const searchInput = document.querySelector('.search-bar input');
+        if (searchInput) {
+            searchInput.addEventListener('input', function (e) {
+                const searchTerm = e.target.value.toLowerCase();
+                // Here you would implement search functionality
+                console.log('Searching for:', searchTerm);
+            });
+        }
     </script>
 </body>
 
