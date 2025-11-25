@@ -536,3 +536,270 @@ DEBUG: Doctor: doc1
 DEBUG: Appointments found: 1
 DEBUG: First appointment: {'_id': ObjectId('692457e9d10860eeee400f0a'), 'patient': 'Aditya21', 'doctor': 'doc1', 'preferred_date': '2025-11-26', 'preferred_time': '21:34', 'status': 'pending', 'created_at': '2025-11-24T18:34:41.008524'}
 DEBUG: Patients with appointments: {'Aditya21'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 16
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'robert_williams', 'mary_johnson', 'ken', 'john_smith', 'Ria'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 16
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'robert_williams', 'mary_johnson', 'ken', 'john_smith', 'Ria'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 16
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'robert_williams', 'mary_johnson', 'ken', 'john_smith', 'Ria'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 16
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'robert_williams', 'mary_johnson', 'ken', 'john_smith', 'Ria'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 16
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'robert_williams', 'mary_johnson', 'ken', 'john_smith', 'Ria'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 16
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'robert_williams', 'mary_johnson', 'ken', 'john_smith', 'Ria'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 16
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'robert_williams', 'mary_johnson', 'ken', 'john_smith', 'Ria'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 16
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'robert_williams', 'mary_johnson', 'ken', 'john_smith', 'Ria'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 16
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'robert_williams', 'mary_johnson', 'ken', 'john_smith', 'Ria'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 16
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'robert_williams', 'mary_johnson', 'ken', 'john_smith', 'Ria'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 16
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'Ria', 'ken', 'john_smith', 'mary_johnson', 'robert_williams'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 16
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'Ria', 'ken', 'john_smith', 'mary_johnson', 'robert_williams'}
+Booking request received: {'doctor_name': 'doctor1', 'preferred_date': '2025-11-26', 'preferred_time': '12:00'}
+Doctor name: doctor1
+Appointment created successfully: {'patient': 'Jack', 'doctor': 'doctor1', 'preferred_date': '2025-11-26', 'preferred_time': '12:00', 'status': 'pending', 'created_at': '2025-11-25T22:12:59.603385', '_id': '6925dc93fa2d50bfc60d2efb'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 17
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'Ria', 'ken', 'john_smith', 'mary_johnson', 'Jack', 'robert_williams'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 17
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'ken', 'Ria', 'robert_williams', 'mary_johnson', 'john_smith', 'Jack'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 17
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'ken', 'Ria', 'robert_williams', 'mary_johnson', 'john_smith', 'Jack'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 17
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'mary_johnson', 'john_smith', 'Jack', 'robert_williams', 'ken', 'Ria'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 17
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'mary_johnson', 'john_smith', 'Jack', 'robert_williams', 'ken', 'Ria'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 17
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'robert_williams', 'ken', 'Jack', 'john_smith', 'mary_johnson', 'Ria'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 17
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'robert_williams', 'ken', 'Jack', 'john_smith', 'mary_johnson', 'Ria'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 17
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'robert_williams', 'ken', 'Jack', 'john_smith', 'mary_johnson', 'Ria'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 17
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'ken', 'mary_johnson', 'robert_williams', 'Jack', 'Ria', 'john_smith'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 17
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'ken', 'mary_johnson', 'robert_williams', 'Jack', 'Ria', 'john_smith'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 17
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'john_smith', 'ken', 'mary_johnson', 'robert_williams', 'Jack', 'Ria'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 17
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'john_smith', 'ken', 'mary_johnson', 'robert_williams', 'Jack', 'Ria'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 17
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'robert_williams', 'ken', 'Jack', 'john_smith', 'Ria', 'mary_johnson'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 17
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'robert_williams', 'ken', 'Jack', 'john_smith', 'Ria', 'mary_johnson'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 17
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'robert_williams', 'ken', 'Jack', 'john_smith', 'Ria', 'mary_johnson'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 17
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'robert_williams', 'ken', 'Jack', 'john_smith', 'Ria', 'mary_johnson'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 17
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'robert_williams', 'ken', 'Jack', 'john_smith', 'Ria', 'mary_johnson'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 17
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'robert_williams', 'ken', 'Jack', 'john_smith', 'Ria', 'mary_johnson'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 17
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'john_smith', 'ken', 'robert_williams', 'Ria', 'mary_johnson', 'Jack'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 17
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'Jack', 'mary_johnson', 'john_smith', 'robert_williams', 'Ria', 'ken'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 17
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'john_smith', 'Jack', 'Ria', 'mary_johnson', 'robert_williams', 'ken'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 17
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'john_smith', 'Jack', 'Ria', 'mary_johnson', 'robert_williams', 'ken'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 17
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'john_smith', 'Jack', 'Ria', 'mary_johnson', 'robert_williams', 'ken'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 17
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'john_smith', 'Jack', 'Ria', 'mary_johnson', 'robert_williams', 'ken'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 17
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'john_smith', 'Jack', 'Ria', 'mary_johnson', 'robert_williams', 'ken'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 17
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'john_smith', 'Jack', 'Ria', 'mary_johnson', 'robert_williams', 'ken'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 17
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'mary_johnson', 'robert_williams', 'ken', 'john_smith', 'Ria', 'Jack'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 17
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'john_smith', 'Ria', 'mary_johnson', 'robert_williams', 'Jack', 'ken'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 17
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'ken', 'john_smith', 'Jack', 'robert_williams', 'mary_johnson', 'Ria'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 17
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'Ria', 'Jack', 'robert_williams', 'john_smith', 'mary_johnson', 'ken'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 17
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'Ria', 'Jack', 'robert_williams', 'john_smith', 'mary_johnson', 'ken'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 17
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'Ria', 'Jack', 'robert_williams', 'john_smith', 'mary_johnson', 'ken'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 17
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'Ria', 'Jack', 'robert_williams', 'john_smith', 'mary_johnson', 'ken'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 17
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'mary_johnson', 'robert_williams', 'Ria', 'john_smith', 'ken', 'Jack'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 17
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'mary_johnson', 'robert_williams', 'Ria', 'john_smith', 'ken', 'Jack'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 17
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'Jack', 'mary_johnson', 'robert_williams', 'Ria', 'ken', 'john_smith'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 17
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'robert_williams', 'Ria', 'Jack', 'mary_johnson', 'ken', 'john_smith'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 17
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'robert_williams', 'Ria', 'Jack', 'mary_johnson', 'ken', 'john_smith'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 17
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'robert_williams', 'Ria', 'Jack', 'mary_johnson', 'ken', 'john_smith'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 17
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'ken', 'john_smith', 'robert_williams', 'mary_johnson', 'Jack', 'Ria'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 17
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'ken', 'john_smith', 'robert_williams', 'mary_johnson', 'Jack', 'Ria'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 17
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'ken', 'john_smith', 'robert_williams', 'mary_johnson', 'Jack', 'Ria'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 17
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'mary_johnson', 'robert_williams', 'Ria', 'ken', 'john_smith', 'Jack'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 17
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'Ria', 'Jack', 'robert_williams', 'mary_johnson', 'ken', 'john_smith'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 17
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'Jack', 'mary_johnson', 'Ria', 'ken', 'robert_williams', 'john_smith'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 17
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'mary_johnson', 'Ria', 'robert_williams', 'Jack', 'ken', 'john_smith'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 17
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'Jack', 'Ria', 'mary_johnson', 'robert_williams', 'john_smith', 'ken'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 17
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'Jack', 'Ria', 'mary_johnson', 'robert_williams', 'john_smith', 'ken'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 17
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'Jack', 'Ria', 'mary_johnson', 'robert_williams', 'john_smith', 'ken'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 17
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'Jack', 'Ria', 'john_smith', 'robert_williams', 'ken', 'mary_johnson'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 17
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'Jack', 'ken', 'Ria', 'john_smith', 'mary_johnson', 'robert_williams'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 17
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'Jack', 'ken', 'Ria', 'john_smith', 'mary_johnson', 'robert_williams'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 17
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'mary_johnson', 'john_smith', 'robert_williams', 'ken', 'Jack', 'Ria'}
+DEBUG: Doctor: doctor1
+DEBUG: Appointments found: 17
+DEBUG: First appointment: {'_id': ObjectId('69241f431e2c8030fc046418'), 'patient': 'Ria', 'doctor': 'doctor1', 'preferred_date': '2025-11-25', 'preferred_time': '15:00', 'status': 'pending', 'created_at': '2025-11-24T14:32:59.957885'}
+DEBUG: Patients with appointments: {'mary_johnson', 'john_smith', 'robert_williams', 'ken', 'Jack', 'Ria'}
