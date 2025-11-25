@@ -62,22 +62,19 @@ class CKDAIRecommender:
         """
         anonymized_data = self.anonymize_patient_data(patient_data)
         
-        prompt = f"""You are a certified renal dietitian and CKD specialist. Generate a comprehensive, personalized kidney-friendly lifestyle plan.
+        prompt = f"""You are a helpful AI assistant providing educational information about kidney-friendly lifestyles. 
+This is for informational purposes only and does not constitute medical advice.
 
-Patient Profile (anonymized clinical data only):
+Based on the following anonymized profile, suggest general lifestyle guidelines that are commonly recommended for similar profiles.
+
+Profile:
 - CKD Stage: {anonymized_data['ckd_stage']}
-- eGFR: {anonymized_data['egfr']} mL/min
-- Serum Creatinine: {anonymized_data['serum_creatinine']} mg/dL
-- Blood Urea: {anonymized_data['blood_urea']} mg/dL
-- Sodium: {anonymized_data['sodium']} mEq/L
-- Potassium: {anonymized_data['potassium']} mEq/L
-- Diabetes: {anonymized_data['has_diabetes']}
-- Hypertension: {anonymized_data['has_hypertension']}
-- Age Range: {anonymized_data['age_range']}
-- Smoking: {anonymized_data['smoking_status']}
-- Exercise Frequency: {anonymized_data['exercise_frequency']}
+- eGFR: {anonymized_data['egfr']}
+- Potassium: {anonymized_data['potassium']}
+- Sodium: {anonymized_data['sodium']}
+- Condition: {anonymized_data['has_diabetes']} (Diabetes), {anonymized_data['has_hypertension']} (Hypertension)
 
-Generate a detailed, actionable plan in the following JSON format:
+Provide a structured response in the following JSON format:
 
 {{
   "diet_plan": {{
@@ -85,16 +82,16 @@ Generate a detailed, actionable plan in the following JSON format:
     "daily_potassium_limit_mg": 2000,
     "daily_protein_g": 60,
     "daily_fluid_limit_ml": 1500,
-    "foods_to_avoid": ["list of 5 specific foods"],
-    "recommended_foods": ["list of 5 specific foods"],
-    "meal_timing": "brief description",
-    "portion_guidelines": "brief tips"
+    "foods_to_avoid": ["list of 5 foods"],
+    "recommended_foods": ["list of 5 foods"],
+    "meal_timing": "general tip",
+    "portion_guidelines": "general tip"
   }},
   "food_swaps": [
     {{
       "high_item": "High sodium/potassium food",
-      "low_alternative": "CKD-safe alternative",
-      "reason": "Brief reason",
+      "low_alternative": "Better alternative",
+      "reason": "Why it helps",
       "sodium_saved_mg": 500,
       "potassium_saved_mg": 300
     }}
@@ -104,7 +101,7 @@ Generate a detailed, actionable plan in the following JSON format:
     "daily_limit_liters": 1.5,
     "timing_tips": ["tip 1", "tip 2"],
     "warning_signs": ["sign 1", "sign 2"],
-    "tracking_method": "brief method"
+    "tracking_method": "method"
   }},
   "weekly_recipes": [
     {{
@@ -149,9 +146,8 @@ Generate a detailed, actionable plan in the following JSON format:
 
 IMPORTANT: 
 - Respond ONLY with valid JSON
-- Be specific and actionable
-- All recipes must be truly CKD-safe
-- Exercise intensity must match eGFR level"""
+- Do not include markdown formatting
+- Keep suggestions general and educational"""
 
         try:
             # Configure generation options
@@ -159,13 +155,41 @@ IMPORTANT:
                 temperature=0.7,
                 top_p=0.8,
                 top_k=40,
-                max_output_tokens=2048,
+                max_output_tokens=8192,
             )
+            
+            # Configure safety settings to avoid blocking
+            # Using BLOCK_NONE to ensure educational content isn't flagged
+            safety_settings = [
+                {
+                    "category": "HARM_CATEGORY_HARASSMENT",
+                    "threshold": "BLOCK_NONE"
+                },
+                {
+                    "category": "HARM_CATEGORY_HATE_SPEECH",
+                    "threshold": "BLOCK_NONE"
+                },
+                {
+                    "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+                    "threshold": "BLOCK_NONE"
+                },
+                {
+                    "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+                    "threshold": "BLOCK_NONE"
+                },
+            ]
             
             response = self.model.generate_content(
                 prompt,
-                generation_config=generation_config
+                generation_config=generation_config,
+                safety_settings=safety_settings
             )
+            
+            # Check if response was blocked
+            if not response.parts:
+                print(f"AI Response blocked. Feedback: {response.prompt_feedback}")
+                return self._get_default_recommendations()
+                
             return self._parse_response(response.text)
         except Exception as e:
             print(f"Error generating recommendations: {e}")
@@ -195,6 +219,7 @@ IMPORTANT:
             
             # Parse JSON
             recommendations = json.loads(text)
+            print(f"Generated recommendations: {json.dumps(recommendations, indent=2)}")
             return recommendations
         except json.JSONDecodeError as e:
             print(f"JSON parsing error: {e}")
