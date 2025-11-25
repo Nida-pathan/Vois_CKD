@@ -59,10 +59,14 @@ def save_ai_recommendations(username, recommendations_data):
     try:
         db = Database.get_db()
         if db is None:
+            logger.error("Database connection failed in save_ai_recommendations")
             return False
-        patients = db['patients']
+        # Users are stored in 'users' collection, not 'patients'
+        users = db['users']
         
-        patients.update_one(
+        logger.info(f"Saving AI recommendations for user: {username}")
+        
+        result = users.update_one(
             {'username': username},
             {
                 '$set': {
@@ -74,7 +78,13 @@ def save_ai_recommendations(username, recommendations_data):
                 }
             }
         )
-        return True
+        
+        if result.modified_count > 0:
+            logger.info(f"Successfully saved recommendations for {username}")
+            return True
+        else:
+            logger.warning(f"No document updated for {username}. User might not exist.")
+            return False
     except Exception as e:
         logger.error(f"Error saving AI recommendations: {e}")
         return False
@@ -86,16 +96,32 @@ def get_ai_recommendations(username):
         db = Database.get_db()
         if db is None:
             return None
-        patients = db['patients']
+        # Users are stored in 'users' collection, not 'patients'
+        users = db['users']
         
-        patient = patients.find_one({'username': username})
-        if patient and 'ai_recommendations' in patient:
-            recommendations = patient['ai_recommendations']
+        user = users.find_one({'username': username})
+        
+        if not user:
+            logger.warning(f"User not found for username: {username}")
+            return None
+            
+        if 'ai_recommendations' in user:
+            recommendations = user['ai_recommendations']
             
             # Check if recommendations are still valid (not expired)
             if 'expires_at' in recommendations:
-                if recommendations['expires_at'] > datetime.utcnow():
+                expiry = recommendations['expires_at']
+                now = datetime.utcnow()
+                
+                if expiry > now:
+                    logger.info(f"Found valid recommendations for {username}")
                     return recommendations.get('data')
+                else:
+                    logger.warning(f"Recommendations for {username} expired at {expiry}")
+            else:
+                logger.warning(f"No expiry date found for recommendations of {username}")
+        else:
+            logger.info(f"No AI recommendations found for {username}")
         
         return None
     except Exception as e:
