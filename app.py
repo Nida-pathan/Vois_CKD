@@ -2099,6 +2099,40 @@ def disease_detail(disease_id):
                          '- Continue eating calcium-rich foods but with meals\n'
                          '- Consider preventive medication if prone to recurrent stones'
         },
+        'esrd': {
+            'name': 'End-Stage Renal Disease (ESRD)',
+            'description': 'End-Stage Renal Disease is the final, irreversible stage of chronic kidney disease where kidney function declines below 10-15% of normal capacity. At this point, kidneys cannot remove toxins, maintain electrolyte balance, or regulate fluid status, making renal replacement therapy (dialysis or transplantation) essential for survival.',
+            'stages': 'ESRD care milestones typically include:\n'
+                      '1. Late Stage 4 CKD (eGFR 15-29) – accelerated decline, dialysis education\n'
+                      '2. Dialysis Readiness – vascular access (AV fistula) or peritoneal catheter placement\n'
+                      '3. Initiation of Renal Replacement – hemodialysis, peritoneal dialysis, or CRRT\n'
+                      '4. Transplant Evaluation – listing, donor workup, immunologic matching\n'
+                      '5. Long-term Management – infection prevention, nutrition, anemia and bone disease control',
+            'symptoms': 'Common ESRD manifestations include:\n'
+                        '- Persistent nausea, vomiting, metallic taste\n'
+                        '- Severe fatigue, cognitive slowing, sleep disturbances\n'
+                        '- Generalized pruritus, dry skin, muscle cramps\n'
+                        '- Shortness of breath, pleural effusions, pulmonary edema\n'
+                        '- Refractory hypertension, fluid overload, weight gain\n'
+                        '- Decreased or absent urine output, foamy or bloody urine\n'
+                        '- Restless legs, peripheral neuropathy, cold intolerance',
+            'causes': 'ESRD most often results from progressive chronic kidney insults such as:\n'
+                      '- Long-standing diabetes mellitus (diabetic nephropathy)\n'
+                      '- Chronic uncontrolled hypertension\n'
+                      '- Polycystic kidney disease and other hereditary disorders\n'
+                      '- Recurrent glomerulonephritis or interstitial nephritis\n'
+                      '- Autoimmune diseases (lupus nephritis, IgA nephropathy)\n'
+                      '- Obstructive uropathy, reflux nephropathy, chronic infections\n'
+                      '- Prolonged exposure to nephrotoxic medications or heavy metals',
+            'prevention': 'While ESRD cannot be reversed, progression and complications can be managed by:\n'
+                          '- Tight blood pressure, glucose, and lipid control to slow remaining nephron loss\n'
+                          '- Early referral for dialysis modality education and access placement\n'
+                          '- Adhering to dialysis prescription and maintaining dry weight targets\n'
+                          '- Following renal diet (low sodium, potassium, phosphorus; individualized protein)\n'
+                          '- Treating anemia, mineral bone disease, and metabolic acidosis per KDIGO guidelines\n'
+                          '- Staying vaccination up-to-date (hepatitis B, influenza, pneumococcal)\n'
+                          '- Pursuing kidney transplant evaluation and living donor options when eligible'
+        },
         'glomerulonephritis': {
             'name': 'Glomerulonephritis',
             'description': 'Glomerulonephritis is inflammation of the glomeruli, the tiny filters in your kidneys that remove excess fluid, electrolytes and waste from your bloodstream and pass them into your urine.',
