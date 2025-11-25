@@ -665,137 +665,119 @@
                         <span class="metric-value">{{ patient_data.patient_id }}</span>
                     </div>
                 </div>
-                workload.
-                Limit phosphorus and potassium intake.
-            </div>
-            <div class="therapy-duration">Ongoing</div>
-        </div>
 
-        <div class="therapy-card">
-            <div class="therapy-name">Blood Pressure Control</div>
-            <div class="therapy-description">Maintain BP below 130/80 mmHg. Take prescribed medications
-                regularly.</div>
-            <div class="therapy-duration">Daily</div>
-        </div>
+                <!-- Therapy Recommendations -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-prescription-bottle"></i> Therapy Recommendations
+                        </div>
+                        <a href="{{ url_for('therapy_plan') }}" class="card-action">View Plan</a>
+                    </div>
 
-        <div class="therapy-card">
-            <div class="therapy-name">Regular Monitoring</div>
-            <div class="therapy-description">Monthly checkups for creatinine, eGFR, and electrolytes.
-            </div>
-            <div class="therapy-duration">Monthly</div>
-        </div>
-    </div>
-    </div>
+                    <div class="therapy-card">
+                        <div class="therapy-name">Diet Management</div>
+                        <div class="therapy-description">Follow a low-sodium, low-protein diet to reduce kidney
+                            workload. Limit phosphorus and potassium intake.</div>
+                        <div class="therapy-duration">Ongoing</div>
+                    </div>
 
-    <!-- Right Column -->
-    <div class="sidebar">
-        <!-- Risk Level Indicator -->
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">
-                    <i class="fas fa-exclamation-triangle"></i> Risk Assessment
-                </div>
-            </div>
-            <div class="risk-indicator {{ patient_data.risk_class }}">
-                <div class="risk-level">{{ patient_data.risk_level }}</div>
-                <div class="risk-description">Based on your latest lab results and medical history</div>
-            </div>
-        </div>
+                    <div class="therapy-card">
+                        <div class="therapy-name">Blood Pressure Control</div>
+                        <div class="therapy-description">Maintain BP below 130/80 mmHg. Take prescribed medications
+                            regularly.</div>
+                        <div class="therapy-duration">Daily</div>
+                    </div>
 
-        <!-- AI Lifestyle Recommendations -->
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">
-                    <i class="fas fa-robot"></i> AI Lifestyle Recommendations
-                </div>
-                <a href="{{ url_for('ai_lifestyle_plan') }}" class="card-action">View Plan</a>
-            </div>
-
-            <div class="lifestyle-item">
-                <div class="lifestyle-icon">
-                    <i class="fas fa-tint"></i>
-                </div>
-                <div class="lifestyle-content">
-                    <div class="lifestyle-title">Hydration</div>
-                    <div class="lifestyle-description">Drink 8-10 glasses of water daily. Limit fluid intake
-                        if
-                        advised by doctor.</div>
+                    <div class="therapy-card">
+                        <div class="therapy-name">Regular Monitoring</div>
+                        <div class="therapy-description">Monthly checkups for creatinine, eGFR, and electrolytes.</div>
+                        <div class="therapy-duration">Monthly</div>
+                    </div>
                 </div>
             </div>
 
-            <div class="lifestyle-item">
-                <div class="lifestyle-icon">
-                    <i class="fas fa-carrot"></i>
+            <!-- Right Column -->
+            <div class="sidebar">
+                <!-- Risk Level Indicator -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-exclamation-triangle"></i> Risk Assessment
+                        </div>
+                    </div>
+                    <div class="risk-indicator {{ patient_data.risk_class }}">
+                        <div class="risk-level">{{ patient_data.risk_level }}</div>
+                        <div class="risk-description">Based on your latest lab results and medical history</div>
+                    </div>
                 </div>
-                <div class="lifestyle-content">
-                    <div class="lifestyle-title">Low Sodium Diet</div>
-                    <div class="lifestyle-description">Limit sodium intake to less than 2,300mg per day.
-                        Avoid
-                        processed foods.</div>
-                </div>
-            </div>
 
-            <div class="lifestyle-item">
-                <div class="lifestyle-icon">
-                    <i class="fas fa-dumbbell"></i>
-                </div>
-                <div class="lifestyle-content">
-                    <div class="lifestyle-title">Regular Exercise</div>
-                    <div class="lifestyle-description">30 minutes of moderate exercise, 5 days a week.
-                        Walking,
-                        swimming recommended.</div>
-                </div>
-            </div>
-        </div>
+                <!-- AI Lifestyle Recommendations -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-robot"></i> AI Lifestyle Recommendations
+                        </div>
+                        <a href="{{ url_for('ai_lifestyle_plan') }}" class="card-action">View Plan</a>
+                    </div>
 
-        <!-- Available Doctors -->
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">
-                    <i class="fas fa-user-md"></i> Available Doctors
-                </div>
-                <a href="{{ url_for('appointments') }}" class="card-action">Book</a>
-            </div>
+                    <div class="lifestyle-item">
+                        <div class="lifestyle-icon">
+                            <i class="fas fa-tint"></i>
+                        </div>
+                        <div class="lifestyle-content">
+                            <div class="lifestyle-title">Hydration</div>
+                            <div class="lifestyle-description">Drink 8-10 glasses of water daily. Limit fluid intake if
+                                advised by doctor.</div>
+                        </div>
+                    </div>
 
-            {% for doctor in available_doctors %}
-            <div class="doctor-item">
-                <div class="doctor-avatar">{{ doctor.avatar }}</div>
-                <div class="doctor-info">
-                    <div class="doctor-name">{{ doctor.name }}</div>
-                    <div class="doctor-specialty">{{ doctor.specialty }}</div>
-                    <div class="doctor-experience">{{ doctor.experience }}</div>
-                </div>
-                <button class="book-btn" onclick="bookAppointment('{{ doctor.username }}')">Book</button>
-            </div>
-            {% endfor %}
-        </div>
+                    <div class="lifestyle-item">
+                        <div class="lifestyle-icon">
+                            <i class="fas fa-carrot"></i>
+                        </div>
+                        <div class="lifestyle-content">
+                            <div class="lifestyle-title">Low Sodium Diet</div>
+                            <div class="lifestyle-description">Limit sodium intake to less than 2,300mg per day. Avoid
+                                processed foods.</div>
+                        </div>
+                    </div>
 
-        <!-- Patient Trial Status -->
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">
-                    <i class="fas fa-star"></i> Free Trial Status
+                    <div class="lifestyle-item">
+                        <div class="lifestyle-icon">
+                            <i class="fas fa-dumbbell"></i>
+                        </div>
+                        <div class="lifestyle-content">
+                            <div class="lifestyle-title">Regular Exercise</div>
+                            <div class="lifestyle-description">30 minutes of moderate exercise, 5 days a week. Walking,
+                                swimming recommended.</div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            {% for trial in patient_trials %}
-            <div class="metric-item">
-                <span class="metric-label">Remaining Reports</span>
-                <span class="metric-value">{{ trial.remaining }}</span>
-            </div>
-            <div class="metric-item">
-                <span class="metric-label">Used Reports</span>
-                <span class="metric-value">{{ trial.used }}</span>
-            </div>
-            {% endfor %}
-            <div style="text-align: center; margin-top: 15px;">
-                <button onclick="document.getElementById('labUpload').click()" style="background: #0d9488; color: white; border: none; padding: 10px 20px; 
-                                           border-radius: 8px; cursor: pointer; font-weight: 500; width: 100%;">
-                    <i class="fas fa-upload"></i> Upload Lab Report
-                </button>
+
+                <!-- Available Doctors -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-user-md"></i> Available Doctors
+                        </div>
+                        <a href="{{ url_for('appointments') }}" class="card-action">Book</a>
+                    </div>
+
+                    {% for doctor in available_doctors %}
+                    <div class="doctor-item">
+                        <div class="doctor-avatar">{{ doctor.avatar }}</div>
+                        <div class="doctor-info">
+                            <div class="doctor-name">{{ doctor.name }}</div>
+                            <div class="doctor-specialty">{{ doctor.specialty }}</div>
+                            <div class="doctor-experience">{{ doctor.experience }}</div>
+                        </div>
+                        <button class="book-btn" onclick="bookAppointment('{{ doctor.username }}')">Book</button>
+                    </div>
+                    {% endfor %}
+                </div>
             </div>
         </div>
-    </div>
-    </div>
     </div>
 
     <script>
