@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Therapy Recommendations - Kidney Companion</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%);
+            --glass-bg: rgba(255, 255, 255, 0.95);
+            --glass-border: rgba(255, 255, 255, 0.18);
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --shadow-light: 0 4px 30px rgba(0, 0, 0, 0.05);
+            --shadow-medium: 0 8px 32px rgba(0, 0, 0, 0.1);
+            --border-radius-md: 16px;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f0fdfa 0%, #e0f2fe 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: var(--glass-bg);
+            padding: 20px 30px;
+            border-radius: var(--border-radius-md);
+            box-shadow: var(--shadow-light);
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .back-btn {
+            text-decoration: none;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .back-btn:hover {
+            color: #0d9488;
+        }
+
+        .therapy-card {
+            background: var(--glass-bg);
+            border-radius: var(--border-radius-md);
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow-light);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .therapy-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .therapy-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 15px;
+        }
+
+        .therapy-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+        }
+
+        .therapy-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #0f766e;
+        }
+
+        .therapy-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 10px;
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title i {
+            color: #0d9488;
+        }
+
+        .content-text {
+            line-height: 1.6;
+            color: #4b5563;
+        }
+
+        .steps-list {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .steps-list li {
+            position: relative;
+            padding-left: 25px;
+            margin-bottom: 10px;
+            line-height: 1.5;
+            color: #4b5563;
+        }
+
+        .steps-list li::before {
+            content: "\f00c";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            left: 0;
+            color: #0d9488;
+            font-size: 14px;
+            top: 3px;
+        }
+
+        .benefits-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .benefit-item {
+            background: #f0fdfa;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #0f766e;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .benefit-item i {
+            color: #0d9488;
+        }
+
+        .important-note {
+            background-color: #fff7ed;
+            border-left: 4px solid #f97316;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #9a3412;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-spa"></i> Ayurvedic Therapy Plan</h1>
+            <a href="{{ url_for('patient_dashboard') }}" class="back-btn">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+
+        <!-- 1. Basti Therapy -->
+        <div class="therapy-card">
+            <div class="therapy-header">
+                <div class="therapy-icon"><i class="fas fa-syringe"></i></div>
+                <div>
+                    <div class="therapy-title">Basti Therapy</div>
+                    <div class="therapy-subtitle">The MOST Important for Kidney Healing</div>
+                </div>
+            </div>
+
+            <div class="section-title"><i class="fas fa-info-circle"></i> What is it?</div>
+            <p class="content-text">
+                Basti (Enema Therapy) is considered the "half-treatment" in Ayurveda because it cleanses the Vata dosha,
+                which is the primary energy force behind all movement and elimination in the body. For kidney patients,
+                medicated oil or decoction enemas help remove accumulated toxins (Ama) and balance the body's fluid
+                regulation.
+            </p>
+
+            <div class="section-title"><i class="fas fa-list-ol"></i> Steps to Perform</div>
+            <ul class="steps-list">
+                <li>Consult an Ayurvedic practitioner for the specific medicated oil or decoction suitable for your
+                    condition.</li>
+                <li>Usually performed in the morning on an empty stomach or evening.</li>
+                <li>Lie on your left side with the right leg folded.</li>
+                <li>Administer the medicated liquid gently through the rectum.</li>
+                <li>Retain the fluid for the prescribed duration (usually 30-45 minutes) before evacuation.</li>
+            </ul>
+
+            <div class="section-title"><i class="fas fa-heart"></i> Benefits</div>
+            <div class="benefits-list">
+                <div class="benefit-item"><i class="fas fa-check"></i> Flushes out toxins (urea/creatinine)</div>
+                <div class="benefit-item"><i class="fas fa-check"></i> Balances Vata dosha</div>
+                <div class="benefit-item"><i class="fas fa-check"></i> Improves kidney function</div>
+                <div class="benefit-item"><i class="fas fa-check"></i> Reduces dryness in the body</div>
+            </div>
+
+            <div class="important-note">
+                <strong>Note:</strong> This therapy should strictly be performed under the guidance of a qualified
+                Ayurvedic doctor.
+            </div>
+        </div>
+
+        <!-- 2. Abhyanga -->
+        <div class="therapy-card">
+            <div class="therapy-header">
+                <div class="therapy-icon"><i class="fas fa-hands"></i></div>
+                <div>
+                    <div class="therapy-title">Abhyanga</div>
+                    <div class="therapy-subtitle">Self Oil Massage</div>
+                </div>
+            </div>
+
+            <div class="section-title"><i class="fas fa-info-circle"></i> What is it?</div>
+            <p class="content-text">
+                Abhyanga is the practice of massaging the body with warm, medicated oils. It nourishes the tissues,
+                penetrates deep into the cells, and helps release physical and mental toxins.
+            </p>
+
+            <div class="section-title"><i class="fas fa-list-ol"></i> Steps to Perform</div>
+            <ul class="steps-list">
+                <li>Warm up organic sesame oil or medicated Ayurvedic oil (like Mahanarayan oil).</li>
+                <li>Apply the warm oil to your entire body, starting from the scalp to the soles of your feet.</li>
+                <li>Use long strokes on limbs and circular motions on joints.</li>
+                <li>Massage gently for 15-20 minutes.</li>
+                <li>Let the oil absorb for another 10-15 minutes before taking a warm bath.</li>
+            </ul>
+
+            <div class="section-title"><i class="fas fa-heart"></i> Benefits</div>
+            <div class="benefits-list">
+                <div class="benefit-item"><i class="fas fa-check"></i> Improves circulation</div>
+                <div class="benefit-item"><i class="fas fa-check"></i> Reduces stress & fatigue</div>
+                <div class="benefit-item"><i class="fas fa-check"></i> Strengthens the body</div>
+                <div class="benefit-item"><i class="fas fa-check"></i> Promotes better sleep</div>
+            </div>
+        </div>
+
+        <!-- 3. Swedana -->
+        <div class="therapy-card">
+            <div class="therapy-header">
+                <div class="therapy-icon"><i class="fas fa-hot-tub"></i></div>
+                <div>
+                    <div class="therapy-title">Swedana</div>
+                    <div class="therapy-subtitle">Herbal Steam at Home</div>
+                </div>
+            </div>
+
+            <div class="section-title"><i class="fas fa-info-circle"></i> What is it?</div>
+            <p class="content-text">
+                Swedana is a steam therapy that induces sweating. It helps liquefy toxins deep in the tissues, making it
+                easier for the body to expel them. It is often done after Abhyanga.
+            </p>
+
+            <div class="section-title"><i class="fas fa-list-ol"></i> Steps to Perform</div>
+            <ul class="steps-list">
+                <li>After your oil massage, sit in a steam box or a steam room if available.</li>
+                <li>At home: Boil water with herbs (like ginger or eucalyptus) in a large pot.</li>
+                <li>Sit on a chair with a blanket covering you and the pot (be careful not to burn yourself).</li>
+                <li>Allow the steam to envelop your body (excluding the head) for 10-15 minutes.</li>
+                <li>Wipe off the sweat and take a warm shower.</li>
+            </ul>
+
+            <div class="section-title"><i class="fas fa-heart"></i> Benefits</div>
+            <div class="benefits-list">
+                <div class="benefit-item"><i class="fas fa-check"></i> Opens pores & releases toxins</div>
+                <div class="benefit-item"><i class="fas fa-check"></i> Relieves stiffness</div>
+                <div class="benefit-item"><i class="fas fa-check"></i> Improves circulation</div>
+                <div class="benefit-item"><i class="fas fa-check"></i> Reduces heaviness</div>
+            </div>
+        </div>
+
+        <!-- 4. Castor Oil Hot Pack -->
+        <div class="therapy-card">
+            <div class="therapy-header">
+                <div class="therapy-icon"><i class="fas fa-compress-alt"></i></div>
+                <div>
+                    <div class="therapy-title">Castor Oil Hot Pack</div>
+                    <div class="therapy-subtitle">Targeted Kidney Therapy</div>
+                </div>
+            </div>
+
+            <div class="section-title"><i class="fas fa-info-circle"></i> What is it?</div>
+            <p class="content-text">
+                This involves applying a pack soaked in warm castor oil over the kidney area (lower back). Castor oil
+                has deep penetrating and anti-inflammatory properties that stimulate lymphatic drainage and kidney
+                function.
+            </p>
+
+            <div class="section-title"><i class="fas fa-list-ol"></i> Steps to Perform</div>
+            <ul class="steps-list">
+                <li>Soak a piece of flannel or cotton cloth in warm castor oil.</li>
+                <li>Place the cloth on your lower back (over the kidney region).</li>
+                <li>Cover it with plastic wrap to prevent staining.</li>
+                <li>Place a hot water bottle or heating pad over it.</li>
+                <li>Relax for 30-45 minutes.</li>
+            </ul>
+
+            <div class="section-title"><i class="fas fa-heart"></i> Benefits</div>
+            <div class="benefits-list">
+                <div class="benefit-item"><i class="fas fa-check"></i> Stimulates kidney function</div>
+                <div class="benefit-item"><i class="fas fa-check"></i> Reduces inflammation</div>
+                <div class="benefit-item"><i class="fas fa-check"></i> Relieves lower back pain</div>
+                <div class="benefit-item"><i class="fas fa-check"></i> Detoxifies the area</div>
+            </div>
+        </div>
+
+        <!-- 5. Virechana -->
+        <div class="therapy-card">
+            <div class="therapy-header">
+                <div class="therapy-icon"><i class="fas fa-leaf"></i></div>
+                <div>
+                    <div class="therapy-title">Virechana</div>
+                    <div class="therapy-subtitle">Therapeutic Purgation</div>
+                </div>
+            </div>
+
+            <div class="section-title"><i class="fas fa-info-circle"></i> What is it?</div>
+            <p class="content-text">
+                Virechana is a controlled process of cleansing the digestive tract, specifically the small intestine and
+                liver, through the use of laxative herbs. It eliminates excess Pitta dosha and toxins.
+            </p>
+
+            <div class="section-title"><i class="fas fa-list-ol"></i> Steps to Perform</div>
+            <ul class="steps-list">
+                <li>Requires preparation (Snehana and Swedana) for a few days prior.</li>
+                <li>On the day of therapy, specific herbal laxatives (like castor oil or herbal powders) are
+                    administered in the morning.</li>
+                <li>This induces multiple bowel movements to flush out toxins.</li>
+                <li>Follow a strict diet (Samsarjana Krama) afterwards to restore digestive fire.</li>
+            </ul>
+
+            <div class="section-title"><i class="fas fa-heart"></i> Benefits</div>
+            <div class="benefits-list">
+                <div class="benefit-item"><i class="fas fa-check"></i> Cleanses liver & blood</div>
+                <div class="benefit-item"><i class="fas fa-check"></i> Reduces body heat (Pitta)</div>
+                <div class="benefit-item"><i class="fas fa-check"></i> Improves metabolism</div>
+                <div class="benefit-item"><i class="fas fa-check"></i> Clears skin issues</div>
+            </div>
+
+            <div class="important-note">
+                <strong>Note:</strong> Virechana is a strong detoxification procedure and must ONLY be done under the
+                supervision of an Ayurvedic physician.
+            </div>
+        </div>
+
+    </div>
+
+</body>
+
+</html>

@@ -1610,6 +1610,15 @@ def lab_results():
 def education():
     return render_template('education.html')
 
+@app.route('/patient/therapy-plan')
+@login_required
+def therapy_plan():
+    """Display the therapy recommendations plan"""
+    if current_user.is_doctor():
+        return redirect(url_for('doctor_dashboard'))
+    
+    return render_template('therapy_plan.html')
+
 @app.route('/patient/diet-plan')
 @login_required
 def diet_plan():
