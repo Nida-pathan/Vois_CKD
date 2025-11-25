@@ -950,6 +950,36 @@
 
     <!-- Patient List -->
     <div class="card">
+        <script>
+            (function () {
+                window.viewPatientDetails = function (patientId) {
+                    if (!patientId || typeof patientId !== 'string' || patientId.trim() === '') {
+                        alert('Error: Invalid Patient ID');
+                        return;
+                    }
+
+                    const sanitizedId = patientId.trim();
+                    const detailsUrl = `/doctor/patient/${encodeURIComponent(sanitizedId)}`;
+                    window.location.href = detailsUrl;
+                };
+
+                window.editPatient = function (patientId) {
+                    if (!patientId || typeof patientId !== 'string' || patientId.trim() === '') {
+                        alert('Error: Invalid Patient ID');
+                        return;
+                    }
+
+                    const trimmedId = patientId.trim();
+                    const url = `/doctor/patient/${encodeURIComponent(trimmedId)}`;
+                    window.location.href = url;
+                };
+
+                window.closeHealthTrends = function () {
+                    const modal = document.getElementById('healthTrendsModal');
+                    if (modal) modal.style.display = 'none';
+                };
+            })();
+        </script>
         <div class="card-header">
             <div class="card-title">
                 <i class="fas fa-list-ul"></i> Patient List
@@ -993,9 +1023,9 @@
                         <td>{{ "%.1f"|format(patient.egfr) if patient.egfr else 'N/A' }} mL/min</td>
                         <td class="patient-actions">
                             <button class="btn-sm"
-    onclick="event.stopPropagation(); window.showHealthTrends('{{ patient.patient_id }}')">
-    <i class="fas fa-chart-line"></i> Trends
-</button>
+                                onclick="event.stopPropagation(); viewPatientDetails('{{ patient.patient_id }}')">
+                                <i class="fas fa-eye"></i> View
+                            </button>
                             <button class="btn-sm"
                                 onclick="event.stopPropagation(); showHealthTrends('{{ patient.patient_id }}')">
                                 <i class="fas fa-chart-line"></i> Trends
@@ -1094,31 +1124,34 @@
 </div>
 
 <script>
-    // Make viewPatientDetails globally available
-    window.viewPatientDetails = function (patientId) {
-        if (!patientId || typeof patientId !== 'string' || patientId.trim() === '') {
-            alert('Error: Invalid Patient ID');
-            return;
-        }
+    window.showHealthTrends = function (patientId) {
+        document.getElementById('healthTrendsModal').style.display = 'block';
+        document.getElementById('trendPatientName').textContent = 'Loading...';
 
-        const sanitizedId = patientId.trim();
-        const detailsUrl = `/doctor/patient/${encodeURIComponent(sanitizedId)}`;
-        window.location.href = detailsUrl;
+        fetch(`/api/doctor/patient/${encodeURIComponent(patientId)}/health-trends`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('trendPatientName').textContent = data.patient_name || 'Unknown Patient';
+                renderHealthTrendCharts(data);
+                renderLabResultsTable(data.lab_results || []);
+            })
+            .catch(error => {
+                console.error('Error fetching health trends:', error);
+                document.getElementById('trendPatientName').textContent = 'Error loading data';
+                alert('Error loading health trends data');
+            });
     };
 
-    // Add a delay to the search function to improve performance
-    let searchTimeout;
-    document.getElementById('patientSearch').addEventListener('input', function () {
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(filterPatients, 300); // Wait 300ms after user stops typing
-    });
+    function closeHealthTrends() {
+        const modal = document.getElementById('healthTrendsModal');
+        if (modal) modal.style.display = 'none';
+    }
 
-    // Filter patients based on search and filter criteria
+    // DOM-dependent helpers
     function filterPatients() {
-        const searchInput = document.getElementById('patientSearch').value.toLowerCase().trim();
-        const riskFilter = document.getElementById('riskFilter').value;
-        const stageFilter = document.getElementById('stageFilter').value;
-
+        const searchInput = (document.getElementById('patientSearch')?.value || '').toLowerCase().trim();
+        const riskFilter = document.getElementById('riskFilter')?.value || '';
+        const stageFilter = document.getElementById('stageFilter')?.value || '';
         const tableRows = document.querySelectorAll('#patientsTableBody tr');
 
         tableRows.forEach(row => {
@@ -1128,56 +1161,42 @@
             const risk = row.getAttribute('data-risk') || '';
             const stage = row.getAttribute('data-stage') || '';
 
-            // Check if the row matches the search criteria
-            const matchesSearch = searchInput === '' ||
-                name.toLowerCase().includes(searchInput) ||
-                id.toLowerCase().includes(searchInput) ||
-                username.toLowerCase().includes(searchInput);
+            const matchesSearch = !searchInput ||
+                name.includes(searchInput) ||
+                id.includes(searchInput) ||
+                username.includes(searchInput);
+            const matchesRisk = !riskFilter || risk === riskFilter;
+            const matchesStage = !stageFilter || stage === stageFilter;
 
-            // Check if the row matches the risk filter
-            const matchesRisk = riskFilter === '' || risk === riskFilter;
-
-            // Check if the row matches the stage filter
-            const matchesStage = stageFilter === '' || stage === stageFilter;
-
-            // Show or hide the row based on all criteria
-            if (matchesSearch && matchesRisk && matchesStage) {
-                row.style.display = '';
-            } else {
-                row.style.display = 'none';
-            }
+            row.style.display = (matchesSearch && matchesRisk && matchesStage) ? '' : 'none';
         });
     }
 
-    // Sort table by column
     let sortDirection = {};
     function sortTable(column) {
         const table = document.getElementById('patientsTable');
+        if (!table) return;
+
         const tbody = table.querySelector('tbody');
         const rows = Array.from(tbody.querySelectorAll('tr'));
         const th = table.querySelector(`th[data-sort="${column}"]`);
+        if (!th) return;
+
         const indicator = th.querySelector('.sort-indicator');
+        table.querySelectorAll('.sort-indicator').forEach(ind => ind.className = 'sort-indicator');
 
-        // Reset all indicators
-        table.querySelectorAll('.sort-indicator').forEach(ind => {
-            ind.className = 'sort-indicator';
-        });
-
-        // Determine sort direction
         if (sortDirection[column] === 'asc') {
             sortDirection[column] = 'desc';
-            indicator.className = 'sort-indicator desc';
+            indicator?.classList.add('desc');
         } else {
             sortDirection[column] = 'asc';
-            indicator.className = 'sort-indicator asc';
+            indicator?.classList.add('asc');
         }
 
-        // Sort rows
+        const columnIndex = Array.from(th.parentNode.children).indexOf(th);
         rows.sort((a, b) => {
-            const aVal = a.cells[Array.from(th.parentNode.children).indexOf(th)].textContent.trim();
-            const bVal = b.cells[Array.from(th.parentNode.children).indexOf(th)].textContent.trim();
-
-            // Handle numeric values
+            const aVal = a.cells[columnIndex].textContent.trim();
+            const bVal = b.cells[columnIndex].textContent.trim();
             const aNum = parseFloat(aVal);
             const bNum = parseFloat(bVal);
 
@@ -1185,87 +1204,29 @@
                 return sortDirection[column] === 'asc' ? aNum - bNum : bNum - aNum;
             }
 
-            // Handle text values
-            if (sortDirection[column] === 'asc') {
-                return aVal.localeCompare(bVal);
-            } else {
-                return bVal.localeCompare(aVal);
-            }
+            return sortDirection[column] === 'asc'
+                ? aVal.localeCompare(bVal)
+                : bVal.localeCompare(aVal);
         });
 
-        // Re-append sorted rows
         rows.forEach(row => tbody.appendChild(row));
     }
 
-    // Edit patient - redirects to doctor patient details page
-    window.editPatient = function (patientId) {
-        console.log("=== EDIT PATIENT DEBUG INFO ===");
-        console.log("Raw patientId parameter:", patientId);
-        console.log("Patient ID type:", typeof patientId);
-        console.log("Patient ID length:", patientId ? patientId.length : 0);
-        console.log("Patient ID is empty:", !patientId);
-        console.log("Patient ID is whitespace only:", patientId && patientId.trim() === '');
-
-        // Additional debugging
-        if (!patientId) {
-            console.error("Patient ID is empty or undefined!");
-            alert("Error: Patient ID is missing");
-            return;
-        }
-
-        // Check if patientId is valid
-        if (typeof patientId !== 'string') {
-            console.error("Patient ID is not a string:", patientId);
-            alert("Error: Invalid Patient ID type");
-            return;
-        }
-
-        if (patientId.trim() === '') {
-            console.error("Patient ID is empty string!");
-            alert("Error: Patient ID is empty");
-            return;
-        }
-
-        const trimmedId = patientId.trim();
-        const url = `/doctor/patient/${encodeURIComponent(trimmedId)}`;
-        console.log("Redirecting to:", url);
-        alert(`Redirecting to: ${url}`);  // Show user what's happening
-        window.location.href = url;
-    }
-
-    // Show health trends in modal
-    window.showHealthTrends = function (patientId) {
-        // Show loading state
-        document.getElementById('healthTrendsModal').style.display = 'block';
-        document.getElementById('trendPatientName').textContent = 'Loading...';
-
-        // Fetch patient health data
-        fetch(`/api/doctor/patient/${encodeURIComponent(patientId)}/health-trends`)
-            .then(response => response.json())
-            .then(data => {
-                // Update patient name
-                document.getElementById('trendPatientName').textContent = data.patient_name || 'Unknown Patient';
-
-                // Render charts
-                renderHealthTrendCharts(data);
-
-                // Render lab results table
-                renderLabResultsTable(data.lab_results || []);
-            })
-            .catch(error => {
-                console.error('Error fetching health trends:', error);
-                document.getElementById('trendPatientName').textContent = 'Error loading data';
-                alert('Error loading health trends data');
+    document.addEventListener('DOMContentLoaded', function () {
+        const searchInput = document.getElementById('patientSearch');
+        if (searchInput) {
+            let searchTimeout;
+            searchInput.addEventListener('input', function () {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(filterPatients, 300);
             });
-    }
+        }
 
-    // Close health trends modal
-    function closeHealthTrends() {
-        document.getElementById('healthTrendsModal').style.display = 'none';
-    }
+        document.querySelectorAll('th[data-sort]').forEach(th => {
+            th.addEventListener('click', () => sortTable(th.getAttribute('data-sort')));
+        });
+    });
 
-    // Close health trends modal (duplicate handler for legacy callers)
-    window.closeHealthTrends = closeHealthTrends;
 // Render health trend charts
 function renderHealthTrendCharts(data) {
     // Clear existing charts

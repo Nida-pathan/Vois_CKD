@@ -20,7 +20,9 @@ class CKDAIRecommender:
             raise ValueError("GEMINI_API_KEY not configured in .env file")
         
         genai.configure(api_key=api_key)
-        self.model = genai.GenerativeModel('gemini-pro')
+        
+        # Use Gemini 2.5 Flash (verified available with this API key)
+        self.model = genai.GenerativeModel('models/gemini-2.5-flash')
     
     def anonymize_patient_data(self, patient_data):
         """
@@ -83,33 +85,33 @@ Generate a detailed, actionable plan in the following JSON format:
     "daily_potassium_limit_mg": 2000,
     "daily_protein_g": 60,
     "daily_fluid_limit_ml": 1500,
-    "foods_to_avoid": ["list of 10 specific foods"],
-    "recommended_foods": ["list of 10 specific foods"],
-    "meal_timing": "description of when to eat",
-    "portion_guidelines": "practical portion size tips"
+    "foods_to_avoid": ["list of 5 specific foods"],
+    "recommended_foods": ["list of 5 specific foods"],
+    "meal_timing": "brief description",
+    "portion_guidelines": "brief tips"
   }},
   "food_swaps": [
     {{
       "high_item": "High sodium/potassium food",
       "low_alternative": "CKD-safe alternative",
-      "reason": "Why this swap helps",
+      "reason": "Brief reason",
       "sodium_saved_mg": 500,
       "potassium_saved_mg": 300
     }}
-    // Include 10 swaps
+    // Include 5 swaps
   ],
   "hydration_plan": {{
     "daily_limit_liters": 1.5,
-    "timing_tips": ["tip 1", "tip 2", "tip 3"],
-    "warning_signs": ["sign 1", "sign 2", "sign 3"],
-    "tracking_method": "how to track fluid intake"
+    "timing_tips": ["tip 1", "tip 2"],
+    "warning_signs": ["sign 1", "sign 2"],
+    "tracking_method": "brief method"
   }},
   "weekly_recipes": [
     {{
       "day": "Monday",
-      "recipe_name": "CKD-Safe Recipe Name",
+      "recipe_name": "Recipe Name",
       "meal_type": "Lunch",
-      "ingredients": ["ingredient 1", "ingredient 2"],
+      "ingredients": ["ing 1", "ing 2"],
       "instructions": ["step 1", "step 2"],
       "prep_time_minutes": 20,
       "nutrition_per_serving": {{
@@ -119,7 +121,7 @@ Generate a detailed, actionable plan in the following JSON format:
         "calories": 300
       }}
     }}
-    // Include 7 recipes (one per day)
+    // Include 7 recipes
   ],
   "exercise_plan": {{
     "intensity_level": "moderate",
@@ -129,7 +131,7 @@ Generate a detailed, actionable plan in the following JSON format:
         "activity": "Walking",
         "duration_minutes": 30,
         "intensity": "moderate",
-        "precautions": "specific safety tips"
+        "precautions": "safety tip"
       }}
       // Include 7 days
     ],
@@ -140,39 +142,63 @@ Generate a detailed, actionable plan in the following JSON format:
     "morning": ["activity 1", "activity 2"],
     "afternoon": ["activity 1", "activity 2"],
     "evening": ["activity 1", "activity 2"],
-    "sleep_schedule": "recommended sleep timing",
-    "medication_reminders": ["reminder 1", "reminder 2"]
+    "sleep_schedule": "timing",
+    "medication_reminders": ["reminder 1"]
   }}
 }}
 
 IMPORTANT: 
 - Respond ONLY with valid JSON
 - Be specific and actionable
-- All recipes must be truly CKD-safe (low sodium, low potassium)
-- Exercise intensity must match eGFR level
-- Include practical, easy-to-follow instructions"""
+- All recipes must be truly CKD-safe
+- Exercise intensity must match eGFR level"""
 
         try:
-            response = self.model.generate_content(prompt)
+            # Configure generation options
+            generation_config = genai.types.GenerationConfig(
+                temperature=0.7,
+                top_p=0.8,
+                top_k=40,
+                max_output_tokens=2048,
+            )
+            
+            response = self.model.generate_content(
+                prompt,
+                generation_config=generation_config
+            )
             return self._parse_response(response.text)
         except Exception as e:
             print(f"Error generating recommendations: {e}")
+            # Log the full error for debugging
+            import traceback
+            traceback.print_exc()
             return self._get_default_recommendations()
     
     def _parse_response(self, response_text):
         """Parse Gemini response and extract JSON"""
         try:
+            # Clean up the response text
+            text = response_text.strip()
+            
             # Remove markdown code blocks if present
-            if '```json' in response_text:
-                response_text = response_text.split('```json')[1].split('```')[0]
-            elif '```' in response_text:
-                response_text = response_text.split('```')[1].split('```')[0]
+            if '```json' in text:
+                text = text.split('```json')[1]
+                if '```' in text:
+                    text = text.split('```')[0]
+            elif '```' in text:
+                text = text.split('```')[1]
+                if '```' in text:
+                    text = text.split('```')[0]
+            
+            # Additional cleanup for common issues
+            text = text.strip()
             
             # Parse JSON
-            recommendations = json.loads(response_text.strip())
+            recommendations = json.loads(text)
             return recommendations
         except json.JSONDecodeError as e:
             print(f"JSON parsing error: {e}")
+            print(f"Raw response: {response_text}")
             return self._get_default_recommendations()
     
     def _get_default_recommendations(self):

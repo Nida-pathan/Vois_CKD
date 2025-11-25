@@ -15,6 +15,12 @@ from models.user import (
 from dotenv import load_dotenv
 import atexit
 import threading
+import warnings
+import logging
+
+# Suppress gRPC timeout warnings (harmless development noise)
+warnings.filterwarnings("ignore", message=".*grpc_wait_for_shutdown_with_timeout.*")
+logging.getLogger('absl').setLevel(logging.ERROR)
 
 load_dotenv()
 
