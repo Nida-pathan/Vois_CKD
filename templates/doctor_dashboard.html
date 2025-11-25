@@ -993,8 +993,8 @@
                         <td>{{ "%.1f"|format(patient.egfr) if patient.egfr else 'N/A' }} mL/min</td>
                         <td class="patient-actions">
                             <button class="btn-sm"
-                            onclick="event.stopPropagation(); window.showHealthTrends('{{ patient.patient_id }}')">
-            <i class="fas fa-chart-line"></i> Trends
+    onclick="event.stopPropagation(); window.showHealthTrends('{{ patient.patient_id }}')">
+    <i class="fas fa-chart-line"></i> Trends
 </button>
                             <button class="btn-sm"
                                 onclick="event.stopPropagation(); showHealthTrends('{{ patient.patient_id }}')">
