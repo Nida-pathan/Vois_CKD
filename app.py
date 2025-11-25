@@ -9,7 +9,8 @@ from models.user import (
     User, get_all_doctors, get_all_patients, get_patient_data, save_patient_data, 
     get_all_patients_data, get_patient_records, save_patient_record, get_patient_trials, 
     update_patient_trials, create_appointment, get_appointments_for_doctor, 
-    get_appointments_for_patient, save_feedback, get_all_feedbacks
+    get_appointments_for_patient, save_feedback, get_all_feedbacks,
+    get_prescriptions_for_doctor, create_prescription_record
 )
 from dotenv import load_dotenv
 import atexit
@@ -675,6 +676,29 @@ def doctor_patient_details(patient_id):
         }
         flash(f'Patient data not found for ID: {patient_id}. Displaying minimal information.', 'warning')
     
+    def safe_float(value):
+        """Convert incoming value to float when possible, stripping symbols like %."""
+        if isinstance(value, (int, float)):
+            return float(value)
+        if isinstance(value, str):
+            cleaned = value.replace('%', '').strip()
+            if not cleaned:
+                return None
+            try:
+                return float(cleaned)
+            except ValueError:
+                return None
+        return None
+
+    numeric_fields = [
+        'egfr', 'risk_percentage', 'serum_creatinine', 'blood_urea', 'hemoglobin',
+        'sodium', 'potassium', 'blood_glucose', 'bp_systolic', 'bp_diastolic'
+    ]
+    for field in numeric_fields:
+        if field in patient_data:
+            converted = safe_float(patient_data.get(field))
+            patient_data[field] = converted
+
     # Get prescriptions for this patient
     from models.database import Database
     db = Database.get_db()
@@ -1560,8 +1584,7 @@ def prescriptions():
     if not current_user.is_doctor():
         return redirect(url_for('index'))
     
-    from models.user import Prescription
-    prescriptions_list = Prescription.get_by_doctor(current_user.username)
+    prescriptions_list = get_prescriptions_for_doctor(current_user.username)
     return render_template('prescriptions.html', prescriptions=prescriptions_list)
 
 @app.route('/create_prescription', methods=['POST'])
@@ -1591,8 +1614,7 @@ def create_prescription():
         'notes': request.form.get('notes', '')
     }
     
-    from models.user import Prescription
-    Prescription.create(prescription_data)
+    create_prescription_record(prescription_data)
     flash('Prescription created successfully', 'success')
     return redirect(url_for('prescriptions'))
 

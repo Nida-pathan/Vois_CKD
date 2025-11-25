@@ -210,6 +210,34 @@ def get_all_feedbacks():
     db = Database.get_db()
     return list(db.feedbacks.find())
 
+def get_prescriptions_for_doctor(doctor_username):
+    """Fetch prescriptions authored by the given doctor."""
+    try:
+        db = Database.get_db()
+        if db is None:
+            return []
+        cursor = db.prescriptions.find({'doctor': doctor_username}).sort('date', -1)
+        return list(cursor)
+    except Exception as e:
+        print(f"Error getting prescriptions for doctor {doctor_username}: {e}")
+        return []
+
+def create_prescription_record(prescription_data):
+    """Persist a new prescription document."""
+    try:
+        db = Database.get_db()
+        if db is None:
+            return None
+        if not prescription_data.get('date'):
+            prescription_data['date'] = pd.Timestamp.now().strftime('%Y-%m-%d')
+        prescription_data['created_at'] = pd.Timestamp.now().isoformat()
+        result = db.prescriptions.insert_one(prescription_data)
+        prescription_data['_id'] = result.inserted_id
+        return prescription_data
+    except Exception as e:
+        print(f"Error creating prescription: {e}")
+        return None
+
 def update_patient_lab_values(username, lab_values, prediction, pdf_path=None):
     """Update patient lab values and history"""
     db = Database.get_db()
