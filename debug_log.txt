@@ -25,3 +25,17 @@ Appointment created successfully: {'patient': 'JOHN', 'doctor': 'doc1', 'preferr
 Booking request received: {'doctor_name': 'doc1', 'preferred_date': '2025-11-26', 'preferred_time': '09:29'}
 Doctor name: doc1
 Appointment created successfully: {'patient': 'JOHN', 'doctor': 'doc1', 'preferred_date': '2025-11-26', 'preferred_time': '09:29', 'meet_link': 'https://meet.jit.si/ckd-appointment-8f6ecd27-a3d8-4c98-9b2b-58f7b02c5b96', 'status': 'pending', 'created_at': '2025-11-26T09:27:47.227579', '_id': '69267abbb571a7ec1a5db95f'}
+Booking request received: {'doctor_name': 'doc1', 'preferred_date': '2025-11-26', 'preferred_time': '10:20'}
+Doctor name: doc1
+Appointment created successfully: {'patient': 'JOHN', 'doctor': 'doc1', 'preferred_date': '2025-11-26', 'preferred_time': '10:20', 'meet_link': 'https://meet.jit.si/ckd-appointment-14bc1062-0b59-4c47-bae3-833ffa468c74', 'status': 'pending', 'created_at': '2025-11-26T10:18:24.421299', '_id': '69268698668c26bdcc3253a7'}
+
+--- Patient Dashboard Debug (2025-11-26 11:04:56.945981) ---
+User: JOHN
+Appointments found: 7
+Apt: Doctor=doc1, Link=https://meet.jit.si/ckd-appointment-cb90c3dc-6cea-48c8-98d2-45eced79544a
+Apt: Doctor=doc1, Link=https://meet.jit.si/ckd-appointment-79552b59-017f-4231-80fb-356238648421
+Apt: Doctor=doc1, Link=https://meet.jit.si/ckd-appointment-7ab380a7-17cd-4094-87f8-9ad0cbf176d8
+Apt: Doctor=doc1, Link=https://meet.jit.si/ckd-appointment-d0ec3fb6-d0c4-48bd-b401-a3cbda9b79ed
+Apt: Doctor=doc1, Link=https://meet.jit.si/ckd-appointment-8f6ecd27-a3d8-4c98-9b2b-58f7b02c5b96
+Apt: Doctor=doc1, Link=https://meet.jit.si/ckd-appointment-14bc1062-0b59-4c47-bae3-833ffa468c74
+Apt: Doctor=doc1, Link=https://meet.jit.si/ckd-appointment-1a76ae12-274f-4385-b57f-026545a02122
