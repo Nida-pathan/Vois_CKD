@@ -351,6 +351,203 @@ def update_patient_lab_values(username, lab_values, prediction, pdf_path=None):
         upsert=True
     )
 
+    # Also update patients_data collection to ensure doctor dashboard shows updated values
+    try:
+        # Prepare patient data update
+        patient_data_update = {}
+        for k, v in lab_values.items():
+            if v is not None:
+                patient_data_update[k] = v
+        
+        # Add prediction data
+        if prediction:
+            patient_data_update.update({
+                'risk_percentage': prediction.get('risk_percentage', 0),
+                'stage': prediction.get('stage', 'N/A'),
+                'risk_level': prediction.get('risk_level', 'Unknown'),
+                'egfr': prediction.get('egfr', None)
+            })
+        
+        # Update patients_data collection
+        db.patients_data.update_one(
+            {'username': username},
+            {'$set': patient_data_update},
+            upsert=False  # Only update existing records
+        )
+        print(f"Updated patients_data for {username} with new lab values")
+    except Exception as e:
+        print(f"Error updating patients_data: {e}")
+
+    # Sync with lab_results collection for Doctor Dashboard
+    try:
+        # Prepare lab result document
+        lab_result_doc = {
+            'patient_username': username,
+            'test_date': datetime.datetime.now(),
+            'test_type': 'Lab Report Upload',
+            'notes': f"Uploaded via Patient Dashboard. Prediction: {prediction if prediction else 'N/A'}",
+            'created_at': datetime.datetime.now()
+        }
+        
+        # Map common fields
+        if 'egfr' in lab_values:
+            lab_result_doc['egfr'] = float(lab_values['egfr'])
+        if 'serum_creatinine' in lab_values:
+            lab_result_doc['serum_creatinine'] = float(lab_values['serum_creatinine'])
+        if 'bp_systolic' in lab_values:
+            lab_result_doc['bp_systolic'] = float(lab_values['bp_systolic'])
+        if 'bp_diastolic' in lab_values:
+            lab_result_doc['bp_diastolic'] = float(lab_values['bp_diastolic'])
+            
+        # Add other values
+        for k, v in lab_values.items():
+            if k not in ['egfr', 'serum_creatinine', 'bp_systolic', 'bp_diastolic'] and v is not None:
+                lab_result_doc[k] = v
+                
+        db.lab_results.insert_one(lab_result_doc)
+        print(f"Synced lab result for {username} to lab_results collection")
+    except Exception as e:
+        print(f"Error syncing to lab_results: {e}")
+
 def decrement_trial_count(username):
     """Deprecated: No longer enforcing trial limits"""
     pass
+
+def get_doctor_patients_with_details(doctor_username):
+    """
+    Fetch all patients associated with a doctor (via appointments or manual assignment)
+    and return their detailed data including 'last_updated'.
+    """
+    try:
+        # Get doctor user to check for manually assigned patients
+        doctor = User.get_by_username(doctor_username)
+        if not doctor:
+            return []
+
+        # Refresh patient data to ensure we get the latest values
+        all_patients_data = get_all_patients_data()
+        appointments = get_appointments_for_doctor(doctor_username)
+        
+        # Filter patients: Only show those who have an appointment with this doctor
+        patient_usernames_with_appointments = set(apt['patient'] for apt in appointments)
+        
+        # Also include patients manually assigned to this doctor (if any)
+        if hasattr(doctor, 'patients') and doctor.patients:
+            patient_usernames_with_appointments.update(doctor.patients)
+            
+        # Create a lookup for patient data
+        patient_data_lookup = {}
+        for data in all_patients_data:
+            p_username = data.get('username')
+            if not p_username and data.get('patient_id', '').startswith('P'):
+                    p_username = data.get('patient_id')[1:]
+            if p_username:
+                patient_data_lookup[p_username] = data
+                
+        filtered_patients = []
+        for username in patient_usernames_with_appointments:
+            # Fetch latest records to get real-time "Last Updated"
+            records = get_patient_records(username)
+            last_updated = 'N/A'
+            if records and 'history' in records and records['history']:
+                # Get the most recent history entry
+                latest_entry = records['history'][-1]
+                last_updated = latest_entry.get('date', 'N/A')
+                # If date is a datetime object, format it
+                if hasattr(last_updated, 'strftime'):
+                        last_updated = last_updated.strftime('%Y-%m-%d %H:%M')
+            
+            if username in patient_data_lookup:
+                data = patient_data_lookup[username]
+                
+                # Ensure egfr is a number or None
+                egfr = data.get('egfr')
+                if isinstance(egfr, str):
+                    try:
+                        egfr = float(egfr)
+                    except ValueError:
+                        egfr = None
+                elif egfr is not None:
+                    try:
+                        egfr = float(egfr)
+                    except (ValueError, TypeError):
+                        egfr = None
+                
+                # Ensure other numeric fields are properly typed
+                try:
+                    age = data.get('age')
+                    if isinstance(age, str) and age != 'N/A':
+                        age = int(age)
+                    elif not isinstance(age, int) and age != 'N/A':
+                        age = int(age) if age is not None else 'N/A'
+                except (ValueError, TypeError):
+                    age = 'N/A'
+                
+                try:
+                    risk_percentage = data.get('risk_percentage')
+                    if isinstance(risk_percentage, str):
+                        try:
+                            risk_percentage = float(risk_percentage)
+                        except ValueError:
+                            risk_percentage = 0
+                    elif risk_percentage is not None:
+                        try:
+                            risk_percentage = float(risk_percentage)
+                        except (ValueError, TypeError):
+                            risk_percentage = 0
+                    else:
+                        risk_percentage = 0
+                except (ValueError, TypeError):
+                    risk_percentage = 0
+                
+                try:
+                    stage = data.get('stage')
+                    if isinstance(stage, str) and stage.isdigit():
+                        stage = int(stage)
+                    elif not isinstance(stage, int):
+                        stage = int(stage) if stage is not None else 'N/A'
+                except (ValueError, TypeError):
+                    stage = 'N/A'
+                
+                # Use record date if available, else fall back to patient data
+                if last_updated == 'N/A':
+                        test_date = data.get('test_date')
+                        if test_date:
+                            last_updated = test_date
+                
+                patient_info = {
+                    'patient_id': data.get('patient_id'),
+                    'username': username,
+                    'name': data.get('patient_name', 'Unknown'),
+                    'risk_percentage': risk_percentage,
+                    'stage': stage,
+                    'risk_level': data.get('risk_level', 'Unknown'),
+                    'age': age,
+                    'egfr': egfr,
+                    'last_updated': last_updated
+                }
+                filtered_patients.append(patient_info)
+            else:
+                # Patient has appointment but no health data yet
+                # Fetch basic user info
+                user = User.get_by_username(username)
+                if user:
+                    # Use user creation date if no records
+                    if last_updated == 'N/A' and hasattr(user, 'created_at'):
+                            last_updated = user.created_at
+                            
+                    filtered_patients.append({
+                        'patient_id': f"P{user.id}",
+                        'username': username,
+                        'name': username, # Fallback to username if real name not available
+                        'risk_percentage': 0,
+                        'stage': 'New',
+                        'risk_level': 'Pending Intake',
+                        'age': 'N/A',
+                        'egfr': None,
+                        'last_updated': last_updated
+                    })
+        return filtered_patients
+    except Exception as e:
+        print(f"Error in get_doctor_patients_with_details: {e}")
+        return []

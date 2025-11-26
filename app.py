@@ -2,6 +2,7 @@ import os
 import io
 import pandas as pd
 from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify, send_from_directory
+from datetime import datetime
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from models.database import Database
@@ -314,70 +315,10 @@ def doctor_dashboard():
         flash('Access denied. Doctors only.', 'danger')
         return redirect(url_for('patient_portal'))
     
-    all_patients_data = get_all_patients_data()
+    from models.user import get_doctor_patients_with_details, get_appointments_for_doctor
+    
+    filtered_patients = get_doctor_patients_with_details(current_user.username)
     appointments = get_appointments_for_doctor(current_user.username)
-    
-    # Filter patients: Only show those who have an appointment with this doctor
-    patient_usernames_with_appointments = set(apt['patient'] for apt in appointments)
-    
-    # Also include patients manually assigned to this doctor (if any)
-    if hasattr(current_user, 'patients') and current_user.patients:
-        patient_usernames_with_appointments.update(current_user.patients)
-        
-    try:
-        # Create a lookup for patient data
-        patient_data_lookup = {}
-        for data in all_patients_data:
-            p_username = data.get('username')
-            if not p_username and data.get('patient_id', '').startswith('P'):
-                 p_username = data.get('patient_id')[1:]
-            if p_username:
-                patient_data_lookup[p_username] = data
-                
-        filtered_patients = []
-        for username in patient_usernames_with_appointments:
-            if username in patient_data_lookup:
-                data = patient_data_lookup[username]
-                
-                # Ensure egfr is a number or None
-                egfr = data.get('egfr')
-                if isinstance(egfr, str):
-                    try:
-                        egfr = float(egfr)
-                    except ValueError:
-                        egfr = None
-                        
-                filtered_patients.append({
-                    'patient_id': data.get('patient_id'),
-                    'username': username,  # Add username to the patient data
-                    'name': data.get('patient_name', 'Unknown'),
-                    'risk_percentage': data.get('risk_percentage', 0),
-                    'stage': data.get('stage', 'N/A'),
-                    'risk_level': data.get('risk_level', 'Unknown'),
-                    'age': data.get('age', 'N/A'),
-                    'egfr': egfr
-                })
-            else:
-                # Patient has appointment but no health data yet
-                # Fetch basic user info
-                user = User.get_by_username(username)
-                if user:
-                    filtered_patients.append({
-                        'patient_id': f"P{user.id}",
-                        'username': username,  # Add username to the patient data
-                        'name': username, # Fallback to username if real name not available
-                        'risk_percentage': 0,
-                        'stage': 'New',
-                        'risk_level': 'Pending Intake',
-                        'age': 'N/A',
-                        'egfr': None  # Must be None, not 'N/A', to avoid template formatting error
-                    })
-    except Exception as e:
-        import traceback
-        with open('debug_log.txt', 'a') as f:
-            f.write(f"Error in doctor_dashboard filtering: {str(e)}\n")
-            f.write(traceback.format_exc())
-        filtered_patients = [] # Fallback to empty list
     
     return render_template('doctor_dashboard.html', patients=filtered_patients, appointments=appointments)
 
@@ -386,6 +327,7 @@ def doctor_dashboard():
 def test_buttons():
     """Test route to check button functionality"""
     # Get sample patient data for testing
+    from models.user import get_all_patients_data
     patients = get_all_patients_data()
     sample_patient = patients[0] if patients else None
     
@@ -398,6 +340,7 @@ def test_buttons():
 @login_required
 def debug_patient_ids():
     """Debug route to check patient IDs"""
+    from models.user import get_all_patients_data
     patients = get_all_patients_data()
     patient_ids = [p.get('patient_id') for p in patients if p.get('patient_id')]
     
@@ -428,6 +371,7 @@ def debug_patient_list():
 @login_required
 def debug_patient_data():
     """Debug route to check what patient data is available"""
+    from models.user import get_all_patients_data, get_appointments_for_doctor
     patients = get_all_patients_data()
     
     # Let's also check what the current user can access
@@ -456,6 +400,7 @@ def get_dashboard_stats():
     if not current_user.is_doctor():
         return jsonify({'error': 'Access denied'}), 403
     
+    from models.user import get_all_patients_data
     all_patients_data = get_all_patients_data()
     
     total_patients = len(all_patients_data)
@@ -477,18 +422,8 @@ def get_dashboard_patients():
     if not current_user.is_doctor():
         return jsonify({'error': 'Access denied'}), 403
     
-    all_patients_data = get_all_patients_data()
-    patients = []
-    for data in all_patients_data:
-        patients.append({
-            'patient_id': data.get('patient_id'),
-            'name': data.get('patient_name', 'Unknown'),
-            'risk_percentage': data.get('risk_percentage', 0),
-            'stage': data.get('stage', 'N/A'),
-            'risk_level': data.get('risk_level', 'Unknown'),
-            'age': data.get('age', 'N/A'),
-            'egfr': data.get('egfr')
-        })
+    from models.user import get_doctor_patients_with_details
+    patients = get_doctor_patients_with_details(current_user.username)
     
     return jsonify({'patients': patients})
 
@@ -1096,10 +1031,10 @@ def get_patient_health_trends(patient_id):
     try:
         from bson.objectid import ObjectId, InvalidId
         from models.database import Database
-        from models.user import get_patient_data, get_user_by_username
+        from models.user import get_patient_data
         
         db = Database.get_db()
-        if not db:
+        if db is None:
             return jsonify({'error': 'Database connection failed'}), 500
             
         # Try different methods to find the patient
@@ -1113,7 +1048,7 @@ def get_patient_health_trends(patient_id):
                     print(f"Found patient by ObjectId: {patient_id}")
         except (InvalidId, Exception) as e:
             print(f"Error searching by ObjectId: {str(e)}")
-        
+            
         # Method 2: Try with patient_id field
         if not patient_data:
             patient_data = db.patients_data.find_one({'patient_id': patient_id})
@@ -1135,11 +1070,31 @@ def get_patient_health_trends(patient_id):
         
         # Method 4: Try by username
         if not patient_data:
-            user = get_user_by_username(patient_id)
+            user = User.get_by_username(patient_id)
             if user:
                 patient_data = db.patients_data.find_one({'username': patient_id})
                 if patient_data:
                     print(f"Found patient by username: {patient_id}")
+
+        # Method 5: Try by ID in users collection (fallback if not in patients_data)
+        if not patient_data:
+            # Try stripping 'P' if present
+            search_id = patient_id[1:] if patient_id.startswith('P') else patient_id
+            if ObjectId.is_valid(search_id):
+                user_doc = db.users.find_one({'_id': ObjectId(search_id), 'role': 'patient'})
+                if user_doc:
+                    print(f"Found user in users collection: {search_id}")
+                    # Construct minimal patient_data
+                    patient_data = {
+                        '_id': user_doc['_id'],
+                        'patient_id': patient_id, 
+                        'username': user_doc.get('username'),
+                        'first_name': user_doc.get('username'), # Fallback
+                        'last_name': '',
+                        'email': user_doc.get('email'),
+                        'age': 'N/A',
+                        'gender': 'N/A'
+                    }
         
         if not patient_data:
             print(f"Patient not found with any method for ID: {patient_id}")
@@ -1238,7 +1193,13 @@ def get_patient_health_trends(patient_id):
                     'value': float(creatinine)
                 })
             
-            # Prepare lab results for the table
+            # Prepare lab results for the table with more detailed information
+            detailed_results = {}
+            # Add all available metrics from the result
+            for key, value in result.items():
+                if key not in ['_id', 'patient_id', 'patient_username', 'test_date', 'test_type', 'notes', 'created_at']:
+                    detailed_results[key] = value
+            
             lab_results_list.append({
                 'test_date': formatted_date,
                 'test_type': result.get('test_type', 'Lab Test'),
@@ -1246,7 +1207,8 @@ def get_patient_health_trends(patient_id):
                 'serum_creatinine': creatinine,
                 'bp_systolic': bp_systolic,
                 'bp_diastolic': bp_diastolic,
-                'notes': result.get('notes', '')
+                'notes': result.get('notes', ''),
+                'all_results': detailed_results
             })
         
         # Add current patient data if not already in history

@@ -222,6 +222,7 @@
         height: 100%;
         overflow: auto;
         background-color: rgba(0, 0, 0, 0.5);
+        -webkit-overflow-scrolling: touch;
     }
 
     .modal-content {
@@ -234,6 +235,7 @@
         max-width: 1200px;
         max-height: 90vh;
         overflow-y: auto;
+        overflow-x: hidden;
     }
 
     .modal-header {
@@ -244,6 +246,9 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
     }
 
     .modal-header h2 {
@@ -257,6 +262,8 @@
         font-weight: bold;
         cursor: pointer;
         padding: 0 10px;
+        position: relative;
+        z-index: 1001;
     }
 
     .close:hover {
@@ -265,6 +272,8 @@
 
     .modal-body {
         padding: 20px;
+        max-height: calc(90vh - 100px);
+        overflow-y: auto;
     }
 
     .trend-charts-container {
@@ -272,6 +281,7 @@
         grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
         gap: 20px;
         margin-bottom: 30px;
+        width: 100%;
     }
 
     .chart-card {
@@ -279,6 +289,7 @@
         border-radius: 8px;
         padding: 20px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        min-height: 300px;
     }
 
     .chart-card h3 {
@@ -289,6 +300,7 @@
 
     .lab-results-section {
         margin-top: 30px;
+        overflow-x: auto;
     }
 
     .lab-results-section h3 {
@@ -492,6 +504,8 @@
         height: 320px;
         position: relative;
         padding: 10px;
+        width: 100%;
+        overflow: hidden;
     }
 
     /* Filter Section */
@@ -796,55 +810,57 @@
             overflow-x: auto;
             white-space: nowrap;
         }
-    }@media (max-width: 576px) {
-.stats-grid {
-grid-template-columns: 1fr;
-}
+    }
 
-.card-header {
-flex-direction: column;
-align-items: flex-start;
-gap: 15px;
-}
+    @media (max-width: 576px) {
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
 
-.card-action-btn {
-width: 100%;
-justify-content: center;
-}
+        .card-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 15px;
+        }
 
-.patient-actions {
-flex-direction: column;
-gap: 5px;
-}
+        .card-action-btn {
+            width: 100%;
+            justify-content: center;
+        }
 
-.btn-sm {
-margin-right: 0;
-width: 100%;
-}
-}
+        .patient-actions {
+            flex-direction: column;
+            gap: 5px;
+        }
 
-.join-meeting-btn {
-display: inline-flex;
-align-items: center;
-gap: 8px;
-background: linear-gradient(135deg, #0d9488, #14b8a6);
-color: white;
-padding: 6px 12px;
-border-radius: 6px;
-text-decoration: none;
-font-size: 12px;
-font-weight: 600;
-transition: all 0.3s ease;
-border: none;
-cursor: pointer;
-box-shadow: 0 2px 4px rgba(13, 148, 136, 0.2);
-}
+        .btn-sm {
+            margin-right: 0;
+            width: 100%;
+        }
+    }
 
-.join-meeting-btn:hover {
-transform: translateY(-1px);
-box-shadow: 0 4px 6px rgba(13, 148, 136, 0.3);
-color: white;
-}
+    .join-meeting-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: linear-gradient(135deg, #0d9488, #14b8a6);
+        color: white;
+        padding: 6px 12px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        box-shadow: 0 2px 4px rgba(13, 148, 136, 0.2);
+    }
+
+    .join-meeting-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px rgba(13, 148, 136, 0.3);
+        color: white;
+    }
 </style>
 
 <div class="dashboard-container">
@@ -1010,6 +1026,7 @@ color: white;
                         <th data-sort="risk_percentage">Risk % <span class="sort-indicator"></span></th>
                         <th data-sort="stage">CKD Stage <span class="sort-indicator"></span></th>
                         <th data-sort="egfr">eGFR <span class="sort-indicator"></span></th>
+                        <th>Last Updated</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -1030,6 +1047,7 @@ color: white;
                         <td><strong>{{ patient.risk_percentage }}%</strong></td>
                         <td>Stage {{ patient.stage }}</td>
                         <td>{{ "%.1f"|format(patient.egfr) if patient.egfr else 'N/A' }} mL/min</td>
+                        <td>{{ patient.last_updated }}</td>
                         <td class="patient-actions">
                             <button class="btn-sm"
                                 onclick="event.stopPropagation(); viewPatientDetails('{{ patient.patient_id }}')">
@@ -1143,6 +1161,40 @@ color: white;
 </div>
 
 <script>
+    // Close modal when Escape key is pressed or when clicking outside the content
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            const modal = document.getElementById('healthTrendsModal');
+            if (modal && modal.style.display === 'block') {
+                closeHealthTrends();
+            }
+        }
+    });
+    
+    // Close modal when clicking outside the content
+    document.addEventListener('click', function(event) {
+        const modal = document.getElementById('healthTrendsModal');
+        if (modal && modal.style.display === 'block') {
+            const modalContent = modal.querySelector('.modal-content');
+            if (modalContent && !modalContent.contains(event.target)) {
+                closeHealthTrends();
+            }
+        }
+    });
+    
+    // Prevent closing when clicking inside the modal content
+    document.addEventListener('DOMContentLoaded', function() {
+        const modal = document.getElementById('healthTrendsModal');
+        if (modal) {
+            const modalContent = modal.querySelector('.modal-content');
+            if (modalContent) {
+                modalContent.addEventListener('click', function(event) {
+                    event.stopPropagation();
+                });
+            }
+        }
+    });
+
     window.showHealthTrends = function (patientId) {
         document.getElementById('healthTrendsModal').style.display = 'block';
         document.getElementById('trendPatientName').textContent = 'Loading...';
@@ -1160,10 +1212,87 @@ color: white;
                 alert('Error loading health trends data');
             });
     };
+    
+    // Auto-refresh health trends every 30 seconds when modal is open
+    let healthTrendsInterval;
+    function startHealthTrendsAutoRefresh(patientId) {
+        if (healthTrendsInterval) {
+            clearInterval(healthTrendsInterval);
+        }
+        
+        healthTrendsInterval = setInterval(() => {
+            const modal = document.getElementById('healthTrendsModal');
+            if (modal && modal.style.display === 'block') {
+                fetch(`/api/doctor/patient/${encodeURIComponent(patientId)}/health-trends`)
+                    .then(response => response.json())
+                    .then(data => {
+                        renderHealthTrendCharts(data);
+                        renderLabResultsTable(data.lab_results || []);
+                    })
+                    .catch(error => {
+                        console.error('Error auto-refreshing health trends:', error);
+                    });
+            }
+        }, 30000); // Refresh every 30 seconds
+    }
+    
+    // Enhanced showHealthTrends with auto-refresh
+    window.showHealthTrends = function (patientId) {
+        const modal = document.getElementById('healthTrendsModal');
+        modal.style.display = 'block';
+        document.getElementById('trendPatientName').textContent = 'Loading...';
+
+        // Reset scroll position when opening modal
+        const modalContent = modal.querySelector('.modal-content');
+        if (modalContent) {
+            modalContent.scrollTop = 0;
+        }
+
+        fetch(`/api/doctor/patient/${encodeURIComponent(patientId)}/health-trends`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('trendPatientName').textContent = data.patient_name || 'Unknown Patient';
+                renderHealthTrendCharts(data);
+                renderLabResultsTable(data.lab_results || []);
+                // Start auto-refresh
+                startHealthTrendsAutoRefresh(patientId);
+                
+                // Ensure modal content is scrolled to top after loading
+                setTimeout(() => {
+                    if (modalContent) {
+                        modalContent.scrollTop = 0;
+                    }
+                }, 100);
+            })
+            .catch(error => {
+                console.error('Error fetching health trends:', error);
+                document.getElementById('trendPatientName').textContent = 'Error loading data';
+                alert('Error loading health trends data');
+            });
+    };
 
     function closeHealthTrends() {
         const modal = document.getElementById('healthTrendsModal');
-        if (modal) modal.style.display = 'none';
+        if (modal) {
+            modal.style.display = 'none';
+            
+            // Reset scroll positions
+            const modalContent = modal.querySelector('.modal-content');
+            if (modalContent) {
+                modalContent.scrollTop = 0;
+            }
+            
+            const modalBody = modal.querySelector('.modal-body');
+            if (modalBody) {
+                modalBody.scrollTop = 0;
+            }
+        }
+        
+        // Clean up the auto-refresh interval
+        if (healthTrendsInterval) {
+            clearInterval(healthTrendsInterval);
+            healthTrendsInterval = null;
+        }
     }
 
     // DOM-dependent helpers
@@ -1406,7 +1535,7 @@ color: white;
         }
     }
 
-    // Render lab results table
+    // Render lab results table with enhanced real-time data
     function renderLabResultsTable(labResults) {
         const tableContainer = document.getElementById('labResultsTable');
 
@@ -1421,7 +1550,8 @@ color: white;
                     <tr>
                         <th>Date</th>
                         <th>Test Type</th>
-                        <th>Results</th>
+                        <th>Key Metrics</th>
+                        <th>Detailed Results</th>
                         <th>Notes</th>
                     </tr>
                 </thead>
@@ -1429,11 +1559,49 @@ color: white;
         `;
 
         labResults.forEach(result => {
+            // Format key metrics
+            let keyMetrics = [];
+            if (result.egfr !== undefined && result.egfr !== null) {
+                keyMetrics.push(`eGFR: ${parseFloat(result.egfr).toFixed(1)} mL/min`);
+            }
+            if (result.serum_creatinine !== undefined && result.serum_creatinine !== null) {
+                keyMetrics.push(`Creatinine: ${parseFloat(result.serum_creatinine).toFixed(2)} mg/dL`);
+            }
+            if (result.bp_systolic !== undefined && result.bp_diastolic !== undefined && 
+                result.bp_systolic !== null && result.bp_diastolic !== null) {
+                keyMetrics.push(`BP: ${parseInt(result.bp_systolic)}/${parseInt(result.bp_diastolic)} mmHg`);
+            }
+            
+            // Format detailed results
+            let detailedResults = '';
+            if (result.all_results) {
+                let resultItems = [];
+                for (let [key, value] of Object.entries(result.all_results)) {
+                    if (value !== undefined && value !== null) {
+                        // Format numeric values appropriately
+                        if (typeof value === 'number') {
+                            // Check if it's likely a percentage or needs decimal places
+                            if (key.toLowerCase().includes('percent') || key.toLowerCase().includes('%')) {
+                                resultItems.push(`${key}: ${value.toFixed(1)}%`);
+                            } else if (key.toLowerCase().includes('creatinine') || key.toLowerCase().includes('egfr')) {
+                                resultItems.push(`${key}: ${value.toFixed(2)}`);
+                            } else {
+                                resultItems.push(`${key}: ${value}`);
+                            }
+                        } else {
+                            resultItems.push(`${key}: ${value}`);
+                        }
+                    }
+                }
+                detailedResults = resultItems.join('<br>');
+            }
+            
             tableHTML += `
                 <tr>
                     <td>${result.test_date || 'N/A'}</td>
                     <td>${result.test_type || 'N/A'}</td>
-                    <td>${result.results || 'N/A'}</td>
+                    <td>${keyMetrics.join('<br>') || 'N/A'}</td>
+                    <td>${detailedResults || 'N/A'}</td>
                     <td>${result.notes || 'N/A'}</td>
                 </tr>
             `;
@@ -1596,5 +1764,148 @@ color: white;
             window.stageChartType = newType;
         }
     }
+
+    // Real-time updates with enhanced error handling
+    function pollPatientUpdates() {
+        fetch('/api/doctor/dashboard/patients')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.patients) {
+                    updatePatientTable(data.patients);
+                    updateStats(data.patients);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching patient updates:', error);
+                // Silently ignore errors to prevent popup notifications
+            });
+    }
+
+    function updatePatientTable(patients) {
+        const tbody = document.getElementById('patientsTableBody');
+        if (!tbody) return;
+
+        // Create a map of existing rows for easier updating
+        const existingRows = {};
+        tbody.querySelectorAll('tr').forEach(row => {
+            const id = row.getAttribute('data-id');
+            if (id) existingRows[id] = row;
+        });
+
+        patients.forEach(patient => {
+            const patientId = patient.patient_id.toLowerCase();
+            let row = existingRows[patientId];
+
+            if (row) {
+                // Update existing row
+                updateRowContent(row, patient);
+                delete existingRows[patientId]; // Mark as updated
+            } else {
+                // Create new row
+                row = document.createElement('tr');
+                row.setAttribute('data-id', patientId);
+                row.setAttribute('onclick', `viewPatientDetails('${patient.patient_id}')`);
+                row.style.cursor = 'pointer';
+                updateRowContent(row, patient);
+                tbody.appendChild(row);
+            }
+        });
+
+        // Remove rows that are no longer in the data
+        for (const id in existingRows) {
+            existingRows[id].remove();
+        }
+
+        // Re-apply filters
+        filterPatients();
+    }
+
+    function updateRowContent(row, patient) {
+        // Update data attributes
+        row.setAttribute('data-name', patient.name.toLowerCase());
+        row.setAttribute('data-username', (patient.username || '').toLowerCase());
+        row.setAttribute('data-risk', patient.risk_level);
+        row.setAttribute('data-stage', patient.stage);
+
+        // Update cells individually for better real-time updates
+        const cells = row.querySelectorAll('td');
+        if (cells.length >= 9) { // Ensure we have enough cells
+            cells[0].innerHTML = `<strong>${patient.patient_id}</strong>`;
+            cells[1].textContent = patient.name;
+            cells[2].textContent = patient.age || 'N/A';
+            
+            // Update risk level badge
+            const riskBadge = cells[3].querySelector('.badge');
+            if (riskBadge) {
+                // Remove existing classes and add new ones
+                riskBadge.className = 'badge';
+                riskBadge.classList.add(`badge-${patient.risk_level.toLowerCase()}`);
+                riskBadge.textContent = patient.risk_level;
+            }
+            
+            cells[4].innerHTML = `<strong>${patient.risk_percentage}%</strong>`;
+            cells[5].textContent = `Stage ${patient.stage}`;
+            cells[6].textContent = patient.egfr ? `${patient.egfr.toFixed(1)} mL/min` : 'N/A';
+            cells[7].textContent = patient.last_updated || 'N/A';
+            // cells[8] contains the action buttons, so we don't update it
+        } else {
+            // Fallback to innerHTML if cell count is unexpected
+            row.innerHTML = `
+                <td><strong>${patient.patient_id}</strong></td>
+                <td>${patient.name}</td>
+                <td>${patient.age || 'N/A'}</td>
+                <td>
+                    <span class="badge badge-${patient.risk_level.toLowerCase()}">
+                        ${patient.risk_level}
+                    </span>
+                </td>
+                <td><strong>${patient.risk_percentage}%</strong></td>
+                <td>Stage ${patient.stage}</td>
+                <td>${patient.egfr ? patient.egfr.toFixed(1) : 'N/A'} mL/min</td>
+                <td>${patient.last_updated || 'N/A'}</td>
+                <td class="patient-actions">
+                    <button class="btn-sm" onclick="event.stopPropagation(); viewPatientDetails('${patient.patient_id}')">
+                        <i class="fas fa-eye"></i> View
+                    </button>
+                    <button class="btn-sm" onclick="event.stopPropagation(); showHealthTrends('${patient.patient_id}')">
+                        <i class="fas fa-chart-line"></i> Trends
+                    </button>
+                    <button class="btn-sm" onclick="event.stopPropagation(); editPatient('${patient.patient_id}')">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                </td>
+            `;
+        }
+    }
+
+    function updateStats(patients) {
+        // Update stats cards
+        const totalPatients = patients.length;
+        const highRisk = patients.filter(p => ['High', 'Critical'].includes(p.risk_level)).length;
+        const stage5 = patients.filter(p => p.stage == 5).length;
+        const avgRisk = totalPatients > 0
+            ? patients.reduce((acc, p) => acc + (p.risk_percentage || 0), 0) / totalPatients
+            : 0;
+
+        document.getElementById('totalPatients').textContent = totalPatients;
+        document.getElementById('highRiskPatients').textContent = highRisk;
+        document.getElementById('stage5Patients').textContent = stage5;
+        document.getElementById('avgRisk').textContent = avgRisk.toFixed(1) + '%';
+    }
+
+    // Start polling every 5 seconds for more responsive updates
+    setInterval(pollPatientUpdates, 5000);
+    
+    // Also poll when the page becomes visible (in case user switched tabs)
+    document.addEventListener('visibilitychange', function() {
+        if (!document.hidden) {
+            pollPatientUpdates();
+        }
+    });
 </script>
 {% endblock %}
