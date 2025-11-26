@@ -224,26 +224,58 @@ def get_appointments_for_patient(patient_username):
     try:
         db = Database.get_db()
         if db is None:
-            with open('debug_model.txt', 'a') as f: f.write("DB is None\n")
             return []
         
         # DEBUG LOGGING
-        with open('debug_model.txt', 'a') as f:
-            f.write(f"\n--- get_appointments_for_patient ---\n")
-            f.write(f"DB Name: {db.name}\n")
-            f.write(f"Querying for: '{patient_username}'\n")
+        print(f"\n--- get_appointments_for_patient ---")
+        print(f"DB Name: {db.name}")
+        print(f"Querying for: '{patient_username}'")
         
-        appointments = list(db.appointments.find({
-            'patient': {'$regex': f'^{patient_username}$', '$options': 'i'},
-            'status': {'$in': ['pending', 'confirmed']}
-        }))
+        # Try multiple query approaches to find appointments
+        query_options = [
+            {'patient': patient_username},  # Exact match
+            {'patient': {'$regex': f'^{patient_username}$', '$options': 'i'}},  # Case insensitive exact match
+        ]
         
-        with open('debug_model.txt', 'a') as f:
-            f.write(f"Found: {len(appointments)}\n")
+        appointments = []
+        for query in query_options:
+            appointments = list(db.appointments.find(query))
+            if appointments:
+                print(f"Found {len(appointments)} appointments with query: {query}")
+                break
+        
+        if not appointments:
+            # If no appointments found, let's check what appointments exist in the database
+            all_appointments = list(db.appointments.find())
+            print(f"Total appointments in DB: {len(all_appointments)}")
+            for apt in all_appointments[:5]:  # Show first 5
+                print(f"  Appointment: patient='{apt.get('patient')}', doctor='{apt.get('doctor')}'")
+        
+        # Filter for pending/confirmed status and future dates
+        from datetime import datetime
+        today = datetime.now().date()
+        filtered_appointments = []
+        for apt in appointments:
+            # Check status
+            if apt.get('status') not in ['pending', 'confirmed']:
+                continue
+            
+            # Check date (if it's in the future or today)
+            try:
+                apt_date_str = apt.get('preferred_date', '')
+                if apt_date_str:
+                    apt_date = datetime.strptime(apt_date_str, '%Y-%m-%d').date()
+                    if apt_date >= today:
+                        filtered_appointments.append(apt)
+            except ValueError:
+                # If date parsing fails, include it to be safe
+                filtered_appointments.append(apt)
+        
+        print(f"Filtered appointments (future/pending): {len(filtered_appointments)}")
         
         # Get doctor details for each appointment
         result = []
-        for apt in appointments:
+        for apt in filtered_appointments:
             doctor = db.users.find_one({'username': apt['doctor']})
             if doctor:
                 # Generate meet link if missing
@@ -253,10 +285,11 @@ def get_appointments_for_patient(patient_username):
                     meet_link = f"https://meet.jit.si/{room_id}"
                     apt['meet_link'] = meet_link
                     # Update DB to save this link
-                    db.appointments.update_one(
-                        {'_id': apt['_id']},
-                        {'$set': {'meet_link': meet_link}}
-                    )
+                    if '_id' in apt:  # Make sure we have an ID to update
+                        db.appointments.update_one(
+                            {'_id': apt['_id']},
+                            {'$set': {'meet_link': meet_link}}
+                        )
 
                 apt['doctor_details'] = {
                     'name': doctor.get('username'),
@@ -267,9 +300,12 @@ def get_appointments_for_patient(patient_username):
         
         # Sort by date
         result.sort(key=lambda x: (x.get('preferred_date', ''), x.get('preferred_time', '')))
+        print(f"Final appointments with doctor details: {len(result)}")
         return result
     except Exception as e:
         print(f"Error getting appointments for patient {patient_username}: {e}")
+        import traceback
+        traceback.print_exc()
         return []
 
 

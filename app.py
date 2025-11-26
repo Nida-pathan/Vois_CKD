@@ -1044,17 +1044,37 @@ def patient_dashboard():
             if history:
                 dashboard_data['has_history'] = True
         
+        # Get upcoming appointments for patient
+        from models.user import get_appointments_for_patient
+        upcoming_appointments = get_appointments_for_patient(current_user.username)
+        
+        # DEBUG LOGGING
+        with open('debug_log.txt', 'a') as f:
+            f.write(f"\n--- Patient Dashboard Debug ({pd.Timestamp.now()}) ---\n")
+            f.write(f"User: {current_user.username}\n")
+            f.write(f"Appointments found: {len(upcoming_appointments)}\n")
+            for apt in upcoming_appointments:
+                f.write(f"Apt: Doctor={apt.get('doctor')}, Link={apt.get('meet_link')}\n")
+        # END DEBUG LOGGING
+        
         return render_template('patient_dashboard.html', 
                              patient_data=dashboard_data,
                              patient_trials=patient_trials,
-                             available_doctors=available_doctors)
+                             available_doctors=available_doctors,
+                             upcoming_appointments=upcoming_appointments,
+                             debug_status="FIXED")
     
     except Exception as e:
         print(f"Error fetching patient data for dashboard: {e}")
+        import traceback
+        traceback.print_exc()
+        # Return a simplified dashboard in case of errors
         return render_template('patient_dashboard.html', 
                              patient_data={},
                              patient_trials=[],
-                             available_doctors=[])
+                             available_doctors=[],
+                             upcoming_appointments=[],
+                             debug_status=f"ERROR: {str(e)}")
 
 def get_patient_lab_results(patient_identifier, db):
     """Helper function to get lab results with multiple fallback methods"""
