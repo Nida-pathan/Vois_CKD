@@ -602,403 +602,203 @@
                 <div class="stat-label">CKD Stage</div>
                 <div class="stat-number">{{ patient_data.ckd_stage }}</div>
             </div>
-            .metric-status {
-            font-size: 12px;
-            padding: 2px 8px;
-            border-radius: 12px;
-            margin-left: 8px;
-            }
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-heart"></i></div>
+                <div class="stat-label">Risk Level</div>
+                <div class="stat-number">{{ patient_data.risk_level }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
+                <div class="stat-label">Next Checkup</div>
+                <div class="stat-number">{{ patient_data.next_checkup }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-file-medical"></i></div>
+                <div class="stat-label">Lab Reports</div>
+                <div class="stat-number">{{ patient_data.lab_reports_count }}</div>
+            </div>
+        </div>
 
-            .status-normal {
-            background: #dcfce7;
-            color: #16a34a;
-            }
-
-            .status-warning {
-            background: #fef3c7;
-            color: #d97706;
-            }
-
-            .status-critical {
-            background: #fee2e2;
-            color: #dc2626;
-            }
-
-            /* Lab Results */
-            .lab-result-item {
-            background: #f9fafb;
-            border-radius: var(--border-radius-sm);
-            padding: 15px;
-            margin-bottom: 15px;
-            border-left: 44px solid #0d9488;
-            }
-
-            .lab-date {
-            font-size: 12px;
-            color: var(--text-secondary);
-            margin-bottom: 8px;
-            }
-
-            .lab-title {
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 8px;
-            }
-
-            .lab-metrics {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            }
-
-            .lab-metric {
-            font-size: 12px;
-            }
-
-            .lab-metric-label {
-            color: var(--text-secondary);
-            }
-
-            .lab-metric-value {
-            font-weight: 600;
-            color: var(--text-primary);
-            }
-
-            /* Therapy Cards */
-            .therapy-card {
-            background: linear-gradient(135deg, #f0fdfa 0%, #e0f2fe 100%);
-            border-radius: var(--border-radius-sm);
-            padding: 15px;
-            margin-bottom: 15px;
-            border: 1px solid #e5e7eb;
-            }
-
-            .therapy-name {
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 8px;
-            }
-
-            .therapy-description {
-            font-size: 12px;
-            color: var(--text-secondary);
-            margin-bottom: 10px;
-            }
-
-            .therapy-duration {
-            font-size: 11px;
-            color: #0d9488;
-            font-weight: 500;
-            }
-
-            /* Diet & Lifestyle */
-            .lifestyle-item {
-            display: flex;
-            align-items: flex-start;
-            margin-bottom: 15px;
-            }
-
-            .lifestyle-icon {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            background: var(--primary-gradient);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            margin-right: 12px;
-            flex-shrink: 0;
-            }
-
-            .lifestyle-content {
-            flex: 1;
-            }
-
-            .lifestyle-title {
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 3px;
-            font-size: 14px;
-            }
-
-            .lifestyle-description {
-            font-size: 12px;
-            color: var(--text-secondary);
-            line-height: 1.4;
-            }
-
-            /* Responsive Design */
-            @media (max-width: 1200px) {
-            .dashboard-grid {
-            grid-template-columns: 1fr;
-            }
-            }
-
-            @media (max-width: 768px) {
-            .stats-grid {
-            grid-template-columns: 1fr 1fr;
-            }
-
-            .top-bar {
-            flex-direction: column;
-            gap: 15px;
-            }
-
-            .top-bar-right {
-            width: 100%;
-            justify-content: space-between;
-            }
-
-            .search-bar input {
-            width: 100%;
-            }
-            }
-
-            @media (max-width: 480px) {
-            .stats-grid {
-            grid-template-columns: 1fr;
-            }
-            }
-            </style>
-            </head>
-
-            <body>
-                <div class="dashboard-container">
-                    <!-- Top Welcome Section -->
-                    <div class="top-bar">
-                        <div class="welcome-message">
-                            <h1>Welcome back, {{ current_user.username }}!</h1>
-                            <p>Your kidney health companion dashboard</p>
+        <!-- Main Dashboard Grid -->
+        <div class="dashboard-grid">
+            <!-- Left Column -->
+            <div class="main-content">
+                <!-- Free Trial Lab Upload Section -->
+                <div class="trial-section">
+                    <div class="trial-header">
+                        <div class="trial-title">
+                            <i class="fas fa-flask"></i> Lab Report Analysis
                         </div>
-                        <div class="top-bar-right">
-                            <div class="search-bar">
-                                <i class="fas fa-search"></i>
-                                <input type="text" placeholder="Search features...">
-                            </div>
-                            <div class="user-menu">
-                                <div class="notification-bell">
-                                    <i class="fas fa-bell"></i>
-                                    <div class="notification-badge">3</div>
-                                </div>
-                                <div class="user-avatar">{{ current_user.username[0].upper() }}</div>
-                                <a href="{{ url_for('logout') }}" class="logout-btn">
-                                    <i class="fas fa-sign-out-alt"></i> Logout
-                                </a>
-                            </div>
+                    </div>
+                    <div class="upload-area" onclick="window.location.href='{{ url_for('lab_analysis') }}'"
+                        style="cursor: pointer;">
+                        <div class="upload-icon">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                        </div>
+                        <div class="upload-text">Upload your lab reports for AI analysis</div>
+                        <div class="upload-subtext">Supports PDF format • Select Disease Type</div>
+                    </div>
+                </div>
+
+                <!-- Patient Information -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-user"></i> Patient Information
+                        </div>
+                        <a href="#" class="card-action">Edit</a>
+                    </div>
+                    <div class="metric-item">
+                        <span class="metric-label">Full Name</span>
+                        <span class="metric-value">{{ current_user.username }}</span>
+                    </div>
+                    <div class="metric-item">
+                        <span class="metric-label">Age</span>
+                        <span class="metric-value">{{ patient_data.age }}</span>
+                    </div>
+                    <div class="metric-item">
+                        <span class="metric-label">Blood Type</span>
+                        <span class="metric-value">{{ patient_data.blood_type }}</span>
+                    </div>
+                    <div class="metric-item">
+                        <span class="metric-label">Patient ID</span>
+                        <span class="metric-value">{{ patient_data.patient_id }}</span>
+                    </div>
+                </div>
+
+                <!-- Therapy Recommendations -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-prescription-bottle"></i> Therapy Recommendations
+                        </div>
+                        <a href="{{ url_for('therapy_plan') }}" class="card-action">View Plan</a>
+                    </div>
+                </div>
+
+                <!-- Report History -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-history"></i> Report History
                         </div>
                     </div>
 
-                    <!-- Stats Overview -->
-                    <div class="stats-grid">
-                        <div class="stat-card {{ patient_data.stage_class }}">
-                            <div class="stat-icon"><i class="fas fa-kidney"></i></div>
-                            <div class="stat-label">CKD Stage</div>
-                            <div class="stat-number">{{ patient_data.ckd_stage }}</div>
+                    {% if patient_data.history %}
+                    {% for report in patient_data.history | reverse %}
+                    <div class="metric-item">
+                        <div style="flex: 1;">
+                            <div style="font-weight: 600; color: var(--text-primary);">{{ report.date }}</div>
+                            <div style="font-size: 12px; color: var(--text-secondary);">
+                                {% if report.metrics.egfr %}eGFR: {{ report.metrics.egfr }}{% endif %}
+                                {% if report.metrics.serum_creatinine %} | Creatinine: {{
+                                report.metrics.serum_creatinine }}{% endif %}
+                            </div>
                         </div>
-                        <div class="stat-card">
-                            <div class="stat-icon"><i class="fas fa-heart"></i></div>
-                            <div class="stat-label">Risk Level</div>
-                            <div class="stat-number">{{ patient_data.risk_level }}</div>
+                        {% if report.pdf_path %}
+                        <a href="{{ url_for('static', filename=report.pdf_path) }}" target="_blank" class="card-action"
+                            style="font-size: 14px;">
+                            <i class="fas fa-file-pdf"></i> View
+                        </a>
+                        {% else %}
+                        <span style="font-size: 12px; color: var(--text-secondary);">No PDF</span>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div style="text-align: center; padding: 20px; color: var(--text-secondary);">
+                        No history available
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="sidebar">
+                <!-- Risk Level Indicator -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-exclamation-triangle"></i> Risk Assessment
                         </div>
-                        <div class="stat-card">
-                            <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
-                            <div class="stat-label">Next Checkup</div>
-                            <div class="stat-number">{{ patient_data.next_checkup }}</div>
+                    </div>
+                    <div class="risk-indicator {{ patient_data.risk_class }}">
+                        <div class="risk-level">{{ patient_data.risk_level }}</div>
+                        <div class="risk-description">Based on your latest lab results and medical history</div>
+                    </div>
+                </div>
+
+                <!-- AI Lifestyle Recommendations -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-robot"></i> AI Lifestyle Recommendations
                         </div>
-                        <div class="stat-card">
-                            <div class="stat-icon"><i class="fas fa-file-medical"></i></div>
-                            <div class="stat-label">Lab Reports</div>
-                            <div class="stat-number">{{ patient_data.lab_reports_count }}</div>
+                        <a href="{{ url_for('ai_lifestyle_plan') }}" class="card-action">View Plan</a>
+                    </div>
+
+                    <div class="lifestyle-item">
+                        <div class="lifestyle-icon">
+                            <i class="fas fa-tint"></i>
+                        </div>
+                        <div class="lifestyle-content">
+                            <div class="lifestyle-title">Hydration</div>
+                            <div class="lifestyle-description">Drink 8-10 glasses of water daily. Limit fluid intake if
+                                advised by doctor.</div>
                         </div>
                     </div>
 
-                    <!-- Main Dashboard Grid -->
-                    <div class="dashboard-grid">
-                        <!-- Left Column -->
-                        <div class="main-content">
-                            <!-- Free Trial Lab Upload Section -->
-                            <div class="trial-section">
-                                <div class="trial-header">
-                                    <div class="trial-title">
-                                        <i class="fas fa-flask"></i> Lab Report Analysis
-                                    </div>
-                                </div>
-                                <div class="upload-area" onclick="window.location.href='{{ url_for('lab_analysis') }}'"
-                                    style="cursor: pointer;">
-                                    <div class="upload-icon">
-                                        <i class="fas fa-cloud-upload-alt"></i>
-                                    </div>
-                                    <div class="upload-text">Upload your lab reports for AI analysis</div>
-                                    <div class="upload-subtext">Supports PDF format • Select Disease Type</div>
-                                </div>
-                            </div>
-
-                            <!-- Patient Information -->
-                            <div class="card">
-                                <div class="card-header">
-                                    <div class="card-title">
-                                        <i class="fas fa-user"></i> Patient Information
-                                    </div>
-                                    <a href="#" class="card-action">Edit</a>
-                                </div>
-                                <div class="metric-item">
-                                    <span class="metric-label">Full Name</span>
-                                    <span class="metric-value">{{ current_user.username }}</span>
-                                </div>
-                                <div class="metric-item">
-                                    <span class="metric-label">Age</span>
-                                    <span class="metric-value">{{ patient_data.age }}</span>
-                                </div>
-                                <div class="metric-item">
-                                    <span class="metric-label">Blood Type</span>
-                                    <span class="metric-value">{{ patient_data.blood_type }}</span>
-                                </div>
-                                <div class="metric-item">
-                                    <span class="metric-label">Patient ID</span>
-                                    <span class="metric-value">{{ patient_data.patient_id }}</span>
-                                </div>
-                            </div>
-
-                            <!-- Therapy Recommendations -->
-                            <div class="card">
-                                <div class="card-header">
-                                    <div class="card-title">
-                                        <i class="fas fa-prescription-bottle"></i> Therapy Recommendations
-                                    </div>
-                                    <a href="{{ url_for('therapy_plan') }}" class="card-action">View Plan</a>
-                                </div>
-                            </div>
-
-                            <!-- Report History -->
-                            <div class="card">
-                                <div class="card-header">
-                                    <div class="card-title">
-                                        <i class="fas fa-history"></i> Report History
-                                    </div>
-                                </div>
-
-                                {% if patient_data.history %}
-                                {% for report in patient_data.history | reverse %}
-                                <div class="metric-item">
-                                    <div style="flex: 1;">
-                                        <div style="font-weight: 600; color: var(--text-primary);">{{ report.date }}
-                                        </div>
-                                        <div style="font-size: 12px; color: var(--text-secondary);">
-                                            {% if report.metrics.egfr %}eGFR: {{ report.metrics.egfr }}{% endif %}
-                                            {% if report.metrics.serum_creatinine %} | Creatinine: {{
-                                            report.metrics.serum_creatinine }}{% endif %}
-                                        </div>
-                                    </div>
-                                    {% if report.pdf_path %}
-                                    <a href="{{ url_for('static', filename=report.pdf_path) }}" target="_blank"
-                                        class="card-action" style="font-size: 14px;">
-                                        <i class="fas fa-file-pdf"></i> View
-                                    </a>
-                                    {% else %}
-                                    <span style="font-size: 12px; color: var(--text-secondary);">No PDF</span>
-                                    {% endif %}
-                                </div>
-                                {% endfor %}
-                                {% else %}
-                                <div style="text-align: center; padding: 20px; color: var(--text-secondary);">
-                                    No history available
-                                </div>
-                                {% endif %}
-                            </div>
+                    <div class="lifestyle-item">
+                        <div class="lifestyle-icon">
+                            <i class="fas fa-carrot"></i>
                         </div>
+                        <div class="lifestyle-content">
+                            <div class="lifestyle-title">Low Sodium Diet</div>
+                            <div class="lifestyle-description">Limit sodium intake to less than 2,300mg per day. Avoid
+                                processed foods.</div>
+                        </div>
+                    </div>
 
-                        <!-- Right Column -->
-                        <div class="sidebar">
-                            <!-- Risk Level Indicator -->
-                            <div class="card">
-                                <div class="card-header">
-                                    <div class="card-title">
-                                        <i class="fas fa-exclamation-triangle"></i> Risk Assessment
-                                    </div>
-                                </div>
-                                <div class="risk-indicator {{ patient_data.risk_class }}">
-                                    <div class="risk-level">{{ patient_data.risk_level }}</div>
-                                    <div class="risk-description">Based on your latest lab results and medical history
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- AI Lifestyle Recommendations -->
-                            <div class="card">
-                                <div class="card-header">
-                                    <div class="card-title">
-                                        <i class="fas fa-robot"></i> AI Lifestyle Recommendations
-                                    </div>
-                                    <a href="{{ url_for('ai_lifestyle_plan') }}" class="card-action">View Plan</a>
-                                </div>
-
-                                <div class="lifestyle-item">
-                                    <div class="lifestyle-icon">
-                                        <i class="fas fa-tint"></i>
-                                    </div>
-                                    <div class="lifestyle-content">
-                                        <div class="lifestyle-title">Hydration</div>
-                                        <div class="lifestyle-description">Drink 8-10 glasses of water daily. Limit
-                                            fluid intake if
-                                            advised by doctor.</div>
-                                    </div>
-                                </div>
-
-                                <div class="lifestyle-item">
-                                    <div class="lifestyle-icon">
-                                        <i class="fas fa-carrot"></i>
-                                    </div>
-                                    <div class="lifestyle-content">
-                                        <div class="lifestyle-title">Low Sodium Diet</div>
-                                        <div class="lifestyle-description">Limit sodium intake to less than 2,300mg per
-                                            day. Avoid
-                                            processed foods.</div>
-                                    </div>
-                                </div>
-
-                                <div class="lifestyle-item">
-                                    <div class="lifestyle-icon">
-                                        <i class="fas fa-dumbbell"></i>
-                                    </div>
-                                    <div class="lifestyle-content">
-                                        <div class="lifestyle-title">Regular Exercise</div>
-                                        <div class="lifestyle-description">30 minutes of moderate exercise, 5 days a
-                                            week. Walking,
-                                            swimming recommended.</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Available Doctors -->
-                            <div class="card">
-                                <div class="card-header">
-                                    <div class="card-title">
-                                        <i class="fas fa-user-md"></i> Available Doctors
-                                    </div>
-                                    <a href="{{ url_for('appointments') }}" class="card-action">Book</a>
-                                </div>
-
-                                {% for doctor in available_doctors %}
-                                <div class="doctor-item">
-                                    <div class="doctor-avatar">{{ doctor.avatar }}</div>
-                                    <div class="doctor-info">
-                                        <div class="doctor-name">{{ doctor.name }}</div>
-                                        <div class="doctor-specialty">{{ doctor.specialty }}</div>
-                                        <div class="doctor-experience">{{ doctor.experience }}</div>
-                                    </div>
-                                    <button class="book-btn"
-                                        onclick="bookAppointment('{{ doctor.username }}')">Book</button>
-                                </div>
-                                {% endfor %}
-                            </div>
+                    <div class="lifestyle-item">
+                        <div class="lifestyle-icon">
+                            <i class="fas fa-dumbbell"></i>
+                        </div>
+                        <div class="lifestyle-content">
+                            <div class="lifestyle-title">Regular Exercise</div>
+                            <div class="lifestyle-description">30 minutes of moderate exercise, 5 days a week. Walking,
+                                swimming recommended.</div>
                         </div>
                     </div>
                 </div>
 
-                <script>
-                    function bookAppointment(doctorUsername) {
-                        const modalHtml = `
+                <!-- Available Doctors -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-user-md"></i> Available Doctors
+                        </div>
+                        <a href="{{ url_for('appointments') }}" class="card-action">Book</a>
+                    </div>
+
+                    {% for doctor in available_doctors %}
+                    <div class="doctor-item">
+                        <div class="doctor-avatar">{{ doctor.avatar }}</div>
+                        <div class="doctor-info">
+                            <div class="doctor-name">{{ doctor.name }}</div>
+                            <div class="doctor-specialty">{{ doctor.specialty }}</div>
+                            <div class="doctor-experience">{{ doctor.experience }}</div>
+                        </div>
+                        <button class="book-btn" onclick="bookAppointment('{{ doctor.username }}')">Book</button>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function bookAppointment(doctorUsername) {
+            const modalHtml = `
             <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 1000;">
                 <div style="background: white; padding: 30px; border-radius: 12px; width: 90%; max-width: 500px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
                     <h3 style="margin-top: 0; color: #333;">Book Appointment with Dr. ${doctorUsername}</h3>
@@ -1023,68 +823,68 @@
             </div>
             `;
 
-                        // Add modal to body
-                        const modalDiv = document.createElement('div');
-                        modalDiv.innerHTML = modalHtml;
-                        document.body.appendChild(modalDiv);
+            // Add modal to body
+            const modalDiv = document.createElement('div');
+            modalDiv.innerHTML = modalHtml;
+            document.body.appendChild(modalDiv);
+        }
+
+        function submitAppointment(doctorUsername) {
+            const dateInput = document.getElementById('appointmentDate');
+            const timeInput = document.getElementById('appointmentTime');
+
+            const preferredDate = dateInput.value;
+            const preferredTime = timeInput.value;
+
+            if (!preferredDate || !preferredTime) {
+                alert('Please select both date and time for your appointment.');
+                return;
+            }
+
+            // Send booking request
+            fetch('/patient/book-appointment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    doctor_name: doctorUsername,
+                    preferred_date: preferredDate,
+                    preferred_time: preferredTime
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        alert(data.message);
+                        closeModal();
+                    } else {
+                        alert('Error: ' + (data.error || 'Failed to book appointment'));
                     }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while booking the appointment.');
+                });
+        }
 
-                    function submitAppointment(doctorUsername) {
-                        const dateInput = document.getElementById('appointmentDate');
-                        const timeInput = document.getElementById('appointmentTime');
+        function closeModal() {
+            const modal = document.querySelector('div[style*="position: fixed"]');
+            if (modal) {
+                modal.remove();
+            }
+        }
 
-                        const preferredDate = dateInput.value;
-                        const preferredTime = timeInput.value;
-
-                        if (!preferredDate || !preferredTime) {
-                            alert('Please select both date and time for your appointment.');
-                            return;
-                        }
-
-                        // Send booking request
-                        fetch('/patient/book-appointment', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                doctor_name: doctorUsername,
-                                preferred_date: preferredDate,
-                                preferred_time: preferredTime
-                            })
-                        })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.status === 'success') {
-                                    alert(data.message);
-                                    closeModal();
-                                } else {
-                                    alert('Error: ' + (data.error || 'Failed to book appointment'));
-                                }
-                            })
-                            .catch(error => {
-                                console.error('Error:', error);
-                                alert('An error occurred while booking the appointment.');
-                            });
-                    }
-
-                    function closeModal() {
-                        const modal = document.querySelector('div[style*="position: fixed"]');
-                        if (modal) {
-                            modal.remove();
-                        }
-                    }
-
-                    // Search functionality
-                    const searchInput = document.querySelector('.search-bar input');
-                    if (searchInput) {
-                        searchInput.addEventListener('input', function (e) {
-                            const searchTerm = e.target.value.toLowerCase();
-                            // Here you would implement search functionality
-                            console.log('Searching for:', searchTerm);
-                        });
-                    }
-                </script>
-            </body>
+        // Search functionality
+        const searchInput = document.querySelector('.search-bar input');
+        if (searchInput) {
+            searchInput.addEventListener('input', function (e) {
+                const searchTerm = e.target.value.toLowerCase();
+                // Here you would implement search functionality
+                console.log('Searching for:', searchTerm);
+            });
+        }
+    </script>
+</body>
 
 </html>
