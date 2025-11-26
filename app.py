@@ -317,21 +317,12 @@ def doctor_dashboard():
     all_patients_data = get_all_patients_data()
     appointments = get_appointments_for_doctor(current_user.username)
     
-    with open('debug_log.txt', 'a') as f:
-        f.write(f"DEBUG: Doctor: {current_user.username}\n")
-        f.write(f"DEBUG: Appointments found: {len(appointments)}\n")
-        if appointments:
-            f.write(f"DEBUG: First appointment: {appointments[0]}\n")
-    
     # Filter patients: Only show those who have an appointment with this doctor
     patient_usernames_with_appointments = set(apt['patient'] for apt in appointments)
     
     # Also include patients manually assigned to this doctor (if any)
     if hasattr(current_user, 'patients') and current_user.patients:
         patient_usernames_with_appointments.update(current_user.patients)
-    
-    with open('debug_log.txt', 'a') as f:
-        f.write(f"DEBUG: Patients with appointments: {patient_usernames_with_appointments}\n")
         
     try:
         # Create a lookup for patient data
@@ -1589,11 +1580,25 @@ def get_patient_dashboard_data(patient_id):
         
         dashboard_data['lifestyle_recommendations'] = lifestyle_recommendations
         
+        # Get upcoming appointments for patient
+        from models.user import get_appointments_for_patient
+        upcoming_appointments = get_appointments_for_patient(current_user.username)
+        
+        # DEBUG LOGGING
+        with open('debug_log.txt', 'a') as f:
+            f.write(f"\n--- Patient Dashboard Debug ({pd.Timestamp.now()}) ---\n")
+            f.write(f"User: {current_user.username}\n")
+            f.write(f"Appointments found: {len(upcoming_appointments)}\n")
+            for apt in upcoming_appointments:
+                f.write(f"Apt: Doctor={apt.get('doctor')}, Link={apt.get('meet_link')}\n")
+        # END DEBUG LOGGING
+        
         return render_template('patient_dashboard.html', 
-                             patient=patient_data, 
+                             patient_data=patient_data, 
                              trials=patient_trials,
-                             doctors=available_doctors,
-                             dashboard=dashboard_data)
+                             available_doctors=available_doctors,
+                             dashboard=dashboard_data,
+                             upcoming_appointments=upcoming_appointments)
     
     except Exception as e:
         print(f"Error in patient_dashboard: {e}")
@@ -1675,12 +1680,18 @@ def book_appointment():
         if not doctor_name:
             return jsonify({'error': 'Doctor name is required'}), 400
         
-        # Create appointment record (simplified)
+        # Generate unique Jitsi Meet room link
+        import uuid
+        room_id = f"ckd-appointment-{uuid.uuid4()}"
+        meet_link = f"https://meet.jit.si/{room_id}"
+        
+        # Create appointment record
         appointment = {
             'patient': current_user.username,
             'doctor': doctor_name,
             'preferred_date': preferred_date,
             'preferred_time': preferred_time,
+            'meet_link': meet_link,
             'status': 'pending',
             'created_at': pd.Timestamp.now().isoformat()
         }
@@ -1697,8 +1708,9 @@ def book_appointment():
         
         return jsonify({
             'status': 'success', 
-            'message': f'Appointment request sent to {doctor_name}. You will be notified shortly.',
-            'appointment': appointment
+            'message': f'Appointment booked with {doctor_name}. Join the video call at the scheduled time.',
+            'appointment': appointment,
+            'meet_link': meet_link
         })
     except Exception as e:
         with open('debug_log.txt', 'a') as f:

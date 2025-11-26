@@ -196,11 +196,72 @@ def create_appointment(appointment_data):
 
 def get_appointments_for_doctor(doctor_name):
     db = Database.get_db()
-    return list(db.appointments.find({'doctor': doctor_name}))
+    if db is None:
+        return []
+        
+    appointments = list(db.appointments.find({'doctor': doctor_name}))
+    
+    # Generate meet link if missing for any appointment
+    for apt in appointments:
+        if not apt.get('meet_link'):
+            import uuid
+            room_id = f"ckd-appointment-{uuid.uuid4()}"
+            meet_link = f"https://meet.jit.si/{room_id}"
+            apt['meet_link'] = meet_link
+            # Update DB
+            db.appointments.update_one(
+                {'_id': apt['_id']},
+                {'$set': {'meet_link': meet_link}}
+            )
+            
+    # Sort by date and time
+    appointments.sort(key=lambda x: (x.get('preferred_date', ''), x.get('preferred_time', '')))
+    
+    return appointments
 
 def get_appointments_for_patient(patient_username):
-    db = Database.get_db()
-    return list(db.appointments.find({'patient': patient_username}))
+    """Get upcoming appointments for a patient with doctor details"""
+    try:
+        db = Database.get_db()
+        if db is None:
+            return []
+        
+        appointments = list(db.appointments.find({
+            'patient': {'$regex': f'^{patient_username}$', '$options': 'i'},
+            'status': {'$in': ['pending', 'confirmed']}
+        }))
+        
+        # Get doctor details for each appointment
+        result = []
+        for apt in appointments:
+            doctor = db.users.find_one({'username': apt['doctor']})
+            if doctor:
+                # Generate meet link if missing
+                if not apt.get('meet_link'):
+                    import uuid
+                    room_id = f"ckd-appointment-{uuid.uuid4()}"
+                    meet_link = f"https://meet.jit.si/{room_id}"
+                    apt['meet_link'] = meet_link
+                    # Update DB to save this link
+                    db.appointments.update_one(
+                        {'_id': apt['_id']},
+                        {'$set': {'meet_link': meet_link}}
+                    )
+
+                apt['doctor_details'] = {
+                    'name': doctor.get('username'),
+                    'specialty': doctor.get('specialization', 'Nephrology'),
+                    'avatar': doctor.get('username', 'DR')[0:2].upper()
+                }
+                result.append(apt)
+        
+        # Sort by date
+        result.sort(key=lambda x: (x.get('preferred_date', ''), x.get('preferred_time', '')))
+        return result
+    except Exception as e:
+        print(f"Error getting appointments for patient {patient_username}: {e}")
+        return []
+
 
 def save_feedback(feedback_data):
     db = Database.get_db()

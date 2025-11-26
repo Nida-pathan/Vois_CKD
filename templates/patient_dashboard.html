@@ -566,6 +566,76 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* Upcoming Appointments */
+        .upcoming-appointment-item {
+            background: linear-gradient(135deg, #f0fdfa 0%, #e0f2fe 100%);
+            border-radius: var(--border-radius-sm);
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid #0d9488;
+        }
+
+        .upcoming-appointment-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .appointment-doctor {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .appointment-info {
+            flex: 1;
+        }
+
+        .appointment-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .appointment-datetime {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .join-meeting-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: var(--border-radius-sm);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+        }
+
+        .join-meeting-btn:hover {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .appointment-details {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .join-meeting-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
     </style>
 </head>
 
@@ -816,6 +886,46 @@
                     </div>
                     {% endfor %}
                 </div>
+
+                <!-- Upcoming Checkup -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-video"></i> Upcoming Checkup (DEBUG: {{ upcoming_appointments|length }})
+                        </div>
+                    </div>
+
+                    {% if upcoming_appointments and upcoming_appointments|length > 0 %}
+                    {% for appointment in upcoming_appointments %}
+                    <div class="upcoming-appointment-item">
+                        <div class="appointment-doctor">
+                            <div class="doctor-avatar">{{ appointment.doctor_details.avatar }}</div>
+                            <div class="appointment-info">
+                                <div class="doctor-name">Dr. {{ appointment.doctor_details.name }}</div>
+                                <div class="doctor-specialty">{{ appointment.doctor_details.specialty }}</div>
+                            </div>
+                        </div>
+                        <div class="appointment-details">
+                            <div class="appointment-datetime">
+                                <i class="fas fa-calendar"></i> {{ appointment.preferred_date }}
+                                <i class="fas fa-clock" style="margin-left: 15px;"></i> {{ appointment.preferred_time }}
+                            </div>
+                            <a href="{{ appointment.meet_link }}" target="_blank" class="join-meeting-btn">
+                                <i class="fas fa-video"></i> Join Video Call
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div style="text-align: center; padding: 30px; color: var(--text-secondary);">
+                        <i class="fas fa-calendar-xmark"
+                            style="font-size: 48px; margin-bottom: 15px; opacity: 0.3;"></i>
+                        <div>No upcoming checkups scheduled</div>
+                        <div style="font-size: 12px; margin-top: 5px;">Book an appointment with a doctor to get started
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>
@@ -880,8 +990,11 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'success') {
-                        alert(data.message);
+                        const link = data.meet_link || 'Link not available';
+                        alert(data.message + '\n\nVideo Call Link:\n' + link);
+                        if (link && navigator.clipboard) navigator.clipboard.writeText(link);
                         closeModal();
+                        window.location.reload();
                     } else {
                         alert('Error: ' + (data.error || 'Failed to book appointment'));
                     }
