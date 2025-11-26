@@ -1,0 +1,4 @@
+DEBUG: Doctor: doc1
+DEBUG: Appointments found: 2
+DEBUG: First appointment: {'_id': ObjectId('692457e9d10860eeee400f0a'), 'patient': 'Aditya21', 'doctor': 'doc1', 'preferred_date': '2025-11-26', 'preferred_time': '21:34', 'status': 'pending', 'created_at': '2025-11-24T18:34:41.008524'}
+DEBUG: Patients with appointments: {'Aditya21', 'JOHN'}
