@@ -568,3 +568,14 @@ DEBUG: Doctor: doc1
 DEBUG: Appointments found: 1
 DEBUG: First appointment: {'_id': ObjectId('692457e9d10860eeee400f0a'), 'patient': 'Aditya21', 'doctor': 'doc1', 'preferred_date': '2025-11-26', 'preferred_time': '21:34', 'status': 'pending', 'created_at': '2025-11-24T18:34:41.008524'}
 DEBUG: Patients with appointments: {'Aditya21'}
+Booking request received: {'doctor_name': 'doc1', 'preferred_date': '2025-11-28', 'preferred_time': '23:01'}
+Doctor name: doc1
+Appointment created successfully: {'patient': 'JOHN', 'doctor': 'doc1', 'preferred_date': '2025-11-28', 'preferred_time': '23:01', 'status': 'pending', 'created_at': '2025-11-25T22:01:05.482161', '_id': '6925d9c977e9405628803598'}
+DEBUG: Doctor: doc1
+DEBUG: Appointments found: 2
+DEBUG: First appointment: {'_id': ObjectId('692457e9d10860eeee400f0a'), 'patient': 'Aditya21', 'doctor': 'doc1', 'preferred_date': '2025-11-26', 'preferred_time': '21:34', 'status': 'pending', 'created_at': '2025-11-24T18:34:41.008524'}
+DEBUG: Patients with appointments: {'JOHN', 'Aditya21'}
+DEBUG: Doctor: doc1
+DEBUG: Appointments found: 2
+DEBUG: First appointment: {'_id': ObjectId('692457e9d10860eeee400f0a'), 'patient': 'Aditya21', 'doctor': 'doc1', 'preferred_date': '2025-11-26', 'preferred_time': '21:34', 'status': 'pending', 'created_at': '2025-11-24T18:34:41.008524'}
+DEBUG: Patients with appointments: {'JOHN', 'Aditya21'}
