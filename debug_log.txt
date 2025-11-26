@@ -25,3 +25,6 @@ Appointment created successfully: {'patient': 'JOHN', 'doctor': 'doc1', 'preferr
 Booking request received: {'doctor_name': 'doc1', 'preferred_date': '2025-11-26', 'preferred_time': '09:29'}
 Doctor name: doc1
 Appointment created successfully: {'patient': 'JOHN', 'doctor': 'doc1', 'preferred_date': '2025-11-26', 'preferred_time': '09:29', 'meet_link': 'https://meet.jit.si/ckd-appointment-8f6ecd27-a3d8-4c98-9b2b-58f7b02c5b96', 'status': 'pending', 'created_at': '2025-11-26T09:27:47.227579', '_id': '69267abbb571a7ec1a5db95f'}
+Booking request received: {'doctor_name': 'doc1', 'preferred_date': '2025-11-26', 'preferred_time': '10:20'}
+Doctor name: doc1
+Appointment created successfully: {'patient': 'JOHN', 'doctor': 'doc1', 'preferred_date': '2025-11-26', 'preferred_time': '10:20', 'meet_link': 'https://meet.jit.si/ckd-appointment-14bc1062-0b59-4c47-bae3-833ffa468c74', 'status': 'pending', 'created_at': '2025-11-26T10:18:24.421299', '_id': '69268698668c26bdcc3253a7'}

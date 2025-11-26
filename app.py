@@ -1598,15 +1598,19 @@ def get_patient_dashboard_data(patient_id):
                              trials=patient_trials,
                              available_doctors=available_doctors,
                              dashboard=dashboard_data,
-                             upcoming_appointments=upcoming_appointments)
+                             upcoming_appointments=upcoming_appointments,
+                             debug_status="SERVER_RELOADED")
+
     
     except Exception as e:
         print(f"Error in patient_dashboard: {e}")
+        import traceback
+        traceback.print_exc()
         # Return a simplified dashboard in case of errors
         return render_template('patient_dashboard.html', 
-                             patient=None, 
+                             patient_data=None, 
                              trials={'remaining': 2, 'used': 0},
-                             doctors=[],
+                             available_doctors=[],
                              dashboard={
                                  'patient_id': 'N/A',
                                  'age': 'N/A',
@@ -1635,29 +1639,10 @@ def get_patient_dashboard_data(patient_id):
                                  },
                                  'has_history': False,
                                  'history': [],
-                                 'lifestyle_recommendations': [
-                                     {
-                                         'icon': 'fa-tint',
-                                         'title': 'Hydration',
-                                         'description': 'Drink 8-10 glasses of water daily. Limit fluid intake if advised by doctor.'
-                                     },
-                                     {
-                                         'icon': 'fa-carrot',
-                                         'title': 'Low Sodium Diet',
-                                         'description': 'Limit sodium intake to less than 2,300mg per day. Avoid processed foods.'
-                                     },
-                                     {
-                                         'icon': 'fa-dumbbell',
-                                         'title': 'Regular Exercise',
-                                         'description': '30 minutes of moderate exercise, 5 days a week. Walking, swimming recommended.'
-                                     },
-                                     {
-                                         'icon': 'fa-bed',
-                                         'title': 'Sleep Schedule',
-                                         'description': 'Maintain 7-8 hours of quality sleep. Fixed bedtime routine recommended.'
-                                     }
-                                 ]
-                             })
+                                 'lifestyle_recommendations': []
+                             },
+                             upcoming_appointments=[],
+                             debug_status=f"ERROR: {str(e)}")
 
 
 

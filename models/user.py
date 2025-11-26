@@ -224,12 +224,22 @@ def get_appointments_for_patient(patient_username):
     try:
         db = Database.get_db()
         if db is None:
+            with open('debug_model.txt', 'a') as f: f.write("DB is None\n")
             return []
+        
+        # DEBUG LOGGING
+        with open('debug_model.txt', 'a') as f:
+            f.write(f"\n--- get_appointments_for_patient ---\n")
+            f.write(f"DB Name: {db.name}\n")
+            f.write(f"Querying for: '{patient_username}'\n")
         
         appointments = list(db.appointments.find({
             'patient': {'$regex': f'^{patient_username}$', '$options': 'i'},
             'status': {'$in': ['pending', 'confirmed']}
         }))
+        
+        with open('debug_model.txt', 'a') as f:
+            f.write(f"Found: {len(appointments)}\n")
         
         # Get doctor details for each appointment
         result = []
