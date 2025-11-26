@@ -188,12 +188,6 @@
         font-size: 16px;
         cursor: pointer;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        transition: var(--transition-all);
-    }
-
-    .user-avatar:hover {
-        transform: scale(1.05);
-        box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
     }
 
     .logout-btn {
@@ -840,15 +834,7 @@
             <p>Patient Monitoring & Analytics Dashboard</p>
         </div>
         <div class="top-bar-right">
-            <div class="search-bar">
-                <i class="fas fa-search"></i>
-                <input type="text" placeholder="Search dashboard...">
-            </div>
             <div class="user-menu">
-                <div class="notification-bell">
-                    <i class="fas fa-bell"></i>
-                    <div class="notification-badge">5</div>
-                </div>
                 <div class="user-avatar">DR</div>
                 <a href="{{ url_for('logout') }}" class="logout-btn">
                     <i class="fas fa-sign-out-alt"></i> Logout
@@ -896,7 +882,8 @@
                 </button>
             </div>
             <div class="chart-container">
-                <canvas id="riskDistributionChart"></canvas>
+                <canvas id="riskDistributionChart" 
+                        data-risk-counts="{{ [patients|selectattr('risk_level', 'equalto', 'Low')|list|length, patients|selectattr('risk_level', 'equalto', 'Moderate')|list|length, patients|selectattr('risk_level', 'equalto', 'High')|list|length, patients|selectattr('risk_level', 'equalto', 'Critical')|list|length]|tojson }}"></canvas>
             </div>
         </div>
         <div class="card">
@@ -909,7 +896,8 @@
                 </button>
             </div>
             <div class="chart-container">
-                <canvas id="stageDistributionChart"></canvas>
+                <canvas id="stageDistributionChart" 
+                        data-stage-counts="{{ [patients|selectattr('stage', 'equalto', 1)|list|length, patients|selectattr('stage', 'equalto', 2)|list|length, patients|selectattr('stage', 'equalto', 3)|list|length, patients|selectattr('stage', 'equalto', 4)|list|length, patients|selectattr('stage', 'equalto', 5)|list|length]|tojson }}"></canvas>
             </div>
         </div>
     </div>
@@ -1229,10 +1217,17 @@
 
 // Render health trend charts
 function renderHealthTrendCharts(data) {
-    // Clear existing charts
-    if (window.egfrTrendChart) window.egfrTrendChart.destroy();
-    if (window.bpTrendChart) window.bpTrendChart.destroy();
-    if (window.creatinineTrendChart) window.creatinineTrendChart.destroy();
+    // Clear existing charts with proper validation
+    if (window.egfrTrendChart && typeof window.egfrTrendChart.destroy === 'function') {
+        window.egfrTrendChart.destroy();
+    }
+    if (window.bpTrendChart && typeof window.bpTrendChart.destroy === 'function') {
+        window.bpTrendChart.destroy();
+    }
+    if (window.creatinineTrendChart && typeof window.creatinineTrendChart.destroy === 'function') {
+        window.creatinineTrendChart.destroy();
+    }
+    
     // Render eGFR trend chart
     if (data.egfr_history && data.egfr_history.length > 0) {
         const egfrCtx = document.getElementById('egfrTrendChart').getContext('2d');
@@ -1277,6 +1272,7 @@ function renderHealthTrendCharts(data) {
             }
         });
     }
+    
     // Render Blood Pressure trend chart
     if (data.bp_history && data.bp_history.length > 0) {
         const bpCtx = document.getElementById('bpTrendChart').getContext('2d');
@@ -1332,6 +1328,7 @@ function renderHealthTrendCharts(data) {
             }
         });
     }
+    
     // Render Serum Creatinine trend chart
     if (data.creatinine_history && data.creatinine_history.length > 0) {
         const creatinineCtx = document.getElementById('creatinineTrendChart').getContext('2d');
@@ -1423,213 +1420,11 @@ function renderHealthTrendCharts(data) {
     function refreshPatientList() {
         location.reload();
     }
-
-    borderWidth: 2,
-        fill: true,
-            tension: 0.4
-                        }]
-                    },
-    options: {
-        responsive: true,
-            maintainAspectRatio: false,
-                plugins: {
-            title: {
-                display: true,
-                    text: 'eGFR Trend Over Time'
-            }
-        },
-        scales: {
-            y: {
-                beginAtZero: false,
-                    title: {
-                    display: true,
-                        text: 'eGFR (mL/min)'
-                }
-            },
-            x: {
-                title: {
-                    display: true,
-                        text: 'Date'
-                }
-            }
-        }
-    }
-                });
-            }
-
-    // Render Blood Pressure trend chart
-    if (data.bp_history && data.bp_history.length > 0) {
-        const bpCtx = document.getElementById('bpTrendChart').getContext('2d');
-        window.bpTrendChart = new Chart(bpCtx, {
-            type: 'line',
-            data: {
-                labels: data.bp_history.map(item => item.date),
-                datasets: [
-                    {
-                        label: 'Systolic BP',
-                        data: data.bp_history.map(item => item.systolic),
-                        borderColor: '#ef4444',
-                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                        borderWidth: 2,
-                        fill: false,
-                        tension: 0.4
-                    },
-                    {
-                        label: 'Diastolic BP',
-                        data: data.bp_history.map(item => item.diastolic),
-                        borderColor: '#3b82f6',
-                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                        borderWidth: 2,
-                        fill: false,
-                        tension: 0.4
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    title: {
-                        display: true,
-                        text: 'Blood Pressure Trend Over Time'
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: false,
-                        title: {
-                            display: true,
-                            text: 'Blood Pressure (mmHg)'
-                        }
-                    },
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Date'
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    // Render Serum Creatinine trend chart
-    if (data.creatinine_history && data.creatinine_history.length > 0) {
-        const creatinineCtx = document.getElementById('creatinineTrendChart').getContext('2d');
-        window.creatinineTrendChart = new Chart(creatinineCtx, {
-            type: 'line',
-            data: {
-                labels: data.creatinine_history.map(item => item.date),
-                datasets: [{
-                    label: 'Serum Creatinine (mg/dL)',
-                    data: data.creatinine_history.map(item => item.value),
-                    borderColor: '#8b5cf6',
-                    backgroundColor: 'rgba(139, 92, 246, 0.1)',
-                    borderWidth: 2,
-                    fill: true,
-                    tension: 0.4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    title: {
-                        display: true,
-                        text: 'Serum Creatinine Trend Over Time'
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: false,
-                        title: {
-                            display: true,
-                            text: 'Serum Creatinine (mg/dL)'
-                        }
-                    },
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Date'
-                        }
-                    }
-                }
-            }
-        });
-    }
-        }
-
-    // Render lab results table
-    function renderLabResultsTable(labResults) {
-        const tableContainer = document.getElementById('labResultsTable');
-
-        if (!labResults || labResults.length === 0) {
-            tableContainer.innerHTML = '<p>No lab results available</p>';
-            return;
-        }
-
-        let tableHTML = `
-            <table class="lab-results-table">
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Test Type</th>
-                        <th>Results</th>
-                        <th>Notes</th>
-                    </tr>
-                </thead>
-                <tbody>
-        `;
-
-        labResults.forEach(result => {
-            tableHTML += `
-                <tr>
-                    <td>${result.test_date || 'N/A'}</td>
-                    <td>${result.test_type || 'N/A'}</td>
-                    <td>${result.results || 'N/A'}</td>
-                    <td>${result.notes || 'N/A'}</td>
-                </tr>
-            `;
-        });
-
-        tableHTML += `
-                </tbody>
-            </table>
-        `;
-
-        tableContainer.innerHTML = tableHTML;
-    }
-
-    // Refresh patient list
-    function refreshPatientList() {
-        location.reload();
-    }
-
-    // Initialize sortable columns
-    document.addEventListener('DOMContentLoaded', function () {
-        document.querySelectorAll('th[data-sort]').forEach(th => {
-            th.addEventListener('click', () => {
-                sortTable(th.getAttribute('data-sort'));
-            });
-        });
-    });
 </script>
-
 <script>
-    const riskCounts = [
-        {{ patients|selectattr('risk_level', 'equalto', 'Low')|list|length }},
-        {{ patients|selectattr('risk_level', 'equalto', 'Moderate')|list|length }},
-        {{ patients|selectattr('risk_level', 'equalto', 'High')|list|length }},
-        {{ patients|selectattr('risk_level', 'equalto', 'Critical')|list|length }}
-    ];
-
-    const stageCounts = [
-        {{ patients|selectattr('stage', 'equalto', 1)|list|length }},
-        {{ patients|selectattr('stage', 'equalto', 2)|list|length }},
-        {{ patients|selectattr('stage', 'equalto', 3)|list|length }},
-        {{ patients|selectattr('stage', 'equalto', 4)|list|length }},
-        {{ patients|selectattr('stage', 'equalto', 5)|list|length }}
-    ];
+    // Define the riskCounts and stageCounts arrays using data attributes
+    const riskCounts = JSON.parse(document.getElementById('riskDistributionChart').getAttribute('data-risk-counts') || '[0,0,0,0]');
+    const stageCounts = JSON.parse(document.getElementById('stageDistributionChart').getAttribute('data-stage-counts') || '[0,0,0,0,0]');
 
     document.addEventListener('DOMContentLoaded', function () {
         const riskCtx = document.getElementById('riskDistributionChart').getContext('2d');
@@ -1651,7 +1446,7 @@ function renderHealthTrendCharts(data) {
                 datasets: [{
                     data: riskCounts,
                     backgroundColor: ['#10b981', '#f59e0b', '#ef4444', '#7f1d1d'],
-                    borderColor: ['#047857', '#b45309', '#dc2626', '#450a0a'],
+                    borderColor: ['#10b981', '#f59e0b', '#ef4444', '#7f1d1d'],
                     borderWidth: 1,
                     hoverOffset: 15
                 }]
@@ -1754,13 +1549,17 @@ function renderHealthTrendCharts(data) {
     function toggleChartType(chartName) {
         if (chartName === 'risk') {
             const newType = window.riskChartType === 'doughnut' ? 'polarArea' : 'doughnut';
-            window.riskChart.destroy();
+            if (window.riskChart && typeof window.riskChart.destroy === 'function') {
+                window.riskChart.destroy();
+            }
             const ctx = document.getElementById('riskDistributionChart').getContext('2d');
             window.riskChart = new Chart(ctx, getRiskChartConfig(newType));
             window.riskChartType = newType;
         } else if (chartName === 'stage') {
             const newType = window.stageChartType === 'bar' ? 'line' : 'bar';
-            window.stageChart.destroy();
+            if (window.stageChart && typeof window.stageChart.destroy === 'function') {
+                window.stageChart.destroy();
+            }
             const ctx = document.getElementById('stageDistributionChart').getContext('2d');
             window.stageChart = new Chart(ctx, getStageChartConfig(newType));
             window.stageChartType = newType;

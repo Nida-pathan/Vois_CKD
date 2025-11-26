@@ -633,41 +633,83 @@ def doctor_patient_details(patient_id):
     
     print(f"Doctor accessing patient details for ID: {patient_id}")  # Debug log
     
-    # Get patient data
+    # Import Database here to avoid duplication
+    from models.database import Database
+    
+    # Get patient data from patients_data collection
     patient_data = get_patient_data(patient_id)
     
-    # If not found in patients_data collection, try patient_records
+    # Convert MongoDB document to dict if needed
+    if patient_data and hasattr(patient_data, 'copy'):
+        patient_data = dict(patient_data)
+        patient_data.pop('_id', None)
+    
+    # If not found, try to find in all patients data
+    patient_username = None
     if not patient_data:
-        # Try to find in patient records
         all_patients = get_all_patients_data()
         for patient in all_patients:
             if patient.get('patient_id') == patient_id:
-                patient_data = patient
+                patient_data = dict(patient) if patient else None
+                if patient_data:
+                    patient_data.pop('_id', None)
+                    patient_username = patient_data.get('username')
                 break
     
-    # If still not found, try to get from patient_records collection
-    if not patient_data:
-        # Try to get patient records by username
-        # We need to find the username associated with this patient_id
-        all_patients_data = get_all_patients_data()
-        patient_username = None
-        for patient in all_patients_data:
-            if patient.get('patient_id') == patient_id:
-                patient_username = patient.get('username')
-                break
-        
-        if patient_username:
-            patient_records = get_patient_records(patient_username)
-            # Merge with patient data if needed
-            patient_info = get_patient_data(patient_id)
-            if patient_info:
-                if patient_records:
-                    patient_records.update(patient_info)
-                    patient_data = patient_records
+    # Extract username from patient_data if available
+    if patient_data and not patient_username:
+        patient_username = patient_data.get('username')
+    
+    # If patient_id starts with 'P', try extracting username
+    if not patient_username and patient_id.startswith('P'):
+        potential_username = patient_id[1:]
+        patient_username = potential_username
+    
+    # Try to get additional patient info directly from database
+    # Look in patients_data collection with username match to get complete patient info
+    if patient_username:
+        db = Database.get_db()
+        if db is not None:
+            # Try to find patient by username in patients_data
+            patient_by_username = db.patients_data.find_one({'username': patient_username})
+            if patient_by_username:
+                # Convert to dict and remove _id
+                patient_by_username = dict(patient_by_username)
+                patient_by_username.pop('_id', None)
+                # Merge with existing patient_data (existing patient_data takes precedence)
+                if patient_data:
+                    # Merge missing fields from patient_by_username
+                    for key, value in patient_by_username.items():
+                        if key not in patient_data or not patient_data.get(key):
+                            patient_data[key] = value
                 else:
-                    patient_data = patient_info
-            elif patient_records:
-                patient_data = patient_records
+                    patient_data = patient_by_username.copy()
+                    patient_data['patient_id'] = patient_id
+    
+    # Try to get additional patient info from patient_records
+    if patient_username:
+        patient_records = get_patient_records(patient_username)
+        if patient_records:
+            # Convert to dict if needed
+            if hasattr(patient_records, 'copy'):
+                patient_records = dict(patient_records)
+                patient_records.pop('_id', None)
+            # Merge missing fields from patient_records into patient_data (patient_data takes precedence)
+            if patient_data:
+                for key, value in patient_records.items():
+                    if key not in patient_data or not patient_data.get(key):
+                        patient_data[key] = value
+            else:
+                patient_data = patient_records.copy()
+                patient_data['patient_id'] = patient_id
+    
+    # Ensure patient_data is a dict
+    if patient_data and not isinstance(patient_data, dict):
+        try:
+            patient_data = dict(patient_data)
+            patient_data.pop('_id', None)
+        except:
+            patient_data = {}
     
     # If we still don't have patient data, create a minimal patient object
     if not patient_data:
@@ -681,6 +723,10 @@ def doctor_patient_details(patient_id):
             'egfr': 'N/A'
         }
         flash(f'Patient data not found for ID: {patient_id}. Displaying minimal information.', 'warning')
+    elif not isinstance(patient_data, dict):
+        # Force conversion to dict if somehow it's still not
+        patient_data = dict(patient_data) if patient_data else {}
+        patient_data.pop('_id', None)
     
     def safe_float(value):
         """Convert incoming value to float when possible, stripping symbols like %."""
@@ -706,7 +752,6 @@ def doctor_patient_details(patient_id):
             patient_data[field] = converted
 
     # Get prescriptions for this patient
-    from models.database import Database
     db = Database.get_db()
     prescriptions = []
     lab_results = []
@@ -1017,116 +1062,264 @@ def patient_dashboard():
                              patient_trials=[],
                              available_doctors=[])
 
+def get_patient_lab_results(patient_identifier, db):
+    """Helper function to get lab results with multiple fallback methods"""
+    from bson.objectid import ObjectId
+    
+    # Try different query methods
+    query_methods = [
+        # Try exact match with patient_id
+        {'patient_id': str(patient_identifier)},
+        # Try with ObjectId if valid
+        {'patient_id': ObjectId(patient_identifier)} if ObjectId.is_valid(str(patient_identifier)) else None,
+        # Try with username
+        {'patient_username': str(patient_identifier)},
+        # Try with patient_username as ObjectId if valid
+        {'patient_username': ObjectId(patient_identifier)} if ObjectId.is_valid(str(patient_identifier)) else None
+    ]
+    
+    # Remove None values from methods
+    query_methods = [q for q in query_methods if q is not None]
+    
+    for query in query_methods:
+        try:
+            results = list(db.lab_results.find(query).sort('test_date', -1))
+            if results:
+                return results
+        except Exception as e:
+            print(f"Query {query} failed: {str(e)}")
+            continue
+    return []
+
 @app.route('/api/doctor/patient/<patient_id>/health-trends')
 @login_required
 def get_patient_health_trends(patient_id):
     if not current_user.is_doctor():
         return jsonify({'error': 'Access denied. Doctors only.'}), 403
     
+    print(f"\n=== Processing health trends for patient_id: {patient_id} ===")
+    
     try:
-        # Get patient data
-        patient_data = get_patient_data(patient_id)
-        
-        # Get lab results for this patient
+        from bson.objectid import ObjectId, InvalidId
         from models.database import Database
+        from models.user import get_patient_data, get_user_by_username
+        
         db = Database.get_db()
+        if not db:
+            return jsonify({'error': 'Database connection failed'}), 500
+            
+        # Try different methods to find the patient
+        patient_data = None
+        
+        # Method 1: Try with the ID as is
+        try:
+            if ObjectId.is_valid(patient_id):
+                patient_data = db.patients_data.find_one({'_id': ObjectId(patient_id)})
+                if patient_data:
+                    print(f"Found patient by ObjectId: {patient_id}")
+        except (InvalidId, Exception) as e:
+            print(f"Error searching by ObjectId: {str(e)}")
+        
+        # Method 2: Try with patient_id field
+        if not patient_data:
+            patient_data = db.patients_data.find_one({'patient_id': patient_id})
+            if patient_data:
+                print(f"Found patient by patient_id: {patient_id}")
+        
+        # Method 3: If ID starts with 'P', try without it
+        if not patient_data and patient_id.startswith('P'):
+            alt_id = patient_id[1:]
+            if ObjectId.is_valid(alt_id):
+                patient_data = db.patients_data.find_one({'_id': ObjectId(alt_id)})
+                if patient_data:
+                    print(f"Found patient by alt ObjectId: {alt_id}")
+            
+            if not patient_data:
+                patient_data = db.patients_data.find_one({'patient_id': alt_id})
+                if patient_data:
+                    print(f"Found patient by alt patient_id: {alt_id}")
+        
+        # Method 4: Try by username
+        if not patient_data:
+            user = get_user_by_username(patient_id)
+            if user:
+                patient_data = db.patients_data.find_one({'username': patient_id})
+                if patient_data:
+                    print(f"Found patient by username: {patient_id}")
+        
+        if not patient_data:
+            print(f"Patient not found with any method for ID: {patient_id}")
+            return jsonify({
+                'error': 'Patient not found',
+                'searched_id': patient_id,
+                'tried_methods': ['direct_id', 'patient_id_field', 'alt_id', 'username']
+            }), 404
+            
+        print(f"Found patient data: {patient_data.get('_id')} - {patient_data.get('username')}")
+        
+        if not patient_data:
+            return jsonify({'error': 'Patient not found'}), 404
+            
+        # Get lab results using helper function
         lab_results = []
-        if db is not None:
-            lab_results_cursor = db.lab_results.find({'patient_id': patient_id})
-            lab_results = list(lab_results_cursor)
+        try:
+            # Try with various identifiers
+            identifiers = [
+                patient_data.get('_id'),
+                patient_data.get('patient_id'),
+                patient_data.get('username'),
+                str(patient_data.get('_id')),  # Convert ObjectId to string
+                patient_id,  # Original ID
+                patient_id[1:] if patient_id.startswith('P') else None  # Without 'P' prefix
+            ]
+            
+            # Remove None and duplicate values
+            identifiers = list({str(i) for i in identifiers if i is not None})
+            
+            print(f"Trying to find lab results with identifiers: {identifiers}")
+            
+            for identifier in identifiers:
+                lab_results = get_patient_lab_results(identifier, db)
+                if lab_results:
+                    print(f"Found {len(lab_results)} lab results using identifier: {identifier}")
+                    break
+            
+            if not lab_results:
+                print("No lab results found with any identifier")
+                
+        except Exception as e:
+            print(f"Error in lab results query: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            lab_results = []
         
         # Process data for health trends
         egfr_history = []
         bp_history = []
         creatinine_history = []
+        lab_results_list = []
         
-        # Add current patient data point
-        if patient_data:
-            # eGFR history
-            if patient_data.get('egfr') is not None:
-                egfr_history.append({
-                    'date': 'Current',
-                    'value': patient_data['egfr']
-                })
-            
-            # Blood pressure history
-            if patient_data.get('bp_systolic') is not None and patient_data.get('bp_diastolic') is not None:
-                bp_history.append({
-                    'date': 'Current',
-                    'systolic': patient_data['bp_systolic'],
-                    'diastolic': patient_data['bp_diastolic']
-                })
-            
-            # Serum creatinine history
-            if patient_data.get('serum_creatinine') is not None:
-                creatinine_history.append({
-                    'date': 'Current',
-                    'value': patient_data['serum_creatinine']
-                })
+        # Ensure we have patient data to work with
+        if not patient_data:
+            return jsonify({
+                'patient_name': 'Unknown Patient',
+                'egfr_history': [],
+                'bp_history': [],
+                'creatinine_history': [],
+                'lab_results': []
+            })
         
-        # Process lab results for historical data
+        # Process lab results first (historical data)
         for result in lab_results:
-            # Try to extract relevant data from lab results
-            test_type = result.get('test_type', '').lower()
-            results = result.get('results', '')
-            test_date = result.get('test_date', 'Unknown Date')
-            
-            # Parse results for numerical values
-            try:
-                if 'egfr' in test_type or 'glomerular' in test_type:
-                    # Extract numerical value from results string
-                    import re
-                    numbers = re.findall(r'[\d.]+', results)
-                    if numbers:
-                        egfr_history.append({
-                            'date': test_date,
-                            'value': float(numbers[0])
-                        })
-                elif 'blood pressure' in test_type or 'bp' in test_type:
-                    # Extract systolic and diastolic values
-                    import re
-                    numbers = re.findall(r'[\d.]+', results)
-                    if len(numbers) >= 2:
-                        bp_history.append({
-                            'date': test_date,
-                            'systolic': float(numbers[0]),
-                            'diastolic': float(numbers[1])
-                        })
-                elif 'creatinine' in test_type:
-                    # Extract numerical value from results string
-                    import re
-                    numbers = re.findall(r'[\d.]+', results)
-                    if numbers:
-                        creatinine_history.append({
-                            'date': test_date,
-                            'value': float(numbers[0])
-                        })
-            except (ValueError, IndexError):
-                # Skip malformed data
+            test_date = result.get('test_date', '')
+            if not test_date:
                 continue
+                
+            # Format date for display
+            formatted_date = test_date.strftime('%Y-%m-%d') if hasattr(test_date, 'strftime') else str(test_date)
+            
+            # Extract eGFR
+            egfr = result.get('egfr')
+            if egfr is not None:
+                egfr_history.append({
+                    'date': formatted_date,
+                    'value': float(egfr)
+                })
+            
+            # Extract Blood Pressure
+            bp_systolic = result.get('bp_systolic')
+            bp_diastolic = result.get('bp_diastolic')
+            if bp_systolic is not None and bp_diastolic is not None:
+                bp_history.append({
+                    'date': formatted_date,
+                    'systolic': float(bp_systolic),
+                    'diastolic': float(bp_diastolic)
+                })
+            
+            # Extract Serum Creatinine
+            creatinine = result.get('serum_creatinine')
+            if creatinine is not None:
+                creatinine_history.append({
+                    'date': formatted_date,
+                    'value': float(creatinine)
+                })
+            
+            # Prepare lab results for the table
+            lab_results_list.append({
+                'test_date': formatted_date,
+                'test_type': result.get('test_type', 'Lab Test'),
+                'egfr': egfr,
+                'serum_creatinine': creatinine,
+                'bp_systolic': bp_systolic,
+                'bp_diastolic': bp_diastolic,
+                'notes': result.get('notes', '')
+            })
         
-        # Sort history by date (newest first)
-        egfr_history.sort(key=lambda x: x['date'], reverse=True)
-        bp_history.sort(key=lambda x: x['date'], reverse=True)
-        creatinine_history.sort(key=lambda x: x['date'], reverse=True)
+        # Add current patient data if not already in history
+        current_date = datetime.now().strftime('%Y-%m-%d')
         
-        # Limit to last 10 entries for cleaner display
-        egfr_history = egfr_history[:10]
-        bp_history = bp_history[:10]
-        creatinine_history = creatinine_history[:10]
+        # Add current eGFR if available and not already in history
+        if patient_data.get('egfr') is not None:
+            try:
+                egfr_value = float(patient_data['egfr'])
+                if not any(d['date'] == current_date for d in egfr_history):
+                    egfr_history.append({
+                        'date': current_date,
+                        'value': egfr_value
+                    })
+            except (ValueError, TypeError) as e:
+                print(f"Error processing eGFR value: {e}")
         
-        return jsonify({
-            'patient_id': patient_id,
-            'patient_name': patient_data.get('patient_name', 'Unknown Patient') if patient_data else 'Unknown Patient',
+        # Add current BP if available and not already in history
+        if (patient_data.get('bp_systolic') is not None and 
+            patient_data.get('bp_diastolic') is not None):
+            try:
+                systolic = float(patient_data['bp_systolic'])
+                diastolic = float(patient_data['bp_diastolic'])
+                if not any(d['date'] == current_date for d in bp_history):
+                    bp_history.append({
+                        'date': current_date,
+                        'systolic': systolic,
+                        'diastolic': diastolic
+                    })
+            except (ValueError, TypeError) as e:
+                print(f"Error processing BP values: {e}")
+        
+        # Add current Creatinine if available and not already in history
+        if patient_data.get('serum_creatinine') is not None:
+            try:
+                creatinine_value = float(patient_data['serum_creatinine'])
+                if not any(d['date'] == current_date for d in creatinine_history):
+                    creatinine_history.append({
+                        'date': current_date,
+                        'value': creatinine_value
+                    })
+            except (ValueError, TypeError) as e:
+                print(f"Error processing Creatinine value: {e}")
+                
+        
+        # Sort all history by date
+        egfr_history.sort(key=lambda x: x['date'])
+        bp_history.sort(key=lambda x: x['date'])
+        creatinine_history.sort(key=lambda x: x['date'])
+        
+        # Prepare response
+        response = {
+            'patient_name': f"{patient_data.get('first_name', '')} {patient_data.get('last_name', '')}",
             'egfr_history': egfr_history,
             'bp_history': bp_history,
             'creatinine_history': creatinine_history,
-            'lab_results': lab_results
-        })
+            'lab_results': lab_results_list
+        }
+        
+        return jsonify(response)
     
     except Exception as e:
-        print(f"Error fetching health trends for patient {patient_id}: {e}")
-        return jsonify({'error': 'Failed to fetch health trends data'}), 500
+        print(f"Error in get_patient_health_trends: {str(e)}")
+        return jsonify({
+            'error': 'Failed to load health trends data',
+            'details': str(e)
+        }), 500
 
 @app.route('/api/doctor/patient/<patient_id>/dashboard')
 @login_required
