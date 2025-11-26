@@ -989,8 +989,12 @@ def patient_dashboard():
         }
         
         if patient_data:
-            # Calculate CKD stage from eGFR
-            egfr = patient_data.get('egfr')
+            # Extract current metrics (lab values are nested inside current_metrics)
+            current_metrics = patient_data.get('current_metrics', {})
+            disease_prediction = current_metrics.get('disease_prediction', {})
+            
+            # Calculate CKD stage from eGFR in current_metrics
+            egfr = current_metrics.get('egfr')
             if egfr:
                 if egfr >= 90:
                     dashboard_data['ckd_stage'] = 'Stage 1'
@@ -1008,8 +1012,8 @@ def patient_dashboard():
                     dashboard_data['ckd_stage'] = 'Stage 5'
                     dashboard_data['stage_class'] = 'stage-5'
             
-            # Get risk level
-            risk_level = patient_data.get('risk_level', 'Unknown')
+            # Get risk level from disease prediction
+            risk_level = disease_prediction.get('risk_level', 'Unknown')
             dashboard_data['risk_level'] = risk_level
             if risk_level == 'High':
                 dashboard_data['risk_class'] = 'high-risk'
@@ -1018,34 +1022,33 @@ def patient_dashboard():
             elif risk_level == 'Low':
                 dashboard_data['risk_class'] = 'low-risk'
             
-            # Get next checkup date
+            # Get next checkup date from patient intake data or use default
             next_checkup = patient_data.get('next_checkup', 'Not scheduled')
             dashboard_data['next_checkup'] = next_checkup
             
-            # Get lab reports count
-            lab_reports_count = patient_data.get('lab_reports_count', 0)
+            # Calculate lab reports count from history array
+            history = patient_data.get('history', [])
+            lab_reports_count = len(history) if history else 0
             dashboard_data['lab_reports_count'] = lab_reports_count
             
-            # Get current metrics
-            current_metrics = {
-                'bp_systolic': patient_data.get('bp_systolic', 'N/A'),
-                'bp_diastolic': patient_data.get('bp_diastolic', 'N/A'),
-                'blood_glucose': patient_data.get('blood_glucose', 'N/A'),
-                'serum_creatinine': patient_data.get('serum_creatinine', 'N/A'),
-                'egfr': patient_data.get('egfr', 'N/A'),
-                'hemoglobin': patient_data.get('hemoglobin', 'N/A'),
-                'blood_urea': patient_data.get('blood_urea', 'N/A'),
-                'sodium': patient_data.get('sodium', 'N/A'),
-                'potassium': patient_data.get('potassium', 'N/A'),
-                'bp_status': patient_data.get('bp_status', 'unknown'),
-                'glucose_status': patient_data.get('glucose_status', 'unknown'),
-                'creatinine_status': patient_data.get('creatinine_status', 'unknown'),
-                'egfr_status': patient_data.get('egfr_status', 'unknown')
+            # Get current metrics from nested current_metrics object
+            dashboard_data['current_metrics'] = {
+                'bp_systolic': current_metrics.get('bp_systolic', 'N/A'),
+                'bp_diastolic': current_metrics.get('bp_diastolic', 'N/A'),
+                'blood_glucose': current_metrics.get('blood_glucose', 'N/A'),
+                'serum_creatinine': current_metrics.get('serum_creatinine', 'N/A'),
+                'egfr': current_metrics.get('egfr', 'N/A'),
+                'hemoglobin': current_metrics.get('hemoglobin', 'N/A'),
+                'blood_urea': current_metrics.get('blood_urea', 'N/A'),
+                'sodium': current_metrics.get('sodium', 'N/A'),
+                'potassium': current_metrics.get('potassium', 'N/A'),
+                'bp_status': current_metrics.get('bp_status', 'unknown'),
+                'glucose_status': current_metrics.get('glucose_status', 'unknown'),
+                'creatinine_status': current_metrics.get('creatinine_status', 'unknown'),
+                'egfr_status': current_metrics.get('egfr_status', 'unknown')
             }
-            dashboard_data['current_metrics'] = current_metrics
             
             # Get history
-            history = patient_data.get('history', [])
             dashboard_data['history'] = history
             if history:
                 dashboard_data['has_history'] = True
