@@ -1,7 +1,5 @@
 {% extends "base.html" %}
 
-{% block title %}Patient Details - CKD Diagnostic System{% endblock %}
-
 {% block content %}
 <style>
     .patient-details-container {
@@ -9,159 +7,136 @@
         margin: 0 auto;
         padding: 20px;
     }
-    
+
     .header {
         display: flex;
         justify-content: space-between;
         align-items: center;
         margin-bottom: 30px;
-        background: rgba(255, 255, 255, 0.85);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.18);
-        border-radius: 16px;
-        padding: 20px 30px;
-        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
     }
-    
+
+    .header h1 {
+        color: #0f766e;
+        font-weight: 700;
+        margin: 0;
+    }
+
     .back-btn {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 8px 16px;
-        background: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%);
+        background: #0d9488;
         color: white;
-        text-decoration: none;
+        padding: 10px 20px;
         border-radius: 8px;
-        font-size: 14px;
+        text-decoration: none;
         font-weight: 500;
         transition: all 0.3s ease;
     }
-    
+
+    .back-btn:hover {
+        background: #0f766e;
+        transform: translateY(-2px);
+    }
+
     .section {
-        background: rgba(255, 255, 255, 0.85);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.18);
+        background: white;
         border-radius: 16px;
         padding: 25px;
         margin-bottom: 25px;
-        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     }
-    
+
     .section-title {
-        font-size: 20px;
+        font-size: 1.2rem;
         font-weight: 600;
+        color: #374151;
         margin-bottom: 20px;
-        color: #333;
         display: flex;
         align-items: center;
         gap: 10px;
     }
-    
+
+    .section-title i {
+        color: #0d9488;
+    }
+
     .info-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
         gap: 20px;
     }
-    
+
     .info-item {
-        margin-bottom: 15px;
+        padding: 15px;
+        background: #f9fafb;
+        border-radius: 8px;
     }
-    
+
     .info-label {
-        font-size: 12px;
-        color: #666;
+        font-size: 0.9rem;
+        color: #6b7280;
         margin-bottom: 5px;
-        font-weight: 500;
     }
-    
+
     .info-value {
-        font-size: 16px;
         font-weight: 600;
-        color: #333;
+        color: #111827;
+        font-size: 1.1rem;
     }
-    
-    .badge {
-        padding: 4px 10px;
-        border-radius: 12px;
-        font-size: 11px;
-        font-weight: 600;
-    }
-    
-    .badge-low {
-        background: #dcfce7;
-        color: #16a34a;
-    }
-    
-    .badge-moderate {
-        background: #fef3c7;
-        color: #d97706;
-    }
-    
-    .badge-high {
-        background: #fee2e2;
-        color: #dc2626;
-    }
-    
-    .badge-critical {
-        background: #7f1d1d;
-        color: white;
-    }
-    
+
     .lab-results-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
         gap: 20px;
     }
-    
+
     .lab-card {
         background: #f9fafb;
-        border-radius: 8px;
         padding: 20px;
-        border-left: 4px solid #0d9488;
+        border-radius: 12px;
+        border: 1px solid #e5e7eb;
     }
-    
+
     .lab-card-title {
         font-weight: 600;
         margin-bottom: 15px;
         color: #333;
     }
-    
+
     .lab-item {
         display: flex;
         justify-content: space-between;
         padding: 8px 0;
         border-bottom: 1px solid #e5e7eb;
     }
-    
+
     .lab-item:last-child {
         border-bottom: none;
     }
-    
+
     .lab-label {
         color: #666;
     }
-    
+
     .lab-value {
         font-weight: 600;
     }
-    
+
     .risk-card {
         text-align: center;
         padding: 30px;
     }
-    
+
     .risk-percentage-large {
         font-size: 48px;
         font-weight: 700;
         margin: 20px 0;
     }
-    
+
     .risk-level-badge {
         font-size: 20px;
         font-weight: 600;
         margin-bottom: 20px;
     }
-    
+
     .risk-bar {
         height: 12px;
         background: #e5e7eb;
@@ -169,35 +144,35 @@
         overflow: hidden;
         margin-bottom: 10px;
     }
-    
+
     .risk-fill {
         height: 100%;
         border-radius: 6px;
     }
-    
+
     .stage-display {
         text-align: center;
         padding: 20px;
     }
-    
+
     .stage-number {
         font-size: 48px;
         font-weight: 700;
         margin: 20px 0;
         color: #0d9488;
     }
-    
+
     .stage-description {
         font-size: 14px;
         color: #666;
         margin-bottom: 20px;
     }
-    
+
     .egfr-display {
         font-size: 18px;
         font-weight: 600;
     }
-    
+
     .prescription-item {
         padding: 15px;
         border: 1px solid #e5e7eb;
@@ -205,7 +180,7 @@
         margin-bottom: 15px;
         background: #f9fafb;
     }
-    
+
     .prescription-header {
         display: flex;
         justify-content: space-between;
@@ -213,30 +188,30 @@
         padding-bottom: 10px;
         border-bottom: 1px solid #e5e7eb;
     }
-    
+
     .prescription-date {
         font-weight: 600;
         color: #0d9488;
     }
-    
+
     .medication-item {
         padding: 10px;
         background: rgba(13, 148, 136, 0.05);
         border-radius: 8px;
         margin-bottom: 10px;
     }
-    
+
     .medication-name {
         font-weight: 600;
         color: #0d9488;
     }
-    
+
     .medication-details {
         font-size: 0.9rem;
         color: #666;
         margin-top: 5px;
     }
-    
+
     .lab-result-item {
         padding: 15px;
         border: 1px solid #e5e7eb;
@@ -244,7 +219,7 @@
         margin-bottom: 15px;
         background: #f9fafb;
     }
-    
+
     .lab-result-header {
         display: flex;
         justify-content: space-between;
@@ -252,12 +227,12 @@
         padding-bottom: 10px;
         border-bottom: 1px solid #e5e7eb;
     }
-    
+
     .lab-result-date {
         font-weight: 600;
         color: #0d9488;
     }
-    
+
     .upload-section {
         text-align: center;
         padding: 30px;
@@ -265,7 +240,7 @@
         border-radius: 16px;
         border: 2px dashed #0d9488;
     }
-    
+
     .btn-upload {
         background: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%);
         color: white;
@@ -279,7 +254,7 @@
         gap: 8px;
         margin-top: 15px;
     }
-    
+
     .btn-upload:hover {
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3);
@@ -299,7 +274,7 @@
         </a>
         {% endif %}
     </div>
-    
+
     {% if patient %}
     <!-- Patient Information -->
     <div class="section">
@@ -333,7 +308,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Risk Assessment -->
     <div class="section">
         <div class="section-title">
@@ -345,39 +320,78 @@
                 <span class="badge badge-{{ patient.risk_level.lower() }}">{{ patient.risk_level }} Risk</span>
             </div>
             <div class="risk-bar">
-                <div class="risk-fill" style="width: {{ patient.risk_percentage }}%; background: {% if patient.risk_level == 'Low' %}#10b981{% elif patient.risk_level == 'Moderate' %}#f59e0b{% elif patient.risk_level == 'High' %}#ef4444{% else %}#7f1d1d{% endif %};"></div>
+                <div class="risk-fill"
+                    style="width: {{ patient.risk_percentage }}%; background: {% if patient.risk_level == 'Low' %}#10b981{% elif patient.risk_level == 'Moderate' %}#f59e0b{% elif patient.risk_level == 'High' %}#ef4444{% else %}#7f1d1d{% endif %};">
+                </div>
             </div>
         </div>
     </div>
-    
-    <!-- CKD Stage -->
+
+    <!-- Disease Status Grid -->
     <div class="section">
         <div class="section-title">
-            <i class="fas fa-procedures"></i> CKD Stage
+            <i class="fas fa-heartbeat"></i> Disease Status
         </div>
-        <div class="stage-display">
-            <div class="stage-number">Stage {{ patient.stage }}</div>
-            <div class="stage-description">
-                {% if patient.stage == 1 %}
-                Normal or high GFR (≥90 mL/min/1.73m²)
-                {% elif patient.stage == 2 %}
-                Mild decrease in GFR (60-89 mL/min/1.73m²)
-                {% elif patient.stage == 3 %}
-                Moderate decrease in GFR (30-59 mL/min/1.73m²)
-                {% elif patient.stage == 4 %}
-                Severe decrease in GFR (15-29 mL/min/1.73m²)
-                {% elif patient.stage == 5 %}
-                Kidney failure (GFR <15 mL/min/1.73m²)
-                {% else %}
-                Not determined
-                {% endif %}
+        <div class="disease-status-grid"
+            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+            <!-- CKD Card -->
+            <div class="disease-status-card"
+                style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; text-align: center;">
+                <div class="disease-icon" style="color: #0d9488; font-size: 24px; margin-bottom: 10px;"><i
+                        class="fas fa-kidney"></i></div>
+                <h4 style="margin: 0 0 10px 0; color: #374151;">CKD</h4>
+                <div class="disease-value" style="font-size: 18px; font-weight: 600; color: #111827;">
+                    Stage {{ patient.stage if patient.stage else 'N/A' }}
+                </div>
+                <div class="disease-sub" style="font-size: 13px; color: #6b7280; margin-top: 5px;">
+                    eGFR: {{ "%.1f"|format(patient.egfr) if patient.egfr else 'N/A' }}
+                </div>
             </div>
-            <div class="egfr-display">
-                eGFR: {{ "%.1f"|format(patient.egfr) if patient.egfr else 'N/A' }} mL/min/1.73m²
+
+            <!-- Kidney Stone Card -->
+            <div class="disease-status-card"
+                style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; text-align: center;">
+                <div class="disease-icon" style="color: #f5576c; font-size: 24px; margin-bottom: 10px;"><i
+                        class="fas fa-gem"></i></div>
+                <h4 style="margin: 0 0 10px 0; color: #374151;">Kidney Stone</h4>
+                <div class="disease-value" style="font-size: 18px; font-weight: 600; color: #111827;">
+                    {{ patient.kidney_stone_risk if patient.kidney_stone_risk else 'N/A' }}
+                </div>
+                <div class="disease-sub" style="font-size: 13px; color: #6b7280; margin-top: 5px;">
+                    Risk Analysis
+                </div>
+            </div>
+
+            <!-- AKI Card -->
+            <div class="disease-status-card"
+                style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; text-align: center;">
+                <div class="disease-icon" style="color: #fa709a; font-size: 24px; margin-bottom: 10px;"><i
+                        class="fas fa-exclamation-triangle"></i></div>
+                <h4 style="margin: 0 0 10px 0; color: #374151;">AKI</h4>
+                <div class="disease-value" style="font-size: 18px; font-weight: 600; color: #111827;">
+                    {{ patient.aki_risk if patient.aki_risk else 'N/A' }}
+                </div>
+                <div class="disease-sub" style="font-size: 13px; color: #6b7280; margin-top: 5px;">
+                    Risk Level
+                </div>
+            </div>
+
+            <!-- ESRD Card -->
+            <div class="disease-status-card"
+                style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; text-align: center;">
+                <div class="disease-icon" style="color: #30cfd0; font-size: 24px; margin-bottom: 10px;"><i
+                        class="fas fa-heartbeat"></i></div>
+                <h4 style="margin: 0 0 10px 0; color: #374151;">ESRD</h4>
+                <div class="disease-value" style="font-size: 18px; font-weight: 600; color: #111827;">
+                    {{ patient.esrd_status if patient.esrd_status else 'N/A' }}
+                </div>
+                <div class="disease-sub" style="font-size: 13px; color: #6b7280; margin-top: 5px;">
+                    Status
+                </div>
             </div>
         </div>
     </div>
-    
+
     <!-- Lab Results -->
     <div class="section">
         <div class="section-title">
@@ -388,22 +402,26 @@
                 <div class="lab-card-title">Kidney Function</div>
                 <div class="lab-item">
                     <span class="lab-label">Serum Creatinine</span>
-                    <span class="lab-value">{{ patient.serum_creatinine if patient.serum_creatinine else 'N/A' }} mg/dL</span>
+                    <span class="lab-value">{{ patient.serum_creatinine if patient.serum_creatinine else 'N/A' }}
+                        mg/dL</span>
                 </div>
                 <div class="lab-item">
                     <span class="lab-label">Blood Urea Nitrogen</span>
-                    <span class="lab-value">{{ patient.blood_urea if patient.blood_urea else 'N/A' }} mg/dL</span>
+                    <span class="lab-value">{{ patient.blood_urea if patient.blood_urea else 'N/A' }}
+                        mg/dL</span>
                 </div>
                 <div class="lab-item">
                     <span class="lab-label">eGFR</span>
-                    <span class="lab-value">{{ "%.1f"|format(patient.egfr) if patient.egfr else 'N/A' }} mL/min/1.73m²</span>
+                    <span class="lab-value">{{ "%.1f"|format(patient.egfr) if patient.egfr else 'N/A' }}
+                        mL/min/1.73m²</span>
                 </div>
             </div>
             <div class="lab-card">
                 <div class="lab-card-title">Blood Metrics</div>
                 <div class="lab-item">
                     <span class="lab-label">Hemoglobin</span>
-                    <span class="lab-value">{{ patient.hemoglobin if patient.hemoglobin else 'N/A' }} g/dL</span>
+                    <span class="lab-value">{{ patient.hemoglobin if patient.hemoglobin else 'N/A' }}
+                        g/dL</span>
                 </div>
                 <div class="lab-item">
                     <span class="lab-label">Sodium</span>
@@ -418,11 +436,13 @@
                 <div class="lab-card-title">Other Metrics</div>
                 <div class="lab-item">
                     <span class="lab-label">Blood Glucose</span>
-                    <span class="lab-value">{{ patient.blood_glucose if patient.blood_glucose else 'N/A' }} mg/dL</span>
+                    <span class="lab-value">{{ patient.blood_glucose if patient.blood_glucose else 'N/A' }}
+                        mg/dL</span>
                 </div>
                 <div class="lab-item">
                     <span class="lab-label">Blood Pressure</span>
-                    <span class="lab-value">{{ patient.bp_systolic if patient.bp_systolic else 'N/A' }}/{{ patient.bp_diastolic if patient.bp_diastolic else 'N/A' }} mmHg</span>
+                    <span class="lab-value">{{ patient.bp_systolic if patient.bp_systolic else 'N/A' }}/{{
+                        patient.bp_diastolic if patient.bp_diastolic else 'N/A' }} mmHg</span>
                 </div>
                 <div class="lab-item">
                     <span class="lab-label">Albumin</span>
@@ -431,7 +451,35 @@
             </div>
         </div>
     </div>
-    
+
+    <!-- Latest Lab Report -->
+    {% if patient.latest_lab_pdf %}
+    <div class="section">
+        <div class="section-title">
+            <i class="fas fa-file-pdf"></i> Latest Lab Report
+        </div>
+        <div
+            style="display: flex; align-items: center; justify-content: space-between; background: #f0fdfa; padding: 20px; border-radius: 12px; border: 1px solid #ccfbf1;">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div
+                    style="width: 50px; height: 50px; background: white; border-radius: 10px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                    <i class="fas fa-file-pdf" style="font-size: 24px; color: #ef4444;"></i>
+                </div>
+                <div>
+                    <h4 style="margin: 0 0 5px 0; color: #0f766e;">Lab Report PDF</h4>
+                    <p style="margin: 0; font-size: 13px; color: #5f6c7b;">Uploaded on {{ patient.last_updated
+                        if
+                        patient.last_updated else 'Recent' }}</p>
+                </div>
+            </div>
+            <a href="{{ url_for('static', filename=patient.latest_lab_pdf) }}" target="_blank" class="btn-upload"
+                style="margin-top: 0; text-decoration: none;">
+                <i class="fas fa-download"></i> View Report
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
     <!-- Historical Lab Results -->
     {% if lab_results and lab_results|length > 0 %}
     <div class="section">
@@ -445,12 +493,25 @@
                 <div>{{ result.test_type }}</div>
             </div>
             <div class="lab-results-grid">
+                {% if result.results %}
                 {% for key, value in result.results.items() %}
                 <div class="lab-item">
                     <span class="lab-label">{{ key }}</span>
                     <span class="lab-value">{{ value }}</span>
                 </div>
                 {% endfor %}
+                {% else %}
+                <!-- Handle flat structure by iterating and excluding metadata -->
+                {% for key, value in result.items() %}
+                {% if key not in ['_id', 'patient_id', 'patient_username', 'test_date', 'test_type', 'notes',
+                'created_at'] %}
+                <div class="lab-item">
+                    <span class="lab-label">{{ key|replace('_', ' ')|title }}</span>
+                    <span class="lab-value">{{ value }}</span>
+                </div>
+                {% endif %}
+                {% endfor %}
+                {% endif %}
             </div>
             {% if result.notes %}
             <div style="margin-top: 10px; padding: 10px; background: #fffbeb; border-radius: 8px;">
@@ -461,58 +522,94 @@
         {% endfor %}
     </div>
     {% endif %}
-    
-    <!-- Medical History -->
+
+    <!-- Medical History & Documents -->
     {% if patient.history and patient.history|length > 0 %}
     <div class="section">
         <div class="section-title">
-            <i class="fas fa-history"></i> Medical History
+            <i class="fas fa-folder-open"></i> Document History
         </div>
-        <div>
-            <h3>Previous Records</h3>
-            <ul>
-                {% for record in patient.history %}
-                <li>{{ record.date if record.date else 'Unknown Date' }}</li>
-                {% endfor %}
-            </ul>
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background: #f9fafb; text-align: left;">
+                        <th style="padding: 12px; border-bottom: 2px solid #e5e7eb; color: #4b5563;">Date</th>
+                        <th style="padding: 12px; border-bottom: 2px solid #e5e7eb; color: #4b5563;">Type</th>
+                        <th style="padding: 12px; border-bottom: 2px solid #e5e7eb; color: #4b5563;">Prediction
+                        </th>
+                        <th style="padding: 12px; border-bottom: 2px solid #e5e7eb; color: #4b5563;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in patient.history %}
+                    <tr style="border-bottom: 1px solid #e5e7eb;">
+                        <td style="padding: 12px; color: #333;">{{ record.date if record.date else 'Unknown
+                            Date' }}
+                        </td>
+                        <td style="padding: 12px; color: #666;">Lab Report Analysis</td>
+                        <td style="padding: 12px;">
+                            {% if record.prediction %}
+                            <span
+                                class="badge badge-{{ record.prediction.risk_level.lower() if record.prediction.risk_level else 'moderate' }}">
+                                {{ record.prediction.disease if record.prediction.disease else 'CKD' }} - {{
+                                record.prediction.risk_level if record.prediction.risk_level else 'Unknown' }}
+                            </span>
+                            {% else %}
+                            <span style="color: #9ca3af;">N/A</span>
+                            {% endif %}
+                        </td>
+                        <td style="padding: 12px;">
+                            {% if record.pdf_path %}
+                            <a href="{{ url_for('static', filename=record.pdf_path) }}" target="_blank"
+                                style="color: #0d9488; text-decoration: none; font-weight: 500;">
+                                <i class="fas fa-file-pdf"></i> View PDF
+                            </a>
+                            {% else %}
+                            <span style="color: #9ca3af; font-size: 13px;">No File</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
     {% endif %}
-    
+
     <!-- Prescriptions -->
     <div class="section">
         <div class="section-title">
             <i class="fas fa-prescription"></i> Medications & Prescriptions
         </div>
         {% if prescriptions and prescriptions|length > 0 %}
-            {% for prescription in prescriptions %}
-            <div class="prescription-item">
-                <div class="prescription-header">
-                    <div class="prescription-date">{{ prescription.date }}</div>
-                    <div>Prescribed by: Dr. {{ prescription.doctor }}</div>
-                </div>
-                <div style="margin-bottom: 15px;">
-                    <strong>Medications:</strong>
-                    {% for med in prescription.medications %}
-                    <div class="medication-item">
-                        <div class="medication-name">{{ med.name }}</div>
-                        <div class="medication-details">
-                            Dosage: {{ med.dosage }} | Frequency: {{ med.frequency }}
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-                {% if prescription.notes %}
-                <div style="padding: 10px; background: #fffbeb; border-radius: 8px;">
-                    <strong>Notes:</strong> {{ prescription.notes }}
-                </div>
-                {% endif %}
+        {% for prescription in prescriptions %}
+        <div class="prescription-item">
+            <div class="prescription-header">
+                <div class="prescription-date">{{ prescription.date }}</div>
+                <div>Prescribed by: Dr. {{ prescription.doctor }}</div>
             </div>
-            {% endfor %}
+            <div style="margin-bottom: 15px;">
+                <strong>Medications:</strong>
+                {% for med in prescription.medications %}
+                <div class="medication-item">
+                    <div class="medication-name">{{ med.name }}</div>
+                    <div class="medication-details">
+                        Dosage: {{ med.dosage }} | Frequency: {{ med.frequency }}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% if prescription.notes %}
+            <div style="padding: 10px; background: #fffbeb; border-radius: 8px;">
+                <strong>Notes:</strong> {{ prescription.notes }}
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
         {% else %}
-            <p><strong>NOTE : Previously prescriped medication included</strong></p>
+        <p><strong>NOTE : Previously prescriped medication included</strong></p>
         {% endif %}
-        
+
         <!-- Prescription Upload Button -->
         <div class="upload-section">
             <h3><i class="fas fa-file-upload"></i> Upload New Prescription</h3>
@@ -522,7 +619,7 @@
             </button>
         </div>
     </div>
-    
+
     {% else %}
     <div class="section">
         <div style="text-align: center; padding: 60px 20px;">
@@ -530,7 +627,8 @@
             <h3>Patient Not Found</h3>
             <p>The requested patient information could not be found.</p>
             {% if current_user.is_doctor() %}
-            <a href="{{ url_for('doctor_dashboard') }}" class="back-btn" style="display: inline-flex; margin-top: 20px;">
+            <a href="{{ url_for('doctor_dashboard') }}" class="back-btn"
+                style="display: inline-flex; margin-top: 20px;">
                 <i class="fas fa-arrow-left"></i> Back to Dashboard
             </a>
             {% else %}

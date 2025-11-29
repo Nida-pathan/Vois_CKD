@@ -524,50 +524,9 @@ def get_doctor_patients_with_details(doctor_username):
                     age = data.get('age')
                     if isinstance(age, str) and age != 'N/A':
                         age = int(age)
-                    elif not isinstance(age, int) and age != 'N/A':
-                        age = int(age) if age is not None else 'N/A'
-                except (ValueError, TypeError):
-                    age = 'N/A'
-                
-                try:
-                    risk_percentage = data.get('risk_percentage')
-                    if isinstance(risk_percentage, str):
-                        try:
-                            risk_percentage = float(risk_percentage)
-                        except ValueError:
-                            risk_percentage = 0
-                    elif risk_percentage is not None:
-                        try:
-                            risk_percentage = float(risk_percentage)
-                        except (ValueError, TypeError):
-                            risk_percentage = 0
-                    else:
-                        risk_percentage = 0
-                except (ValueError, TypeError):
-                    risk_percentage = 0
-                
-                try:
-                    stage = data.get('stage')
-                    if isinstance(stage, str) and stage.isdigit():
-                        stage = int(stage)
-                    elif not isinstance(stage, int):
-                        stage = int(stage) if stage is not None else 'N/A'
-                except (ValueError, TypeError):
-                    stage = 'N/A'
-                
-                # Use record date if available, else fall back to patient data
-                if last_updated == 'N/A':
-                        test_date = data.get('test_date')
-                        if test_date:
-                            last_updated = test_date
-                
-                patient_info = {
-                    'patient_id': data.get('patient_id'),
-                    'username': username,
-                    'name': data.get('patient_name', 'Unknown'),
                     'risk_percentage': risk_percentage,
                     'stage': stage,
-                    'risk_level': data.get('risk_level', 'Unknown'),
+                    'risk_level': data.get('risk_level', 'Unknown').title() if isinstance(data.get('risk_level'), str) else 'Unknown',
                     'age': age,
                     'egfr': egfr,
                     'last_updated': last_updated

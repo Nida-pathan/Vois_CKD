@@ -1,0 +1,63 @@
+
+--- Debug Results View 2025-11-29 19:29:47.134466 ---
+Patient ID: P6925b23e2e62cd902e6dcaf9
+Patient Username: JOHN
+Lab Results Found: 4
+Latest Result Keys: ['_id', 'patient_username', 'test_date', 'test_type', 'notes', 'created_at', 'egfr', 'serum_creatinine', 'sodium', 'potassium']
+Latest Result Sample: {'_id': ObjectId('692ae634d093090c5f593b84'), 'patient_username': 'JOHN', 'test_date': datetime.datetime(2025, 11, 29, 17, 55, 24, 384000), 'test_type': 'Lab Report Upload', 'notes': "Uploaded via Pat...
+
+--- Debug Results View 2025-11-29 19:33:02.000767 ---
+Patient ID: P6925b23e2e62cd902e6dcaf9
+Patient Username: JOHN
+Lab Results Found: 4
+Latest Result Keys: ['_id', 'patient_username', 'test_date', 'test_type', 'notes', 'created_at', 'egfr', 'serum_creatinine', 'sodium', 'potassium']
+Latest Result Sample: {'_id': ObjectId('692ae634d093090c5f593b84'), 'patient_username': 'JOHN', 'test_date': datetime.datetime(2025, 11, 29, 17, 55, 24, 384000), 'test_type': 'Lab Report Upload', 'notes': "Uploaded via Pat...
+
+--- Debug Results View 2025-11-29 19:33:06.222370 ---
+Patient ID: P6925b23e2e62cd902e6dcaf9
+Patient Username: JOHN
+Lab Results Found: 4
+Latest Result Keys: ['_id', 'patient_username', 'test_date', 'test_type', 'notes', 'created_at', 'egfr', 'serum_creatinine', 'sodium', 'potassium']
+Latest Result Sample: {'_id': ObjectId('692ae634d093090c5f593b84'), 'patient_username': 'JOHN', 'test_date': datetime.datetime(2025, 11, 29, 17, 55, 24, 384000), 'test_type': 'Lab Report Upload', 'notes': "Uploaded via Pat...
+
+--- Debug Results View 2025-11-29 19:33:07.683218 ---
+Patient ID: P6925b23e2e62cd902e6dcaf9
+Patient Username: JOHN
+Lab Results Found: 4
+Latest Result Keys: ['_id', 'patient_username', 'test_date', 'test_type', 'notes', 'created_at', 'egfr', 'serum_creatinine', 'sodium', 'potassium']
+Latest Result Sample: {'_id': ObjectId('692ae634d093090c5f593b84'), 'patient_username': 'JOHN', 'test_date': datetime.datetime(2025, 11, 29, 17, 55, 24, 384000), 'test_type': 'Lab Report Upload', 'notes': "Uploaded via Pat...
+
+--- Debug Results View 2025-11-29 19:33:08.521441 ---
+Patient ID: P6925b23e2e62cd902e6dcaf9
+Patient Username: JOHN
+Lab Results Found: 4
+Latest Result Keys: ['_id', 'patient_username', 'test_date', 'test_type', 'notes', 'created_at', 'egfr', 'serum_creatinine', 'sodium', 'potassium']
+Latest Result Sample: {'_id': ObjectId('692ae634d093090c5f593b84'), 'patient_username': 'JOHN', 'test_date': datetime.datetime(2025, 11, 29, 17, 55, 24, 384000), 'test_type': 'Lab Report Upload', 'notes': "Uploaded via Pat...
+
+--- Debug Results View 2025-11-29 19:33:08.812095 ---
+Patient ID: P6925b23e2e62cd902e6dcaf9
+Patient Username: JOHN
+Lab Results Found: 4
+Latest Result Keys: ['_id', 'patient_username', 'test_date', 'test_type', 'notes', 'created_at', 'egfr', 'serum_creatinine', 'sodium', 'potassium']
+Latest Result Sample: {'_id': ObjectId('692ae634d093090c5f593b84'), 'patient_username': 'JOHN', 'test_date': datetime.datetime(2025, 11, 29, 17, 55, 24, 384000), 'test_type': 'Lab Report Upload', 'notes': "Uploaded via Pat...
+
+--- Debug Results View 2025-11-29 19:33:08.987349 ---
+Patient ID: P6925b23e2e62cd902e6dcaf9
+Patient Username: JOHN
+Lab Results Found: 4
+Latest Result Keys: ['_id', 'patient_username', 'test_date', 'test_type', 'notes', 'created_at', 'egfr', 'serum_creatinine', 'sodium', 'potassium']
+Latest Result Sample: {'_id': ObjectId('692ae634d093090c5f593b84'), 'patient_username': 'JOHN', 'test_date': datetime.datetime(2025, 11, 29, 17, 55, 24, 384000), 'test_type': 'Lab Report Upload', 'notes': "Uploaded via Pat...
+
+--- Debug Results View 2025-11-29 19:33:09.204177 ---
+Patient ID: P6925b23e2e62cd902e6dcaf9
+Patient Username: JOHN
+Lab Results Found: 4
+Latest Result Keys: ['_id', 'patient_username', 'test_date', 'test_type', 'notes', 'created_at', 'egfr', 'serum_creatinine', 'sodium', 'potassium']
+Latest Result Sample: {'_id': ObjectId('692ae634d093090c5f593b84'), 'patient_username': 'JOHN', 'test_date': datetime.datetime(2025, 11, 29, 17, 55, 24, 384000), 'test_type': 'Lab Report Upload', 'notes': "Uploaded via Pat...
+
+--- Debug Results View 2025-11-29 19:36:09.029178 ---
+Patient ID: P6925b23e2e62cd902e6dcaf9
+Patient Username: JOHN
+Lab Results Found: 4
+Latest Result Keys: ['_id', 'patient_username', 'test_date', 'test_type', 'notes', 'created_at', 'egfr', 'serum_creatinine', 'sodium', 'potassium']
+Latest Result Sample: {'_id': ObjectId('692ae634d093090c5f593b84'), 'patient_username': 'JOHN', 'test_date': datetime.datetime(2025, 11, 29, 17, 55, 24, 384000), 'test_type': 'Lab Report Upload', 'notes': "Uploaded via Pat...

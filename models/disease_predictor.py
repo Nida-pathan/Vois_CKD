@@ -3,10 +3,96 @@ Multi-Disease Predictor for Kidney-Related Conditions
 Rule-based severity detection for CKD, Kidney Stone, AKI, and ESRD
 """
 
+import joblib
+import numpy as np
+import pandas as pd
+import os
 from models.ckd_model import ckd_model
+
+# Model paths
+MODEL_DIR = os.path.dirname(os.path.abspath(__file__))
+ESRD_MODEL_PATH = os.path.join(MODEL_DIR, 'esrd_detection_model.pkl')
+AKI_MODEL_PATH = os.path.join(MODEL_DIR, 'aki_detection_model.pkl')
 
 class KidneyDiseasePredictor:
     """Unified kidney disease prediction system"""
+    
+    esrd_model = None
+    aki_model = None
+    
+    @classmethod
+    def _load_models(cls):
+        if cls.esrd_model is None and os.path.exists(ESRD_MODEL_PATH):
+            try:
+                cls.esrd_model = joblib.load(ESRD_MODEL_PATH)
+            except Exception as e:
+                print(f"Error loading ESRD model: {e}")
+                
+        if cls.aki_model is None and os.path.exists(AKI_MODEL_PATH):
+            try:
+                cls.aki_model = joblib.load(AKI_MODEL_PATH)
+            except Exception as e:
+                print(f"Error loading AKI model: {e}")
+
+    @staticmethod
+    def _prepare_features(lab_values: dict, model_type='esrd') -> np.ndarray:
+        """
+        Prepare features for the model.
+        Assumes features: ['Age', 'Gender', 'Smoking', 'Alcohol', 'Hypertension',
+         'Coronary Artery Disease', 'Cancer', 'Chronic Liver Disease',
+         'Mean Serum Creatinine (mg/dL)', 'Cholesterol (mg/dL)', 'LDL-C (mg/dL)',
+         'HDL-C (mg/dL)', 'Uric Acid (mg/dL)', 'Calcium (mg/dL)', 'Phosphate (mg/dL)',
+         'Hemoglobin (g/dL)', 'Statin', 'Metformin', 'Insulin',
+         'Dipeptidyl Peptidase-4 Inhibitor', 'cholesterol_ratio', 'creatinine_log',
+         'age_creatinine_interaction', 'high_creatinine', 'high_glucose']
+        """
+        # Map input keys to expected features
+        # Default values are 0 or normal ranges
+        
+        age = float(lab_values.get('age', 50))
+        gender = 1 if lab_values.get('gender', 'Male').lower() == 'male' else 0
+        smoking = 1 if lab_values.get('smoking', 'No') == 'Yes' else 0
+        alcohol = 1 if lab_values.get('alcohol', 'No') == 'Yes' else 0
+        htn = 1 if lab_values.get('hypertension', 'No') == 'Yes' else 0
+        cad = 1 if lab_values.get('coronary_artery_disease', 'No') == 'Yes' else 0
+        cancer = 1 if lab_values.get('cancer', 'No') == 'Yes' else 0
+        cld = 1 if lab_values.get('chronic_liver_disease', 'No') == 'Yes' else 0
+        
+        creatinine = float(lab_values.get('serum_creatinine', 1.0))
+        cholesterol = float(lab_values.get('cholesterol', 200))
+        ldl = float(lab_values.get('ldl', 100))
+        hdl = float(lab_values.get('hdl', 50))
+        uric_acid = float(lab_values.get('uric_acid', 5.0))
+        calcium = float(lab_values.get('calcium', 9.5))
+        phosphate = float(lab_values.get('phosphate', 3.5))
+        hemoglobin = float(lab_values.get('hemoglobin', 14.0))
+        
+        statin = 1 if lab_values.get('statin', 'No') == 'Yes' else 0
+        metformin = 1 if lab_values.get('metformin', 'No') == 'Yes' else 0
+        insulin = 1 if lab_values.get('insulin', 'No') == 'Yes' else 0
+        dpp4 = 1 if lab_values.get('dpp4_inhibitor', 'No') == 'Yes' else 0
+        
+        # Base features (20)
+        features = [
+            age, gender, smoking, alcohol, htn, cad, cancer, cld,
+            creatinine, cholesterol, ldl, hdl, uric_acid, calcium, phosphate, hemoglobin,
+            statin, metformin, insulin, dpp4
+        ]
+        
+        if model_type == 'aki':
+            return np.array([features])
+            
+        # Derived features for ESRD (and likely CKD)
+        chol_ratio = cholesterol / hdl if hdl > 0 else 0
+        creat_log = np.log(creatinine) if creatinine > 0 else 0
+        age_creat_interaction = age * creatinine
+        high_creat = 1 if creatinine > 1.3 else 0 # Threshold assumption
+        high_glucose = 1 if float(lab_values.get('blood_glucose', 100)) > 140 else 0 # Threshold assumption
+        
+        features.extend([chol_ratio, creat_log, age_creat_interaction, high_creat, high_glucose])
+        
+        return np.array([features])
+
     
     @staticmethod
     def predict_ckd(lab_values: dict) -> dict:
@@ -90,11 +176,51 @@ class KidneyDiseasePredictor:
     @staticmethod
     def predict_aki(lab_values: dict) -> dict:
         """
-        Predict Acute Kidney Injury (AKI) severity
-        Based on KDIGO criteria
+        Predict Acute Kidney Injury (AKI) using trained model
         """
-        creatinine = lab_values.get('serum_creatinine', 1.0)
-        egfr = lab_values.get('egfr', 90)
+        KidneyDiseasePredictor._load_models()
+        
+        if KidneyDiseasePredictor.aki_model:
+            try:
+                features = KidneyDiseasePredictor._prepare_features(lab_values, model_type='aki')
+                prediction = KidneyDiseasePredictor.aki_model.predict(features)[0]
+                # Assuming prediction is 0 (No AKI) or 1 (AKI)
+                # Or maybe it's multi-class?
+                # If binary, we might need probability for severity
+                
+                try:
+                    probs = KidneyDiseasePredictor.aki_model.predict_proba(features)[0]
+                    risk_score = probs[1] # Probability of AKI
+                except:
+                    risk_score = float(prediction)
+                
+                if risk_score > 0.7:
+                    stage = 'Stage 3 (Severe)'
+                    severity = 'High'
+                elif risk_score > 0.4:
+                    stage = 'Stage 1-2 (Moderate)'
+                    severity = 'Moderate'
+                else:
+                    stage = 'No AKI'
+                    severity = 'Low'
+                    
+                return {
+                    'disease': 'Acute Kidney Injury (AKI)',
+                    'stage': stage,
+                    'severity': severity,
+                    'risk_level': severity,
+                    'risk_score': round(risk_score * 100, 1),
+                    'lab_values': lab_values,
+                    'recommendations': KidneyDiseasePredictor._get_aki_recommendations(stage)
+                }
+            except Exception as e:
+                print(f"Error in AKI model prediction: {e}")
+                # Fallback to rule-based
+                pass
+        
+        # Fallback logic
+        creatinine = float(lab_values.get('serum_creatinine', 1.0))
+        egfr = float(lab_values.get('egfr', 90))
         
         # AKI staging based on creatinine increase
         if creatinine >= 4.0:
@@ -112,11 +238,11 @@ class KidneyDiseasePredictor:
         
         # Additional risk factors
         risk_factors = []
-        potassium = lab_values.get('potassium', 4.0)
+        potassium = float(lab_values.get('potassium', 4.0))
         if potassium > 5.5:
             risk_factors.append(f"Hyperkalemia ({potassium} mEq/L)")
         
-        sodium = lab_values.get('sodium', 140)
+        sodium = float(lab_values.get('sodium', 140))
         if sodium < 135:
             risk_factors.append(f"Hyponatremia ({sodium} mEq/L)")
         
@@ -124,6 +250,7 @@ class KidneyDiseasePredictor:
             'disease': 'Acute Kidney Injury (AKI)',
             'stage': stage,
             'severity': severity,
+            'risk_level': severity,
             'creatinine': creatinine,
             'egfr': egfr,
             'risk_factors': risk_factors if risk_factors else ['Monitor kidney function closely'],
@@ -134,10 +261,51 @@ class KidneyDiseasePredictor:
     @staticmethod
     def predict_esrd(lab_values: dict) -> dict:
         """
-        Predict End-Stage Renal Disease (ESRD) status
+        Predict End-Stage Renal Disease (ESRD) status using trained model
         """
-        egfr = lab_values.get('egfr', 60)
-        creatinine = lab_values.get('serum_creatinine', 1.0)
+        KidneyDiseasePredictor._load_models()
+        
+        if KidneyDiseasePredictor.esrd_model:
+            try:
+                features = KidneyDiseasePredictor._prepare_features(lab_values, model_type='esrd')
+                prediction = KidneyDiseasePredictor.esrd_model.predict(features)[0]
+                
+                try:
+                    probs = KidneyDiseasePredictor.esrd_model.predict_proba(features)[0]
+                    risk_score = probs[1]
+                except:
+                    risk_score = float(prediction)
+                
+                if risk_score > 0.8:
+                    stage = 'ESRD (Stage 5)'
+                    severity = 'Critical'
+                    dialysis_needed = True
+                elif risk_score > 0.5:
+                    stage = 'Severe CKD (Stage 4)'
+                    severity = 'High'
+                    dialysis_needed = False
+                else:
+                    stage = 'Early/Moderate CKD'
+                    severity = 'Moderate' if risk_score > 0.3 else 'Low'
+                    dialysis_needed = False
+                    
+                return {
+                    'disease': 'End-Stage Renal Disease (ESRD)',
+                    'stage': stage,
+                    'severity': severity,
+                    'risk_level': severity,
+                    'risk_score': round(risk_score * 100, 1),
+                    'dialysis_needed': dialysis_needed,
+                    'lab_values': lab_values,
+                    'recommendations': KidneyDiseasePredictor._get_esrd_recommendations(severity, dialysis_needed)
+                }
+            except Exception as e:
+                print(f"Error in ESRD model prediction: {e}")
+                # Fallback to rule-based
+                pass
+
+        egfr = float(lab_values.get('egfr', 60))
+        creatinine = float(lab_values.get('serum_creatinine', 1.0))
         
         # ESRD classification
         if egfr < 15:
@@ -159,18 +327,18 @@ class KidneyDiseasePredictor:
         
         # Complications
         complications = []
-        hemoglobin = lab_values.get('hemoglobin', 12.0)
+        hemoglobin = float(lab_values.get('hemoglobin', 12.0))
         if hemoglobin < 10.0:
             complications.append(f"Anemia (Hb: {hemoglobin} g/dL)")
         
-        calcium = lab_values.get('calcium', 9.0)
-        phosphorus = lab_values.get('phosphorus', 3.5)
+        calcium = float(lab_values.get('calcium', 9.0))
+        phosphorus = float(lab_values.get('phosphorus', 3.5))
         if calcium < 8.5:
             complications.append(f"Hypocalcemia ({calcium} mg/dL)")
         if phosphorus > 5.5:
             complications.append(f"Hyperphosphatemia ({phosphorus} mg/dL)")
         
-        potassium = lab_values.get('potassium', 4.0)
+        potassium = float(lab_values.get('potassium', 4.0))
         if potassium > 5.5:
             complications.append(f"Hyperkalemia ({potassium} mEq/L)")
         
@@ -178,6 +346,7 @@ class KidneyDiseasePredictor:
             'disease': 'End-Stage Renal Disease (ESRD)',
             'stage': stage,
             'severity': severity,
+            'risk_level': severity,
             'egfr': egfr,
             'creatinine': creatinine,
             'dialysis_needed': dialysis_needed,

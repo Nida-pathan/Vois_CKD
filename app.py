@@ -18,6 +18,8 @@ import atexit
 import threading
 import warnings
 import logging
+import ast
+
 
 # Suppress gRPC timeout warnings (harmless development noise)
 warnings.filterwarnings("ignore", message=".*grpc_wait_for_shutdown_with_timeout.*")
@@ -586,10 +588,18 @@ def doctor_patient_details(patient_id):
     if patient_data and not patient_username:
         patient_username = patient_data.get('username')
     
-    # If patient_id starts with 'P', try extracting username
+    # If patient_id starts with 'P', try extracting username by looking up User ID
     if not patient_username and patient_id.startswith('P'):
-        potential_username = patient_id[1:]
-        patient_username = potential_username
+        potential_id = patient_id[1:]
+        # Import User model to lookup by ID
+        from models.user import User
+        user = User.get_by_id(potential_id)
+        if user:
+            patient_username = user.username
+            print(f"Resolved patient_id {patient_id} to username {patient_username}")
+        else:
+            # Fallback to old behavior just in case
+            patient_username = potential_id
     
     # Try to get additional patient info directly from database
     # Look in patients_data collection with username match to get complete patient info
@@ -677,6 +687,23 @@ def doctor_patient_details(patient_id):
             converted = safe_float(patient_data.get(field))
             patient_data[field] = converted
 
+    # Ensure required fields have defaults to prevent template errors
+    defaults = {
+        'risk_level': 'Unknown',
+        'risk_percentage': 0,
+        'stage': 'N/A',
+        'egfr': None,
+        'name': 'Unknown Patient',
+        'patient_name': 'Unknown Patient'
+    }
+    for key, default in defaults.items():
+        if key not in patient_data or patient_data[key] is None:
+            patient_data[key] = default
+            
+    # Ensure risk_level is a string for .lower() call in template
+    if not isinstance(patient_data.get('risk_level'), str):
+        patient_data['risk_level'] = str(patient_data['risk_level'])
+
     # Get prescriptions for this patient
     db = Database.get_db()
     prescriptions = []
@@ -686,9 +713,108 @@ def doctor_patient_details(patient_id):
         prescriptions_cursor = db.prescriptions.find({'patient': patient_username if patient_username else patient_id})
         prescriptions = list(prescriptions_cursor)
         
-        # Get lab results
-        lab_results_cursor = db.lab_results.find({'patient_id': patient_id})
-        lab_results = list(lab_results_cursor)
+        # Get lab results using the robust helper function
+        # Try with patient_id first
+        lab_results = get_patient_lab_results(patient_id, db)
+        
+        # If not found and we have a username, try that
+        if not lab_results and patient_username:
+            lab_results = get_patient_lab_results(patient_username, db)
+            
+        # Debug logging to file
+        try:
+            with open('debug_results_view.txt', 'a') as f:
+                f.write(f"\n--- Debug Results View {datetime.now()} ---\n")
+                f.write(f"Patient ID: {patient_id}\n")
+                f.write(f"Patient Username: {patient_username}\n")
+                f.write(f"Lab Results Found: {len(lab_results)}\n")
+                if lab_results:
+                    f.write(f"Latest Result Keys: {list(lab_results[0].keys())}\n")
+                    f.write(f"Latest Result Sample: {str(lab_results[0])[:200]}...\n")
+        except Exception as e:
+            print(f"Debug logging failed: {e}")
+        
+        # Sort lab results by date (newest first)
+        lab_results.sort(key=lambda x: x.get('test_date', ''), reverse=True)
+        
+        # Update patient_data with latest lab results if available
+        if lab_results:
+            latest_result = lab_results[0]
+            print(f"Updating patient data with latest lab result from {latest_result.get('test_date')}")
+            
+            # Update metrics
+            for field in numeric_fields:
+                if field in latest_result:
+                    patient_data[field] = safe_float(latest_result.get(field))
+            
+            # Update Risk Assessment and Disease Status
+            # Map fields from lab result to patient_data expected keys
+            if 'risk_level' in latest_result:
+                patient_data['risk_level'] = latest_result['risk_level']
+            if 'risk_percentage' in latest_result:
+                patient_data['risk_percentage'] = safe_float(latest_result['risk_percentage'])
+            if 'ckd_stage' in latest_result:
+                patient_data['stage'] = latest_result['ckd_stage']
+            elif 'stage' in latest_result:
+                patient_data['stage'] = latest_result['stage']
+                
+            # Disease specific risks
+            if 'kidney_stone_risk' in latest_result:
+                patient_data['kidney_stone_risk'] = latest_result['kidney_stone_risk']
+            if 'aki_risk' in latest_result:
+                patient_data['aki_risk'] = latest_result['aki_risk']
+            if 'esrd_status' in latest_result:
+                patient_data['esrd_status'] = latest_result['esrd_status']
+                
+            # Update PDF link and date
+            if 'pdf_path' in latest_result:
+                patient_data['latest_lab_pdf'] = latest_result['pdf_path']
+            if 'test_date' in latest_result:
+                patient_data['last_updated'] = latest_result['test_date']
+                
+            # Try to parse 'notes' field for prediction data (where rich data might be hidden)
+            if 'notes' in latest_result and isinstance(latest_result['notes'], str):
+                notes = latest_result['notes']
+                if 'Prediction:' in notes:
+                    try:
+                        # Extract the dictionary part
+                        pred_str = notes.split('Prediction:', 1)[1].strip()
+                        # Use ast.literal_eval to safely parse stringified python dict
+                        prediction = ast.literal_eval(pred_str)
+                        
+                        if isinstance(prediction, dict):
+                            print(f"Extracted prediction from notes: {prediction}")
+                            
+                            # Update Risk/Stage from prediction
+                            if 'stage' in prediction:
+                                patient_data['stage'] = prediction['stage']
+                            if 'risk_level' in prediction:
+                                patient_data['risk_level'] = prediction['risk_level']
+                            if 'risk_percentage' in prediction:
+                                patient_data['risk_percentage'] = safe_float(prediction['risk_percentage'])
+                                
+                            # Update Disease Status specific fields
+                            if 'kidney_stone_risk' in prediction:
+                                patient_data['kidney_stone_risk'] = prediction['kidney_stone_risk']
+                            if 'aki_risk' in prediction:
+                                patient_data['aki_risk'] = prediction['aki_risk']
+                            if 'esrd_status' in prediction:
+                                patient_data['esrd_status'] = prediction['esrd_status']
+                            
+                            # Update Lab Values from prediction if available (overrides top-level if present)
+                            if 'lab_values' in prediction and isinstance(prediction['lab_values'], dict):
+                                lab_values = prediction['lab_values']
+                                for k, v in lab_values.items():
+                                    if k in numeric_fields:
+                                        patient_data[k] = safe_float(v)
+                                        
+                            # Also check top-level keys of prediction for metrics
+                            for k, v in prediction.items():
+                                if k in numeric_fields:
+                                    patient_data[k] = safe_float(v)
+                                    
+                    except Exception as e:
+                        print(f"Failed to parse prediction from notes: {e}")
     
     # Access Control for Doctors - TEMPORARILY DISABLED FOR DEBUGGING
     # appointments = get_appointments_for_doctor(current_user.username)
@@ -2527,7 +2653,7 @@ def handler(event, context):
 # For local development
 if __name__ == '__main__':
     try:
-        app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=True)
+        app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=True, use_reloader=False)
     except KeyboardInterrupt:
         print("Shutting down gracefully...")
     except SystemExit:
