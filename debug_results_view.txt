@@ -61,3 +61,18 @@ Patient Username: JOHN
 Lab Results Found: 4
 Latest Result Keys: ['_id', 'patient_username', 'test_date', 'test_type', 'notes', 'created_at', 'egfr', 'serum_creatinine', 'sodium', 'potassium']
 Latest Result Sample: {'_id': ObjectId('692ae634d093090c5f593b84'), 'patient_username': 'JOHN', 'test_date': datetime.datetime(2025, 11, 29, 17, 55, 24, 384000), 'test_type': 'Lab Report Upload', 'notes': "Uploaded via Pat...
+
+--- Debug Results View 2025-12-06 12:09:19.411962 ---
+Patient ID: P691f4b029b57d3c1a00f28e9
+Patient Username: Aditya21
+Lab Results Found: 0
+
+--- Debug Results View 2025-12-06 12:09:26.193096 ---
+Patient ID: P691f4b029b57d3c1a00f28e9
+Patient Username: Aditya21
+Lab Results Found: 0
+
+--- Debug Results View 2025-12-06 12:10:18.357207 ---
+Patient ID: P691f4b029b57d3c1a00f28e9
+Patient Username: Aditya21
+Lab Results Found: 0

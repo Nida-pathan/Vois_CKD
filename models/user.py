@@ -524,14 +524,32 @@ def get_doctor_patients_with_details(doctor_username):
                     age = data.get('age')
                     if isinstance(age, str) and age != 'N/A':
                         age = int(age)
-                    'risk_percentage': risk_percentage,
-                    'stage': stage,
-                    'risk_level': data.get('risk_level', 'Unknown').title() if isinstance(data.get('risk_level'), str) else 'Unknown',
-                    'age': age,
-                    'egfr': egfr,
-                    'last_updated': last_updated
-                }
-                filtered_patients.append(patient_info)
+                    
+                    # Get risk data with defaults
+                    risk_percentage = data.get('risk_percentage', 0)
+                    stage = data.get('stage', 'Unknown')
+                    
+                    patient_info = {
+                        'risk_percentage': risk_percentage,
+                        'stage': stage,
+                        'risk_level': data.get('risk_level', 'Unknown').title() if isinstance(data.get('risk_level'), str) else 'Unknown',
+                        'age': age,
+                        'egfr': egfr,
+                        'last_updated': last_updated
+                    }
+                    filtered_patients.append(patient_info)
+                except (ValueError, TypeError) as e:
+                    print(f"Error processing patient data for {username}: {e}")
+                    # Continue with default values
+                    patient_info = {
+                        'risk_percentage': 0,
+                        'stage': 'Unknown',
+                        'risk_level': 'Unknown',
+                        'age': 'N/A',
+                        'egfr': None,
+                        'last_updated': last_updated
+                    }
+                    filtered_patients.append(patient_info)
             else:
                 # Patient has appointment but no health data yet
                 # Fetch basic user info

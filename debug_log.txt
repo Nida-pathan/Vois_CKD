@@ -177,3 +177,36 @@ Appointments found: 0
 --- Patient Dashboard Debug (2025-11-29 18:39:50.869492) ---
 User: JOHN
 Appointments found: 0
+
+--- Patient Dashboard Debug (2025-12-06 12:09:53.234862) ---
+User: Aditya21
+Appointments found: 0
+Booking request received: {'doctor_name': 'doc2', 'preferred_date': '2025-12-07', 'preferred_time': '12:10'}
+Doctor name: doc2
+Appointment created successfully: {'patient': 'Aditya21', 'doctor': 'doc2', 'preferred_date': '2025-12-07', 'preferred_time': '12:10', 'meet_link': 'https://meet.jit.si/ckd-appointment-49103ad4-230d-4e95-842c-0e38a4334eac', 'status': 'pending', 'created_at': '2025-12-06T12:10:03.987713', '_id': '6933cfc32775933a362a675d'}
+
+--- Patient Dashboard Debug (2025-12-06 12:10:05.101640) ---
+User: Aditya21
+Appointments found: 1
+Apt: Doctor=doc2, Link=https://meet.jit.si/ckd-appointment-49103ad4-230d-4e95-842c-0e38a4334eac
+
+--- Patient Dashboard Debug (2025-12-06 12:21:19.298265) ---
+User: Aditya21
+Appointments found: 1
+Apt: Doctor=doc2, Link=https://meet.jit.si/ckd-appointment-49103ad4-230d-4e95-842c-0e38a4334eac
+
+--- Patient Dashboard Debug (2025-12-19 11:49:44.429660) ---
+User: Aditya21
+Appointments found: 0
+
+--- Patient Dashboard Debug (2025-12-19 11:49:56.337160) ---
+User: Aditya21
+Appointments found: 0
+Booking request received: {'doctor_name': 'doc2', 'preferred_date': '2025-12-20', 'preferred_time': '12:50'}
+Doctor name: doc2
+Appointment created successfully: {'patient': 'Aditya21', 'doctor': 'doc2', 'preferred_date': '2025-12-20', 'preferred_time': '12:50', 'meet_link': 'https://meet.jit.si/ckd-appointment-83f61f1e-e1c6-4ebe-992d-a0cc0a9147e9', 'status': 'pending', 'created_at': '2025-12-19T11:50:13.721029', '_id': '6944ee9d9f2c8a6f95e806c9'}
+
+--- Patient Dashboard Debug (2025-12-19 11:50:14.959862) ---
+User: Aditya21
+Appointments found: 1
+Apt: Doctor=doc2, Link=https://meet.jit.si/ckd-appointment-83f61f1e-e1c6-4ebe-992d-a0cc0a9147e9
