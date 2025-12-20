@@ -13,6 +13,7 @@ class User(UserMixin):
         self.role = user_data.get('role')
         self.email = user_data.get('email')
         self.specialization = user_data.get('specialization')
+        self.city = user_data.get('city')
         # For doctors: list of patient IDs they manage
         self.patients = user_data.get('patients', []) 
 
@@ -52,7 +53,7 @@ class User(UserMixin):
             return None
 
     @staticmethod
-    def create_user(username, password, role, email=None, specialization=None):
+    def create_user(username, password, role, email=None, specialization=None, city=None):
         """Create user with error handling"""
         try:
             db = Database.get_db()
@@ -67,6 +68,7 @@ class User(UserMixin):
                 'role': role,
                 'email': email,
                 'specialization': specialization,
+                'city': city,
                 'created_at': pd.Timestamp.now().isoformat(),
                 'patients': [] # Initialize empty patient list
             }

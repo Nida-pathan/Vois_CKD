@@ -82,14 +82,19 @@ def register():
             return render_template('register.html')
         
         try:
-            # Create new patient user
-            User.create_user(username, password, 'patient', email)
+            # Extract city from form (default to Mumbai if not provided for now, but field will be added)
+            city = request.form.get('city')
+            print(f"DEBUG: Registering user {username} with City: {city}")
+            
+            # Create new patient user with city
+            User.create_user(username, password, 'patient', email, city=city)
             
             # Collect comprehensive medical data
             patient_data = {
                 'patient_id': f"P{username}",
                 'patient_name': request.form.get('full_name'),
                 'username': username,
+                'city': city,  # Add city to patient data for easy access
                 'age': int(request.form.get('age', 0)),
                 'gender': request.form.get('gender'),
                 'blood_type': request.form.get('blood_type', 'N/A'),
@@ -342,9 +347,10 @@ def add_doctor():
     email = request.form.get('email')
     password = request.form.get('password')
     specialization = request.form.get('specialization')
+    city = request.form.get('city')
     
-    if not all([username, email, password, specialization]):
-        flash('All fields are required', 'danger')
+    if not all([username, email, password, specialization, city]):
+        flash('All fields including City are required', 'danger')
         return redirect(url_for('admin_dashboard'))
     
     # Check if username already exists
@@ -353,7 +359,7 @@ def add_doctor():
         return redirect(url_for('admin_dashboard'))
     
     # Create new doctor
-    User.create_user(username, password, 'doctor', email, specialization)
+    User.create_user(username, password, 'doctor', email, specialization, city)
     
     flash(f'Doctor {username} added successfully!', 'success')
     return redirect(url_for('admin_dashboard'))
@@ -726,12 +732,12 @@ def doctor_patient_details(patient_id):
         patient_data = dict(patient_data) if patient_data else {}
         patient_data.pop('_id', None)
     
-    def safe_float(value):
+    def safe_float(val):
         """Convert incoming value to float when possible, stripping symbols like %."""
-        if isinstance(value, (int, float)):
-            return float(value)
-        if isinstance(value, str):
-            cleaned = value.replace('%', '').strip()
+        if isinstance(val, (int, float)):
+            return float(val)
+        if isinstance(val, str):
+            cleaned = val.replace('%', '').strip()
             if not cleaned:
                 return None
             try:
@@ -740,169 +746,69 @@ def doctor_patient_details(patient_id):
                 return None
         return None
 
-    numeric_fields = [
-        'egfr', 'risk_percentage', 'serum_creatinine', 'blood_urea', 'hemoglobin',
-        'sodium', 'potassium', 'blood_glucose', 'bp_systolic', 'bp_diastolic'
-    ]
-    for field in numeric_fields:
-        if field in patient_data:
-            converted = safe_float(patient_data.get(field))
-            patient_data[field] = converted
-
-    # Ensure required fields have defaults to prevent template errors
-    defaults = {
-        'risk_level': 'Unknown',
-        'risk_percentage': 0,
-        'stage': 'N/A',
-        'egfr': None,
-        'name': 'Unknown Patient',
-        'patient_name': 'Unknown Patient'
-    }
-    for key, default in defaults.items():
-        if key not in patient_data or patient_data[key] is None:
-            patient_data[key] = default
-            
-    # Ensure risk_level is a string for .lower() call in template
-    if not isinstance(patient_data.get('risk_level'), str):
-        patient_data['risk_level'] = str(patient_data['risk_level'])
-
-    # Get prescriptions for this patient
-    db = Database.get_db()
-    prescriptions = []
-    lab_results = []
-    if db is not None:
-        # Get prescriptions
-        prescriptions_cursor = db.prescriptions.find({'patient': patient_username if patient_username else patient_id})
-        prescriptions = list(prescriptions_cursor)
-        
-        # Get lab results using the robust helper function
-        # Try with patient_id first
-        lab_results = get_patient_lab_results(patient_id, db)
-        
-        # If not found and we have a username, try that
-        if not lab_results and patient_username:
-            lab_results = get_patient_lab_results(patient_username, db)
-            
-        # Debug logging to file
-        try:
-            with open('debug_results_view.txt', 'a') as f:
-                f.write(f"\n--- Debug Results View {datetime.now()} ---\n")
-                f.write(f"Patient ID: {patient_id}\n")
-                f.write(f"Patient Username: {patient_username}\n")
-                f.write(f"Lab Results Found: {len(lab_results)}\n")
-                if lab_results:
-                    f.write(f"Latest Result Keys: {list(lab_results[0].keys())}\n")
-                    f.write(f"Latest Result Sample: {str(lab_results[0])[:200]}...\n")
-        except Exception as e:
-            print(f"Debug logging failed: {e}")
-        
-        # Sort lab results by date (newest first)
-        lab_results.sort(key=lambda x: x.get('test_date', ''), reverse=True)
-        
-        # Update patient_data with latest lab results if available
-        if lab_results:
-            latest_result = lab_results[0]
-            print(f"Updating patient data with latest lab result from {latest_result.get('test_date')}")
-            
-            # Update metrics
-            for field in numeric_fields:
-                if field in latest_result:
-                    patient_data[field] = safe_float(latest_result.get(field))
-            
-            # Update Risk Assessment and Disease Status
-            # Map fields from lab result to patient_data expected keys
-            if 'risk_level' in latest_result:
-                patient_data['risk_level'] = latest_result['risk_level']
-            if 'risk_percentage' in latest_result:
-                patient_data['risk_percentage'] = safe_float(latest_result['risk_percentage'])
-            if 'ckd_stage' in latest_result:
-                patient_data['stage'] = latest_result['ckd_stage']
-            elif 'stage' in latest_result:
-                patient_data['stage'] = latest_result['stage']
-                
-            # Disease specific risks
-            if 'kidney_stone_risk' in latest_result:
-                patient_data['kidney_stone_risk'] = latest_result['kidney_stone_risk']
-            if 'aki_risk' in latest_result:
-                patient_data['aki_risk'] = latest_result['aki_risk']
-            if 'esrd_status' in latest_result:
-                patient_data['esrd_status'] = latest_result['esrd_status']
-                
-            # Update PDF link and date
-            if 'pdf_path' in latest_result:
-                patient_data['latest_lab_pdf'] = latest_result['pdf_path']
-            if 'test_date' in latest_result:
-                patient_data['last_updated'] = latest_result['test_date']
-                
-            # Try to parse 'notes' field for prediction data (where rich data might be hidden)
-            if 'notes' in latest_result and isinstance(latest_result['notes'], str):
-                notes = latest_result['notes']
-                if 'Prediction:' in notes:
-                    try:
-                        # Extract the dictionary part
-                        pred_str = notes.split('Prediction:', 1)[1].strip()
-                        # Use ast.literal_eval to safely parse stringified python dict
-                        prediction = ast.literal_eval(pred_str)
-                        
-                        if isinstance(prediction, dict):
-                            print(f"Extracted prediction from notes: {prediction}")
-                            
-                            # Update Risk/Stage from prediction
-                            if 'stage' in prediction:
-                                patient_data['stage'] = prediction['stage']
-                            if 'risk_level' in prediction:
-                                patient_data['risk_level'] = prediction['risk_level']
-                            if 'risk_percentage' in prediction:
-                                patient_data['risk_percentage'] = safe_float(prediction['risk_percentage'])
-                                
-                            # Update Disease Status specific fields
-                            if 'kidney_stone_risk' in prediction:
-                                patient_data['kidney_stone_risk'] = prediction['kidney_stone_risk']
-                            if 'aki_risk' in prediction:
-                                patient_data['aki_risk'] = prediction['aki_risk']
-                            if 'esrd_status' in prediction:
-                                patient_data['esrd_status'] = prediction['esrd_status']
-                            
-                            # Update Lab Values from prediction if available (overrides top-level if present)
-                            if 'lab_values' in prediction and isinstance(prediction['lab_values'], dict):
-                                lab_values = prediction['lab_values']
-                                for k, v in lab_values.items():
-                                    if k in numeric_fields:
-                                        patient_data[k] = safe_float(v)
-                                        
-                            # Also check top-level keys of prediction for metrics
-                            for k, v in prediction.items():
-                                if k in numeric_fields:
-                                    patient_data[k] = safe_float(v)
-                                    
-                    except Exception as e:
-                        print(f"Failed to parse prediction from notes: {e}")
+    # Process history to find latest reports
+    history = patient_data.get('history', [])
+    latest_ai_report = None
+    latest_lab_report = None
     
-    # Access Control for Doctors - TEMPORARILY DISABLED FOR DEBUGGING
-    # appointments = get_appointments_for_doctor(current_user.username)
-    # allowed_patients = set(apt['patient'] for apt in appointments)
-    # if hasattr(current_user, 'patients') and current_user.patients:
-    #     allowed_patients.update(current_user.patients)
-    #     
-    # # Check if this patient is in the allowed list
-    # p_username = patient_data.get('username') if patient_data else None
-    # if not p_username and patient_id.startswith('P'):
-    #     p_username = patient_id[1:]
-    #     
-    # if p_username and p_username not in allowed_patients:
-    #     flash('Access denied. You can only view reports for your booked patients.', 'danger')
-    #     return redirect(url_for('doctor_dashboard'))
+    # Sort history by date descending just in case
+    sorted_history = sorted(history, key=lambda x: x.get('date', ''), reverse=True)
+    
+    for report in sorted_history:
+        test_type = report.get('test_type', '')
+        if test_type == 'Prescription Analysis' and not latest_ai_report:
+            latest_ai_report = report
+        elif test_type != 'Prescription Analysis' and not latest_lab_report:
+            latest_lab_report = report
+    
+    patient_data['latest_ai_report'] = latest_ai_report
+    patient_data['latest_lab_report'] = latest_lab_report
 
-    print(f"Patient data being sent to template: {patient_data}")  # Debug log
-
-    # Additional debugging - let's also print the patient_id to make sure it's correct
-    print(f"Final patient_id: {patient_id}")
-    print(f"Final patient_data keys: {list(patient_data.keys()) if patient_data else 'None'}")
-
+    # Separate AI and Lab reports in history
+    latest_ai_report = None
+    latest_lab_report = None
+    
+    if patient_data and 'history' in patient_data and patient_data['history']:
+        # Sort history by date descending
+        history = list(patient_data['history'])
+        # Sort if date is string, might need robust parsing but string compare often works for ISO
+        try:
+             history.sort(key=lambda x: x.get('date', ''), reverse=True)
+        except:
+             pass
+        
+        for report in history:
+            test_type = report.get('test_type', '')
+            if test_type == 'Prescription Analysis' and not latest_ai_report:
+                latest_ai_report = report
+            elif test_type != 'Prescription Analysis' and not latest_lab_report:
+                latest_lab_report = report
+            
+            if latest_ai_report and latest_lab_report:
+                break
+    
+    # Add to patient_data
+    if patient_data:
+        patient_data['latest_ai_report'] = latest_ai_report
+        patient_data['latest_lab_report'] = latest_lab_report
     return render_template('results.html', 
                          patient=patient_data,
-                         prescriptions=prescriptions,
-                         lab_results=lab_results)
+                         lab_results=patient_data.get('history', []),
+                         prescriptions=get_prescriptions_for_patient(patient_username) if patient_username else [])
+
+def get_prescriptions_for_patient(username):
+    """Helper to get prescriptions for a patient"""
+    # This logic was missing or implied, adding a basic implementation or placeholder
+    # Assuming standard prescription retrieval
+    from models.database import Database
+    db = Database.get_db()
+    if db is None:
+        return []
+    
+    prescriptions = list(db.prescriptions.find({'patient_username': username}).sort('date', -1))
+    for p in prescriptions:
+         p['_id'] = str(p['_id'])
+    return prescriptions
 
 @app.route('/test/route/debug')
 def test_route_debug():
@@ -1060,15 +966,46 @@ def patient_dashboard():
         
         # Get available doctors
         doctors_list = get_all_doctors()
+        
+        # Get patient location (from User object or patient_data)
+        # First try patient_data which comes from the form
+        patient_location = patient_data.get('city')
+        print(f"DEBUG: Dashboard - Patient Data City: {patient_location}")
+        
+        # If not there, try fetching User object
+        if not patient_location:
+            user = User.get_by_username(current_user.username)
+            if user:
+                patient_location = user.city
+                print(f"DEBUG: Dashboard - User Object City: {patient_location}")
+                
+        # Default if still missing
+        if not patient_location:
+             patient_location = 'Mumbai' 
+
         available_doctors = []
         for doc in doctors_list:
+            # Use real doctor location
+            doc_location = doc.city if doc.city else 'Unknown'
+            
+            # Calculate priority (0 = Same City/Highest Priority, 1 = Others)
+            priority = 0 if patient_location and doc_location and doc_location.lower() == patient_location.lower() else 1
+            
             available_doctors.append({
                 'name': f"Dr. {doc.username}",
                 'username': doc.username,
                 'specialty': doc.specialization or 'General',
                 'experience': 'Experienced',
-                'avatar': doc.username[:2].upper()
+                'avatar': doc.username[:2].upper(),
+                'location': doc_location,
+                'priority': priority
             })
+            
+        # Sort doctors: Priority 0 first, then by name
+        available_doctors.sort(key=lambda x: (x['priority'], x['name']))
+        
+        # Limit to 3 for dashboard display
+        dashboard_doctors = available_doctors[:3]
         
         # Prepare dashboard data with defaults
         dashboard_data = {
@@ -1145,7 +1082,22 @@ def patient_dashboard():
             lab_reports_count = len(history) if history else 0
             dashboard_data['lab_reports_count'] = lab_reports_count
             
-            # Get current metrics from nested current_metrics object
+            # Separate reports into AI and Lab
+            latest_ai_report = None
+            latest_lab_report = None
+            
+            # Sort history by date descending just in case
+            sorted_history = sorted(history, key=lambda x: x.get('date', ''), reverse=True)
+            
+            for report in sorted_history:
+                test_type = report.get('test_type', '')
+                if test_type == 'Prescription Analysis' and not latest_ai_report:
+                    latest_ai_report = report
+                elif test_type != 'Prescription Analysis' and not latest_lab_report:
+                    latest_lab_report = report
+            
+            dashboard_data['latest_ai_report'] = latest_ai_report
+            dashboard_data['latest_lab_report'] = latest_lab_report
             dashboard_data['current_metrics'] = {
                 'bp_systolic': current_metrics.get('bp_systolic', 'N/A'),
                 'bp_diastolic': current_metrics.get('bp_diastolic', 'N/A'),
@@ -1183,7 +1135,7 @@ def patient_dashboard():
         return render_template('patient_dashboard.html', 
                              patient_data=dashboard_data,
                              patient_trials=patient_trials,
-                             available_doctors=available_doctors,
+                             available_doctors=dashboard_doctors,
                              upcoming_appointments=upcoming_appointments,
                              debug_status="FIXED")
     
@@ -1198,6 +1150,58 @@ def patient_dashboard():
                              available_doctors=[],
                              upcoming_appointments=[],
                              debug_status=f"ERROR: {str(e)}")
+
+@app.route('/patient/all-doctors')
+@login_required
+def all_doctors_view():
+    if current_user.is_doctor():
+        return redirect(url_for('doctor_dashboard'))
+        
+    try:
+        # Determine patient location
+        patient_location = None
+        patient_id = f"P{current_user.id}"
+        intake_data = get_patient_data(patient_id)
+        if intake_data:
+             patient_location = intake_data.get('city')
+             
+        if not patient_location:
+             patient_location = current_user.city
+             
+        if not patient_location:
+             patient_location = 'Mumbai'
+        
+        # Get all doctors
+        doctors_list = get_all_doctors()
+        
+        all_doctors = []
+        for doc in doctors_list:
+             # Use real doctor location
+            doc_location = doc.city if doc.city else 'Unknown'
+            # Calculate priority (0 = Same City/Highest Priority, 1 = Others)
+            priority = 0 if patient_location and doc_location and doc_location.lower() == patient_location.lower() else 1
+            
+            all_doctors.append({
+                'name': f"Dr. {doc.username}",
+                'username': doc.username,
+                'specialty': doc.specialization or 'General',
+                'experience': 'Experienced',
+                'avatar': doc.username[:2].upper(),
+                'location': doc_location,
+                'priority': priority
+            })
+            
+        # Sort: same location first
+        all_doctors.sort(key=lambda x: (x['priority'], x['name']))
+        
+        return render_template('all_doctors.html', doctors=all_doctors, patient_location=patient_location)
+        
+    except Exception as e:
+        print(f"Error in all_doctors_view: {e}")
+        import traceback
+        traceback.print_exc()
+        flash('Unable to load doctors list.', 'danger')
+        return redirect(url_for('patient_dashboard'))
 
 def get_patient_lab_results(patient_identifier, db):
     """Helper function to get lab results with multiple fallback methods"""
@@ -1954,7 +1958,28 @@ def prescriptions():
         return redirect(url_for('index'))
     
     prescriptions_list = get_prescriptions_for_doctor(current_user.username)
-    return render_template('prescriptions.html', prescriptions=prescriptions_list)
+    
+    # Get unique patients for filter dropdown
+    unique_patients = list(set([p.get('patient') for p in prescriptions_list if p.get('patient')]))
+    unique_patients.sort()
+
+    # Filter by patient if specified
+    patient_filter = request.args.get('patient')
+    if patient_filter:
+        # Keep original list for unique_patients, filter a copy or filter the result for display
+        # We need unique_patients from the FULL list, so we do this before filtering prescriptions_list
+        # But wait, if we filter prescriptions_list above, we lose the other patients? 
+        # No, 'prescriptions_list' holds all prescriptions initially.
+        
+        # We need to filter 'display_prescriptions' separately
+        display_prescriptions = [p for p in prescriptions_list if p.get('patient') == patient_filter]
+    else:
+        display_prescriptions = prescriptions_list
+        
+    return render_template('prescriptions.html', 
+                         prescriptions=display_prescriptions, 
+                         patient_filter=patient_filter,
+                         unique_patients=unique_patients)
 
 @app.route('/create_prescription', methods=['POST'])
 @login_required
@@ -3056,6 +3081,24 @@ def prescription_analysis():
         
         # Generate PDF Report
         pdf_path = generate_prescription_report(patient_data, prescription, analysis_results)
+        
+        # Save to patient history so it appears in dashboard
+        from models.user import update_patient_lab_values
+        
+        # Determine username for saving
+        # patient_identifier might be username or ID. 
+        # If patient_data has username, use it. Otherwise assume patient_identifier is username.
+        save_username = patient_data.get('username', patient_identifier) if isinstance(patient_data, dict) else patient_identifier
+        
+        if save_username:
+            update_patient_lab_values(
+                username=save_username,
+                lab_values={},  # No specific lab metrics from prescription
+                prediction=analysis_results, # Store analysis as prediction/notes
+                pdf_path=pdf_path,
+                test_type='Prescription Analysis'
+            )
+            print(f"DEBUG: Saved Prescription Analysis report for {save_username}")
         
         return jsonify({
             'success': True,

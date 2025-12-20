@@ -972,6 +972,57 @@
                     </div>
                 </div>
 
+                <!-- Latest AI Analysis Report -->
+                {% if patient_data.latest_ai_report %}
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-robot"></i> Latest AI Analysis Report
+                        </div>
+                    </div>
+                    <div class="metric-item">
+                        <div style="flex: 1;">
+                            <div style="font-weight: 600; color: var(--text-primary);">
+                                {{ patient_data.latest_ai_report.date }}
+                            </div>
+                            <div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">
+                                Prescription Analysis
+                            </div>
+                        </div>
+                        <a href="{{ url_for('static', filename=patient_data.latest_ai_report.pdf_path) }}"
+                            target="_blank" class="card-action">
+                            <i class="fas fa-file-pdf"></i> View Report
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Latest Lab Report -->
+                {% if patient_data.latest_lab_report %}
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-vial"></i> Latest Lab Report
+                        </div>
+                    </div>
+                    <div class="metric-item">
+                        <div style="flex: 1;">
+                            <div style="font-weight: 600; color: var(--text-primary);">
+                                {{ patient_data.latest_lab_report.date }}
+                            </div>
+                            <div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">
+                                {{ patient_data.latest_lab_report.test_type if patient_data.latest_lab_report.test_type
+                                else 'Lab Analysis' }}
+                            </div>
+                        </div>
+                        <a href="{{ url_for('static', filename=patient_data.latest_lab_report.pdf_path) }}"
+                            target="_blank" class="card-action">
+                            <i class="fas fa-file-pdf"></i> View Report
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+
                 <!-- Report History -->
                 <div class="card">
                     <div class="card-header">
@@ -1074,20 +1125,36 @@
                         <div class="card-title">
                             <i class="fas fa-user-md"></i> Available Doctors
                         </div>
-                        <a href="{{ url_for('appointments') }}" class="card-action">Book</a>
+                        <a href="{{ url_for('all_doctors_view') }}" class="card-action">View All</a>
                     </div>
 
                     {% for doctor in available_doctors %}
-                    <div class="doctor-item">
+                    <div class="doctor-item" {% if doctor.priority==0
+                        %}style="border-left: 4px solid #10b981; background: #f0fdfa;" {% endif %}>
                         <div class="doctor-avatar">{{ doctor.avatar }}</div>
                         <div class="doctor-info">
-                            <div class="doctor-name">{{ doctor.name }}</div>
-                            <div class="doctor-specialty">{{ doctor.specialty }}</div>
+                            <div class="doctor-name">
+                                {{ doctor.name }}
+                                {% if doctor.priority == 0 %}
+                                <span
+                                    style="font-size: 10px; background: #10b981; color: white; padding: 2px 6px; border-radius: 10px; margin-left: 5px;">Nearby</span>
+                                {% endif %}
+                            </div>
+                            <div class="doctor-specialty">{{ doctor.specialty }} • <span style="color: #6b7280;">{{
+                                    doctor.location }}</span></div>
                             <div class="doctor-experience">{{ doctor.experience }}</div>
                         </div>
                         <button class="book-btn" onclick="bookAppointment('{{ doctor.username }}')">Book</button>
                     </div>
                     {% endfor %}
+
+                    <div
+                        style="text-align: center; margin-top: 15px; padding-top: 10px; border-top: 1px solid #f3f4f6;">
+                        <a href="{{ url_for('all_doctors_view') }}"
+                            style="display: block; width: 100%; color: #0d9488; font-weight: 600; text-decoration: none; font-size: 14px;">
+                            View All Doctors <i class="fas fa-arrow-right" style="margin-left: 5px;"></i>
+                        </a>
+                    </div>
                 </div>
 
                 <!-- Upcoming Checkup -->

@@ -1061,6 +1061,12 @@
                                 onclick="console.log('Edit button clicked for patient:', '{{ patient.patient_id }}'); event.stopPropagation(); editPatient('{{ patient.patient_id }}')">
                                 <i class="fas fa-edit"></i> Edit
                             </button>
+                            <a href="{{ url_for('prescriptions', patient=patient.username if patient.username else patient.name) }}"
+                                class="btn-sm"
+                                style="text-decoration: none; color: inherit; display: inline-flex; align-items: center;"
+                                onclick="event.stopPropagation()">
+                                <i class="fas fa-prescription-bottle-alt"></i> Rx
+                            </a>
                         </td>
                     </tr>
                     {% endfor %}
@@ -1162,7 +1168,7 @@
 
 <script>
     // Close modal when Escape key is pressed or when clicking outside the content
-    document.addEventListener('keydown', function(event) {
+    document.addEventListener('keydown', function (event) {
         if (event.key === 'Escape') {
             const modal = document.getElementById('healthTrendsModal');
             if (modal && modal.style.display === 'block') {
@@ -1170,9 +1176,9 @@
             }
         }
     });
-    
+
     // Close modal when clicking outside the content
-    document.addEventListener('click', function(event) {
+    document.addEventListener('click', function (event) {
         const modal = document.getElementById('healthTrendsModal');
         if (modal && modal.style.display === 'block') {
             const modalContent = modal.querySelector('.modal-content');
@@ -1181,14 +1187,14 @@
             }
         }
     });
-    
+
     // Prevent closing when clicking inside the modal content
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         const modal = document.getElementById('healthTrendsModal');
         if (modal) {
             const modalContent = modal.querySelector('.modal-content');
             if (modalContent) {
-                modalContent.addEventListener('click', function(event) {
+                modalContent.addEventListener('click', function (event) {
                     event.stopPropagation();
                 });
             }
@@ -1212,14 +1218,14 @@
                 alert('Error loading health trends data');
             });
     };
-    
+
     // Auto-refresh health trends every 30 seconds when modal is open
     let healthTrendsInterval;
     function startHealthTrendsAutoRefresh(patientId) {
         if (healthTrendsInterval) {
             clearInterval(healthTrendsInterval);
         }
-        
+
         healthTrendsInterval = setInterval(() => {
             const modal = document.getElementById('healthTrendsModal');
             if (modal && modal.style.display === 'block') {
@@ -1235,7 +1241,7 @@
             }
         }, 30000); // Refresh every 30 seconds
     }
-    
+
     // Enhanced showHealthTrends with auto-refresh
     window.showHealthTrends = function (patientId) {
         const modal = document.getElementById('healthTrendsModal');
@@ -1256,7 +1262,7 @@
                 renderLabResultsTable(data.lab_results || []);
                 // Start auto-refresh
                 startHealthTrendsAutoRefresh(patientId);
-                
+
                 // Ensure modal content is scrolled to top after loading
                 setTimeout(() => {
                     if (modalContent) {
@@ -1275,19 +1281,19 @@
         const modal = document.getElementById('healthTrendsModal');
         if (modal) {
             modal.style.display = 'none';
-            
+
             // Reset scroll positions
             const modalContent = modal.querySelector('.modal-content');
             if (modalContent) {
                 modalContent.scrollTop = 0;
             }
-            
+
             const modalBody = modal.querySelector('.modal-body');
             if (modalBody) {
                 modalBody.scrollTop = 0;
             }
         }
-        
+
         // Clean up the auto-refresh interval
         if (healthTrendsInterval) {
             clearInterval(healthTrendsInterval);
@@ -1567,11 +1573,11 @@
             if (result.serum_creatinine !== undefined && result.serum_creatinine !== null) {
                 keyMetrics.push(`Creatinine: ${parseFloat(result.serum_creatinine).toFixed(2)} mg/dL`);
             }
-            if (result.bp_systolic !== undefined && result.bp_diastolic !== undefined && 
+            if (result.bp_systolic !== undefined && result.bp_diastolic !== undefined &&
                 result.bp_systolic !== null && result.bp_diastolic !== null) {
                 keyMetrics.push(`BP: ${parseInt(result.bp_systolic)}/${parseInt(result.bp_diastolic)} mmHg`);
             }
-            
+
             // Format detailed results
             let detailedResults = '';
             if (result.all_results) {
@@ -1595,7 +1601,7 @@
                 }
                 detailedResults = resultItems.join('<br>');
             }
-            
+
             tableHTML += `
                 <tr>
                     <td>${result.test_date || 'N/A'}</td>
@@ -1838,7 +1844,7 @@
             cells[0].innerHTML = `<strong>${patient.patient_id}</strong>`;
             cells[1].textContent = patient.name;
             cells[2].textContent = patient.age || 'N/A';
-            
+
             // Update risk level badge
             const riskBadge = cells[3].querySelector('.badge');
             if (riskBadge) {
@@ -1847,7 +1853,7 @@
                 riskBadge.classList.add(`badge-${patient.risk_level.toLowerCase()}`);
                 riskBadge.textContent = patient.risk_level;
             }
-            
+
             cells[4].innerHTML = `<strong>${patient.risk_percentage}%</strong>`;
             cells[5].textContent = `Stage ${patient.stage}`;
             cells[6].textContent = patient.egfr ? `${patient.egfr.toFixed(1)} mL/min` : 'N/A';
@@ -1900,9 +1906,9 @@
 
     // Start polling every 5 seconds for more responsive updates
     setInterval(pollPatientUpdates, 5000);
-    
+
     // Also poll when the page becomes visible (in case user switched tabs)
-    document.addEventListener('visibilitychange', function() {
+    document.addEventListener('visibilitychange', function () {
         if (!document.hidden) {
             pollPatientUpdates();
         }

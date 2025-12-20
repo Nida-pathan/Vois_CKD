@@ -339,3 +339,78 @@ Apt: Doctor=doc2, Link=https://meet.jit.si/ckd-appointment-8c9fb605-ec1e-42b6-a2
 User: JOHN
 Appointments found: 1
 Apt: Doctor=doc2, Link=https://meet.jit.si/ckd-appointment-8c9fb605-ec1e-42b6-a280-d41fa9c18f8d
+
+--- Patient Dashboard Debug (2025-12-20 12:53:26.504456) ---
+User: MARK
+Appointments found: 0
+
+--- Patient Dashboard Debug (2025-12-20 12:53:59.682004) ---
+User: JOHN
+Appointments found: 1
+Apt: Doctor=doc2, Link=https://meet.jit.si/ckd-appointment-8c9fb605-ec1e-42b6-a280-d41fa9c18f8d
+
+--- Patient Dashboard Debug (2025-12-20 12:57:35.952968) ---
+User: JOHN
+Appointments found: 1
+Apt: Doctor=doc2, Link=https://meet.jit.si/ckd-appointment-8c9fb605-ec1e-42b6-a280-d41fa9c18f8d
+
+--- Patient Dashboard Debug (2025-12-20 13:06:06.479008) ---
+User: JOHN
+Appointments found: 1
+Apt: Doctor=doc2, Link=https://meet.jit.si/ckd-appointment-8c9fb605-ec1e-42b6-a280-d41fa9c18f8d
+
+--- Patient Dashboard Debug (2025-12-20 13:08:02.837960) ---
+User: JOHN
+Appointments found: 1
+Apt: Doctor=doc2, Link=https://meet.jit.si/ckd-appointment-8c9fb605-ec1e-42b6-a280-d41fa9c18f8d
+
+--- Patient Dashboard Debug (2025-12-20 13:17:38.103787) ---
+User: JOHN
+Appointments found: 1
+Apt: Doctor=doc2, Link=https://meet.jit.si/ckd-appointment-8c9fb605-ec1e-42b6-a280-d41fa9c18f8d
+
+--- Patient Dashboard Debug (2025-12-20 13:19:55.163541) ---
+User: JOHN
+Appointments found: 1
+Apt: Doctor=doc2, Link=https://meet.jit.si/ckd-appointment-8c9fb605-ec1e-42b6-a280-d41fa9c18f8d
+
+--- Patient Dashboard Debug (2025-12-20 13:20:13.640143) ---
+User: JOHN
+Appointments found: 1
+Apt: Doctor=doc2, Link=https://meet.jit.si/ckd-appointment-8c9fb605-ec1e-42b6-a280-d41fa9c18f8d
+
+--- Patient Dashboard Debug (2025-12-20 18:29:03.706338) ---
+User: RAJE
+Appointments found: 0
+
+--- Patient Dashboard Debug (2025-12-20 19:29:11.039618) ---
+User: RAJE01
+Appointments found: 0
+
+--- Patient Dashboard Debug (2025-12-20 19:31:54.532551) ---
+User: RAJE01
+Appointments found: 0
+
+--- Patient Dashboard Debug (2025-12-20 19:32:08.719657) ---
+User: RAJE01
+Appointments found: 0
+
+--- Patient Dashboard Debug (2025-12-20 19:44:47.758349) ---
+User: RAJE01
+Appointments found: 0
+
+--- Patient Dashboard Debug (2025-12-20 19:47:23.312190) ---
+User: RAJE01
+Appointments found: 0
+
+--- Patient Dashboard Debug (2025-12-20 19:53:49.896732) ---
+User: RAJE02
+Appointments found: 0
+Booking request received: {'doctor_name': 'doc2', 'preferred_date': '2025-12-22', 'preferred_time': '19:55'}
+Doctor name: doc2
+Appointment created successfully: {'patient': 'RAJE02', 'doctor': 'doc2', 'preferred_date': '2025-12-22', 'preferred_time': '19:55', 'meet_link': 'https://meet.jit.si/ckd-appointment-2c985d72-dbcb-4798-bdb0-5f9c4acc3eef', 'status': 'pending', 'created_at': '2025-12-20T19:54:04.695074', '_id': '6946b18450dc94d3e0949daa'}
+
+--- Patient Dashboard Debug (2025-12-20 19:54:07.378545) ---
+User: RAJE02
+Appointments found: 1
+Apt: Doctor=doc2, Link=https://meet.jit.si/ckd-appointment-2c985d72-dbcb-4798-bdb0-5f9c4acc3eef

@@ -213,3 +213,38 @@ Patient Username: JOHN
 Lab Results Found: 5
 Latest Result Keys: ['_id', 'patient_username', 'test_date', 'test_type', 'notes', 'created_at']
 Latest Result Sample: {'_id': ObjectId('69463e2ffe384a84d50837e1'), 'patient_username': 'JOHN', 'test_date': datetime.datetime(2025, 12, 20, 11, 41, 59, 825000), 'test_type': 'Lab Report Upload', 'notes': 'Uploaded via Pat...
+
+--- Debug Results View 2025-12-20 12:13:50.230424 ---
+Patient ID: P692aead8b17236a9a146fe79
+Patient Username: MARK
+Lab Results Found: 3
+Latest Result Keys: ['_id', 'patient_username', 'test_date', 'test_type', 'notes', 'created_at', 'egfr', 'serum_creatinine', 'sodium', 'potassium']
+Latest Result Sample: {'_id': ObjectId('69452afa71cb6246004f58ab'), 'patient_username': 'MARK', 'test_date': datetime.datetime(2025, 12, 19, 16, 7, 46, 854000), 'test_type': 'Lab Report Upload', 'notes': "Uploaded via Pati...
+
+--- Debug Results View 2025-12-20 12:14:09.309028 ---
+Patient ID: P6925b23e2e62cd902e6dcaf9
+Patient Username: JOHN
+Lab Results Found: 6
+Latest Result Keys: ['_id', 'patient_username', 'test_date', 'test_type', 'notes', 'created_at']
+Latest Result Sample: {'_id': ObjectId('694645977f7e2c12e81b4edf'), 'patient_username': 'JOHN', 'test_date': datetime.datetime(2025, 12, 20, 12, 13, 35, 820000), 'test_type': 'Lab Report Upload', 'notes': 'Uploaded via Pat...
+
+--- Debug Results View 2025-12-20 12:25:26.946538 ---
+Patient ID: P6925b23e2e62cd902e6dcaf9
+Patient Username: JOHN
+Lab Results Found: 6
+Latest Result Keys: ['_id', 'patient_username', 'test_date', 'test_type', 'notes', 'created_at']
+Latest Result Sample: {'_id': ObjectId('694645977f7e2c12e81b4edf'), 'patient_username': 'JOHN', 'test_date': datetime.datetime(2025, 12, 20, 12, 13, 35, 820000), 'test_type': 'Lab Report Upload', 'notes': 'Uploaded via Pat...
+
+--- Debug Results View 2025-12-20 12:25:36.626634 ---
+Patient ID: P6925b23e2e62cd902e6dcaf9
+Patient Username: JOHN
+Lab Results Found: 6
+Latest Result Keys: ['_id', 'patient_username', 'test_date', 'test_type', 'notes', 'created_at']
+Latest Result Sample: {'_id': ObjectId('694645977f7e2c12e81b4edf'), 'patient_username': 'JOHN', 'test_date': datetime.datetime(2025, 12, 20, 12, 13, 35, 820000), 'test_type': 'Lab Report Upload', 'notes': 'Uploaded via Pat...
+
+--- Debug Results View 2025-12-20 12:26:03.601112 ---
+Patient ID: P6925b23e2e62cd902e6dcaf9
+Patient Username: JOHN
+Lab Results Found: 7
+Latest Result Keys: ['_id', 'patient_username', 'test_date', 'test_type', 'notes', 'created_at']
+Latest Result Sample: {'_id': ObjectId('6946487d7f7e2c12e81b4ee0'), 'patient_username': 'JOHN', 'test_date': datetime.datetime(2025, 12, 20, 12, 25, 57, 296000), 'test_type': 'Lab Report Upload', 'notes': 'Uploaded via Pat...

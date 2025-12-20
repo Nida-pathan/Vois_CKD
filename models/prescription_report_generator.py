@@ -53,11 +53,20 @@ class MedicalReportPDF(FPDF):
         self.add_section_title("Patient Information")
         self.set_font("Arial", size=11)
         
-        # Filter fields
+        # Filter fields - Whitelist only specific fields
+        allowed_fields = {
+            'patient_name': 'Name',
+            'name': 'Name',
+            'age': 'Age',
+            'address': 'Address',
+            'blood_type': 'Blood Type',
+            'phone': 'Phone Number'
+        }
+        
         cols = []
-        for key, value in patient_data.items():
-            if key not in ['clinical_insights', 'risk_assessment', 'recommendations', 'drug_interactions', 'follow_up', 'history', 'current_metrics', '_id']:
-                cols.append(f"{key.replace('_', ' ').title()}: {value}")
+        for key, label in allowed_fields.items():
+            if key in patient_data and patient_data[key]:
+                cols.append(f"{label}: {patient_data[key]}")
         
         # Draw in pairs
         for i in range(0, len(cols), 2):
@@ -113,15 +122,20 @@ class MedicalReportPDF(FPDF):
         self.set_font("Arial", size=11)
         
         if isinstance(items, str):
+            # Pre-process string to add newlines before numbered items embedded in text
+            # Look for patterns like " 1.", " 2." that are preceded by space and not at start of line
+            import re
+            # Add newline before numbers 1-9 followed by dot, if they are not at start of string
+            items = re.sub(r'(?<!^)\s+(\d+\.)', r'\n\1', items)
+            
             # Try to split by common markers if it's a block of text
             lines = items.split('\n')
             processed_items = []
             for line in lines:
                 line = line.strip()
                 # Remove common AI bullet markers
-                if line.startswith(('-', '*', '•', '1.', '2.', '3.')):
+                if line.startswith(('-', '*', '•', '1.', '2.', '3.', '4.', '5.', '6.', '7.', '8.', '9.')):
                     # Strip the marker and leading spaces
-                    import re
                     clean_line = re.sub(r'^(\d+\.|\-|\*|•)\s*', '', line)
                     if clean_line:
                         processed_items.append(clean_line)

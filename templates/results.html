@@ -344,7 +344,7 @@
                     Stage {{ patient.stage if patient.stage else 'N/A' }}
                 </div>
                 <div class="disease-sub" style="font-size: 13px; color: #6b7280; margin-top: 5px;">
-                    eGFR: {{ "%.1f"|format(patient.egfr) if patient.egfr else 'N/A' }}
+                    eGFR: {{ "%.1f"|format(patient.egfr|float) if patient.egfr and patient.egfr|float > 0 else 'N/A' }}
                 </div>
             </div>
 
@@ -412,7 +412,8 @@
                 </div>
                 <div class="lab-item">
                     <span class="lab-label">eGFR</span>
-                    <span class="lab-value">{{ "%.1f"|format(patient.egfr) if patient.egfr else 'N/A' }}
+                    <span class="lab-value">{{ "%.1f"|format(patient.egfr|float) if patient.egfr and patient.egfr|float
+                        > 0 else 'N/A' }}
                         mL/min/1.73m²</span>
                 </div>
             </div>
@@ -452,11 +453,38 @@
         </div>
     </div>
 
-    <!-- Latest Lab Report -->
-    {% if patient.latest_lab_pdf %}
+    <!-- Latest AI Analysis Report -->
+    {% if patient.latest_ai_report %}
     <div class="section">
         <div class="section-title">
-            <i class="fas fa-file-pdf"></i> Latest Lab Report
+            <i class="fas fa-robot"></i> Latest AI Analysis Report
+        </div>
+        <div
+            style="display: flex; align-items: center; justify-content: space-between; background: #f0fdfa; padding: 20px; border-radius: 12px; border: 1px solid #ccfbf1;">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div
+                    style="width: 50px; height: 50px; background: white; border-radius: 10px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                    <i class="fas fa-file-pdf" style="font-size: 24px; color: #0d9488;"></i>
+                </div>
+                <div>
+                    <h4 style="margin: 0 0 5px 0; color: #0f766e;">AI Analysis & Recommendations</h4>
+                    <p style="margin: 0; font-size: 13px; color: #5f6c7b;">Generated on {{ patient.latest_ai_report.date
+                        }}</p>
+                </div>
+            </div>
+            <a href="{{ url_for('static', filename=patient.latest_ai_report.pdf_path) }}" target="_blank"
+                class="btn-upload" style="margin-top: 0; text-decoration: none;">
+                <i class="fas fa-download"></i> View Report
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Latest Lab Report -->
+    {% if patient.latest_lab_report %}
+    <div class="section">
+        <div class="section-title">
+            <i class="fas fa-vial"></i> Latest Lab Report
         </div>
         <div
             style="display: flex; align-items: center; justify-content: space-between; background: #f0fdfa; padding: 20px; border-radius: 12px; border: 1px solid #ccfbf1;">
@@ -467,13 +495,12 @@
                 </div>
                 <div>
                     <h4 style="margin: 0 0 5px 0; color: #0f766e;">Lab Report PDF</h4>
-                    <p style="margin: 0; font-size: 13px; color: #5f6c7b;">Uploaded on {{ patient.last_updated
-                        if
-                        patient.last_updated else 'Recent' }}</p>
+                    <p style="margin: 0; font-size: 13px; color: #5f6c7b;">Uploaded on {{ patient.latest_lab_report.date
+                        }}</p>
                 </div>
             </div>
-            <a href="{{ url_for('static', filename=patient.latest_lab_pdf) }}" target="_blank" class="btn-upload"
-                style="margin-top: 0; text-decoration: none;">
+            <a href="{{ url_for('static', filename=patient.latest_lab_report.pdf_path) }}" target="_blank"
+                class="btn-upload" style="margin-top: 0; text-decoration: none;">
                 <i class="fas fa-download"></i> View Report
             </a>
         </div>
@@ -615,7 +642,8 @@
         <div class="upload-section">
             <h3><i class="fas fa-file-upload"></i> Upload New Prescription</h3>
             <p>Upload a new prescription for this patient</p>
-            <button class="btn-upload" onclick="window.location.href='{{ url_for('prescriptions') }}'">
+            <button class="btn-upload"
+                onclick="window.location.href=&quot;{{ url_for('prescriptions', patient=patient.username if patient.username else patient.name) }}&quot;">
                 <i class="fas fa-plus"></i> Create New Prescription
             </button>
         </div>
