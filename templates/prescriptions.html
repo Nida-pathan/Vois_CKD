@@ -284,6 +284,30 @@
                     <strong>Notes:</strong> {{ prescription.notes }}
                 </div>
                 {% endif %}
+
+                <!-- Generated Reports Section -->
+                <div class="generated-reports"
+                    style="margin-top: 15px; padding: 10px; background: rgba(13, 148, 136, 0.05); border-radius: 8px;">
+                    <div style="font-weight: 600; font-size: 0.9rem; margin-bottom: 10px; color: #0d9488;">
+                        <i class="fas fa-file-medical"></i> Generated AI Reports
+                    </div>
+                    <div id="reports-{{ prescription._id }}">
+                        <!-- This would ideally be populated from the patient's history in a real app -->
+                        <!-- For now, we show a note that they can be found in the Patient View -->
+                        <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0;">
+                            View full report history in the <a
+                                href="{{ url_for('doctor_patient_details', patient_id=prescription.patient) }}"
+                                style="color: #0d9488; font-weight: 500;">Patient Records</a>.
+                        </p>
+                    </div>
+                </div>
+                <!-- Generate Report Button -->
+                <div style="margin-top: 15px; text-align: right;">
+                    <button class="btn-primary" onclick="generateReport('{{ prescription._id }}')"
+                        style="padding: 8px 15px; font-size: 0.9rem;">
+                        <i class="fas fa-file-pdf"></i> Generate AI Analysis Report
+                    </button>
+                </div>
             </div>
             {% else %}
             <div class="prescription-card">
@@ -359,6 +383,59 @@
             const container = document.getElementById('medicationsContainer');
             if (container.children.length > 1) {
                 btn.parentElement.remove();
+            }
+        }
+
+        // Generate prescription analysis report
+        async function generateReport(prescriptionId) {
+            const btn = event.currentTarget;
+            const originalText = btn.innerHTML;
+
+            // Show loading indicator
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating Analysis...';
+            btn.disabled = true;
+
+            try {
+                // Call the backend API to generate the report
+                const response = await fetch('/langflow/prescription-analysis', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        prescription_id: prescriptionId
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Restore button state immediately
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+
+                    // Open the generated PDF in a new tab
+                    const pdfUrl = data.pdf_path.startsWith('/') ? data.pdf_path : '/' + data.pdf_path;
+                    const pdfWindow = window.open(pdfUrl, '_blank');
+
+                    if (!pdfWindow || pdfWindow.closed || typeof pdfWindow.closed === 'undefined') {
+                        alert('Report generated successfully! However, the PDF could not be opened automatically (possibly blocked by a popup blocker). You can view the report in the Patient Dashboard history.');
+                    } else {
+                        // Success notification
+                        setTimeout(() => {
+                            alert('Report generated successfully! The analysis PDF has been opened in a new tab.');
+                        }, 100);
+                    }
+                } else {
+                    alert('Error generating report: ' + (data.error || 'Unknown error'));
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error: ' + error.message);
+                btn.innerHTML = originalText;
+                btn.disabled = false;
             }
         }
 

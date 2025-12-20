@@ -345,7 +345,20 @@ def create_prescription_record(prescription_data):
         print(f"Error creating prescription: {e}")
         return None
 
-def update_patient_lab_values(username, lab_values, prediction, pdf_path=None):
+def get_prescription_by_id(prescription_id):
+    """Fetch a prescription by its ID."""
+    try:
+        from bson import ObjectId
+        db = Database.get_db()
+        if db is None:
+            return None
+        prescription = db.prescriptions.find_one({'_id': ObjectId(prescription_id)})
+        return prescription
+    except Exception as e:
+        print(f"Error getting prescription by ID {prescription_id}: {e}")
+        return None
+
+def update_patient_lab_values(username, lab_values, prediction, pdf_path=None, test_type="Lab Report Analysis"):
     """Update patient lab values and history"""
     db = Database.get_db()
     
@@ -373,6 +386,7 @@ def update_patient_lab_values(username, lab_values, prediction, pdf_path=None):
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     history_entry = {
         'date': timestamp,
+        'test_type': test_type,
         'metrics': lab_values,
         'prediction': prediction,
         'pdf_path': pdf_path

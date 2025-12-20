@@ -1,0 +1,155 @@
+{
+  "name": "Prescription Analysis and Report Generation",
+  "description": "AI-powered prescription analysis for CKD patients with PDF report generation",
+  "nodes": [
+    {
+      "id": "chat_input",
+      "type": "ChatInput",
+      "position": {
+        "x": 300,
+        "y": 200
+      },
+      "data": {
+        "node": {
+          "id": "chat_input",
+          "type": "ChatInput",
+          "data": {
+            "type": "ChatInput",
+            "node": {
+              "template": {
+                "input_value": {
+                  "type": "str",
+                  "required": true,
+                  "placeholder": "Enter prescription details...",
+                  "display_name": "Prescription Input"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "data_processor",
+      "type": "PythonFunction",
+      "position": {
+        "x": 500,
+        "y": 200
+      },
+      "data": {
+        "node": {
+          "id": "data_processor",
+          "type": "PythonFunction",
+          "data": {
+            "type": "PythonFunction",
+            "node": {
+              "template": {
+                "code": {
+                  "type": "str",
+                  "required": true,
+                  "value": "def process_prescription_data(inputs):\n    \"\"\"\n    Process prescription data and prepare for AI analysis\n    \"\"\"\n    # Extract prescription data from inputs\n    prescription_text = inputs.get('input_value', '')\n    \n    # In a real implementation, you would parse the text to extract structured data\n    # For now, we'll simulate with sample data\n    patient_data = {\n        'name': 'John Doe',\n        'age': 65,\n        'gender': 'Male',\n        'ckd_stage': 'Stage 3b',\n        'egfr': 45,\n        'potassium': 4.2,\n        'sodium': 138\n    }\n    \n    prescription_data = {\n        'medications': [\n            {\n                'name': 'Lisinopril',\n                'dosage': '10mg',\n                'frequency': 'Once daily',\n                'notes': 'For blood pressure control'\n            },\n            {\n                'name': 'Furosemide',\n                'dosage': '40mg',\n                'frequency': 'Once daily',\n                'notes': 'Diuretic for fluid management'\n            }\n        ],\n        'date': '2025-12-19',\n        'doctor': 'Dr. Smith'\n    }\n    \n    return {\n        'patient_data': patient_data,\n        'prescription_data': prescription_data\n    }"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "ai_analyzer",
+      "type": "PythonFunction",
+      "position": {
+        "x": 700,
+        "y": 200
+      },
+      "data": {
+        "node": {
+          "id": "ai_analyzer",
+          "type": "PythonFunction",
+          "data": {
+            "type": "PythonFunction",
+            "node": {
+              "template": {
+                "code": {
+                  "type": "str",
+                  "required": true,
+                  "value": "def analyze_prescription(inputs):\n    \"\"\"\n    Analyze prescription using AI recommender\n    \"\"\"\n    from models.ai_recommender import CKDAIRecommender\n    \n    patient_data = inputs.get('patient_data', {})\n    prescription_data = inputs.get('prescription_data', {})\n    \n    # Initialize AI recommender\n    recommender = CKDAIRecommender()\n    \n    # Analyze prescription\n    analysis_results = recommender.analyze_prescription(prescription_data, patient_data)\n    \n    return {\n        'patient_data': patient_data,\n        'prescription_data': prescription_data,\n        'analysis_results': analysis_results\n    }"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "pdf_generator",
+      "type": "PythonFunction",
+      "position": {
+        "x": 900,
+        "y": 200
+      },
+      "data": {
+        "node": {
+          "id": "pdf_generator",
+          "type": "PythonFunction",
+          "data": {
+            "type": "PythonFunction",
+            "node": {
+              "template": {
+                "code": {
+                  "type": "str",
+                  "required": true,
+                  "value": "def generate_pdf_report(inputs):\n    \"\"\"\n    Generate PDF report from analysis results\n    \"\"\"\n    from models.prescription_report_generator import generate_prescription_report\n    \n    patient_data = inputs.get('patient_data', {})\n    prescription_data = inputs.get('prescription_data', {})\n    analysis_results = inputs.get('analysis_results', {})\n    \n    # Generate PDF report\n    pdf_path = generate_prescription_report(patient_data, prescription_data, analysis_results)\n    \n    return {\n        'pdf_path': pdf_path,\n        'message': 'Report generated successfully'\n    }"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "file_output",
+      "type": "FileOutput",
+      "position": {
+        "x": 1100,
+        "y": 200
+      },
+      "data": {
+        "node": {
+          "id": "file_output",
+          "type": "FileOutput",
+          "data": {
+            "type": "FileOutput",
+            "node": {
+              "template": {
+                "path": {
+                  "type": "str",
+                  "required": true,
+                  "value": "{pdf_path}"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "chat_input",
+      "target": "data_processor"
+    },
+    {
+      "source": "data_processor",
+      "target": "ai_analyzer"
+    },
+    {
+      "source": "ai_analyzer",
+      "target": "pdf_generator"
+    },
+    {
+      "source": "pdf_generator",
+      "target": "file_output"
+    }
+  ]
+}

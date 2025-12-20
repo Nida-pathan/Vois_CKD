@@ -209,6 +209,68 @@ def register():
         
     return render_template('register.html')
 
+
+# Patient Education Chatbot Endpoints
+@app.route('/chatbot/welcome')
+@login_required
+def chatbot_welcome():
+    """Get welcome message for patient chatbot"""
+    if current_user.is_doctor():
+        return jsonify({'error': 'Access denied. Chatbot is for patients only.'}), 403
+    
+    from models.user import get_patient_records
+    patient_data = get_patient_records(current_user.username)
+    patient_name = patient_data.get('name') if patient_data else None
+    
+    from models.patient_chatbot import get_patient_chatbot
+    chatbot = get_patient_chatbot()
+    welcome_message = chatbot.get_welcome_message(patient_name)
+    
+    return jsonify({
+        'success': True,
+        'message': welcome_message
+    })
+
+
+@app.route('/chatbot/message', methods=['POST'])
+@login_required
+def chatbot_message():
+    """Process a message from the patient chatbot"""
+    if current_user.is_doctor():
+        return jsonify({'error': 'Access denied. Chatbot is for patients only.'}), 403
+    
+    try:
+        data = request.get_json()
+        message = data.get('message', '')
+        
+        if not message:
+            return jsonify({
+                'success': False,
+                'error': 'Message is required'
+            }), 400
+        
+        from models.user import get_patient_records
+        patient_data = get_patient_records(current_user.username)
+        
+        from models.patient_chatbot import get_patient_chatbot
+        chatbot = get_patient_chatbot()
+        response = chatbot.process_message(message, patient_data)
+        
+        return jsonify({
+            'success': True,
+            'response': response
+        })
+        
+    except Exception as e:
+        print(f"Error in chatbot message processing: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'success': False,
+            'error': 'Failed to process message. Please try again later.'
+        }), 500
+
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -2296,6 +2358,161 @@ def upload_lab_report_pdf():
 def kidneycompanion_landing():
     return render_template('kidneycompanion_landing.html')
 
+
+# Langflow Integration Endpoints
+@app.route('/langflow/prescription-analysis', methods=['POST'])
+@login_required
+def langflow_prescription_analysis():
+    """
+    API endpoint for Langflow prescription analysis workflow
+    """
+    if not current_user.is_doctor():
+        return jsonify({
+            'success': False,
+            'error': 'Access denied. Only doctors can perform prescription analysis.'
+        }), 403
+        
+    try:
+        # Get data from request
+        data = request.get_json()
+        
+        # Check if we're getting prescription by ID
+        prescription_id = data.get('prescription_id')
+        if prescription_id:
+            # Get prescription data by ID
+            from models.user import get_prescription_by_id, get_patient_records
+            prescription_data = get_prescription_by_id(prescription_id)
+            if not prescription_data:
+                return jsonify({
+                    'success': False,
+                    'error': 'Prescription not found'
+                }), 404
+            
+            # Get patient data
+            patient_username = prescription_data.get('patient')
+            if not patient_username:
+                return jsonify({
+                    'success': False,
+                    'error': 'Patient information not found in prescription'
+                }), 400
+            
+            patient_data = get_patient_records(patient_username)
+            if not patient_data:
+                return jsonify({
+                    'success': False,
+                    'error': 'Patient data not found'
+                }), 404
+        else:
+            # Use provided data
+            patient_data = data.get('patient_data', {})
+            prescription_data = data.get('prescription_data', {})
+        
+        # Validate required data
+        if not prescription_data or not patient_data:
+            return jsonify({
+                'success': False,
+                'error': 'Missing patient or prescription data'
+            }), 400
+        
+        # Initialize AI recommender
+        from models.ai_recommender import CKDAIRecommender
+        recommender = CKDAIRecommender()
+        
+        # Analyze prescription
+        analysis_results = recommender.analyze_prescription(prescription_data, patient_data)
+        
+        # Generate PDF report
+        from models.prescription_report_generator import generate_prescription_report
+        pdf_path = generate_prescription_report(patient_data, prescription_data, analysis_results)
+        
+        # Save PDF path to patient's record
+        if pdf_path and patient_username:
+            from models.user import update_patient_lab_values
+            # Filter prefix out of path if it's static/reports/...
+            # update_patient_lab_values expects a path that can be joined with static/
+            relative_reports_path = pdf_path.replace('static/', '') if pdf_path.startswith('static/') else pdf_path
+            
+            # Use empty dicts for lab_values and prediction as we're just updating the PDF
+            update_patient_lab_values(patient_username, {}, {}, relative_reports_path, test_type="Prescription Analysis")
+            
+        return jsonify({
+            'success': True,
+            'pdf_path': pdf_path,
+            'analysis_results': analysis_results,
+            'message': 'Prescription analysis complete and report generated'
+        })
+    
+    except ValueError as e:
+        # API key not configured
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+    except Exception as e:
+        print(f"Error in Langflow prescription analysis: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'success': False,
+            'error': 'Failed to analyze prescription. Please try again later.'
+        }), 500
+
+
+@app.route('/langflow/generate-report', methods=['POST'])
+@login_required
+def langflow_generate_report():
+    """
+    API endpoint to generate PDF report from Langflow analysis
+    """
+    if not current_user.is_doctor():
+        return jsonify({
+            'success': False,
+            'error': 'Access denied. Only doctors can generate reports.'
+        }), 403
+        
+    try:
+        # Get data from request
+        data = request.get_json()
+        patient_data = data.get('patient_data', {})
+        prescription_data = data.get('prescription_data', {})
+        analysis_results = data.get('analysis_results', {})
+        
+        # Validate required data
+        if not all([patient_data, prescription_data, analysis_results]):
+            return jsonify({
+                'success': False,
+                'error': 'Missing required data for report generation'
+            }), 400
+        
+        # Generate PDF report
+        from models.prescription_report_generator import generate_prescription_report
+        pdf_path = generate_prescription_report(patient_data, prescription_data, analysis_results)
+        
+        # Save PDF path to patient's record
+        patient_username = patient_data.get('username')
+        if pdf_path and patient_username:
+            from models.user import update_patient_lab_values
+            relative_reports_path = pdf_path.replace('static/', '') if pdf_path.startswith('static/') else pdf_path
+            update_patient_lab_values(patient_username, {}, {}, relative_reports_path, test_type="Prescription Analysis")
+            
+        return jsonify({
+            'success': True,
+            'pdf_path': pdf_path,
+            'message': 'Report generated successfully'
+        })
+        
+    except Exception as e:
+        print(f"Error generating PDF report: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'success': False,
+            'error': 'Failed to generate report. Please try again later.'
+        }), 500
+
+
+
+
 @app.route('/disease/<disease_id>')
 def disease_detail(disease_id):
     # Map disease IDs to human-readable names and detailed information
@@ -2641,33 +2858,8 @@ def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static'),
                                'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
-# Vercel requires this for the serverless function
-def main():
-    """Entry point for the application."""
-    return app
 
-# Add Vercel handler function
-def handler(event, context):
-    return app(event, context)
-
-# For local development
-if __name__ == '__main__':
-    try:
-        app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=True, use_reloader=False)
-    except KeyboardInterrupt:
-        print("Shutting down gracefully...")
-    except SystemExit:
-        # This is normal during Flask reloading
-        pass
-    finally:
-        # Ensure cleanup
-        try:
-            cleanup()
-        except NameError:
-            # cleanup function may not be available during reload
-            pass
-        except Exception as e:
-            print(f"Warning: Error during cleanup: {e}")
+# --- End of Initial Route Sections ---
 
 @app.route('/patient/intake')
 @login_required
@@ -2803,3 +2995,103 @@ def submit_patient_intake():
     except Exception as e:
         flash(f'Error saving intake data: {str(e)}', 'danger')
         return redirect(url_for('patient_intake'))
+
+
+
+
+
+
+
+# Langflow Integration Routes
+@app.route('/langflow/prescription-analysis', methods=['POST'])
+@login_required
+def prescription_analysis():
+    """
+    Handle prescription analysis request.
+    Generates an AI report and detailed PDF.
+    """
+    try:
+        data = request.get_json()
+        prescription_id = data.get('prescription_id')
+        
+        if not prescription_id:
+            return jsonify({'success': False, 'error': 'Prescription ID required'}), 400
+            
+        # Import models here to avoid circular dependencies
+        from models.user import get_prescription_by_id, get_patient_records, get_patient_data
+        from models.ai_recommender import CKDAIRecommender
+        from models.prescription_report_generator import generate_prescription_report
+        
+
+        # Fetch prescription
+        print(f"DEBUG: Analyzing prescription_id: {prescription_id}")
+        prescription = get_prescription_by_id(prescription_id)
+        if not prescription:
+            print(f"DEBUG: Prescription {prescription_id} NOT FOUND in DB")
+            return jsonify({'success': False, 'error': f'Prescription with ID {prescription_id} not found'}), 404
+            
+        # Fetch patient data
+        patient_identifier = prescription.get('patient')
+        patient_data = {}
+        
+        if patient_identifier:
+            # Try getting detailed medical records first
+            patient_data = get_patient_records(patient_identifier)
+            
+            # If empty, try getting via patient_id logic (sometimes 'patient' is username)
+            if not patient_data:
+                # Try getting from patients_data collection
+                from models.database import Database
+                db = Database.get_db()
+                pat_data = db.patients_data.find_one({'username': patient_identifier})
+                if pat_data:
+                    patient_data = pat_data
+                else:
+                    # Treat as simple dict
+                    patient_data = {'name': patient_identifier}
+
+        # Perform AI Analysis
+        recommender = CKDAIRecommender()
+        analysis_results = recommender.analyze_prescription(prescription, patient_data)
+        
+        # Generate PDF Report
+        pdf_path = generate_prescription_report(patient_data, prescription, analysis_results)
+        
+        return jsonify({
+            'success': True,
+            'pdf_path': pdf_path,
+            'analysis': analysis_results
+        })
+
+    except Exception as e:
+        print(f"Error in prescription analysis: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+# Vercel requires this for the serverless function
+def main():
+    """Entry point for the application."""
+    return app
+
+# Add Vercel handler function
+def handler(event, context):
+    return app(event, context)
+
+if __name__ == '__main__':
+    try:
+        # Use a proper port and host for local development
+        port = int(os.environ.get('PORT', 5000))
+        app.run(host='0.0.0.0', port=port, debug=True, use_reloader=False)
+    except KeyboardInterrupt:
+        print("Shutting down gracefully...")
+    except SystemExit:
+        pass
+    finally:
+        try:
+            # Check if cleanup is defined (it might not be in all versions of the app)
+            if 'cleanup' in globals():
+                cleanup()
+        except Exception as e:
+            print(f"Warning: Error during cleanup: {e}")

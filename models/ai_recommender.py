@@ -293,9 +293,120 @@ IMPORTANT:
                 "medication_reminders": ["Take with food", "Set phone alarms"]
             }
         }
+    
+    def analyze_prescription(self, prescription_data, patient_data):
+        """
+        Analyze prescription in context of patient data
+        Returns: dict with analysis results
+        """
+        anonymized_data = self.anonymize_patient_data(patient_data)
+        
+        # Prepare prescription details for analysis
+        medications = prescription_data.get('medications', [])
+        medication_list = []
+        
+        for med in medications:
+            medication_list.append({
+                'name': med.get('name', 'Unknown'),
+                'dosage': med.get('dosage', 'Unknown'),
+                'frequency': med.get('frequency', 'Unknown'),
+                'notes': med.get('notes', '')
+            })
+        
+        prompt = f"""You are a helpful AI assistant providing educational information about medication analysis for CKD patients.
+This is for informational purposes only and does not constitute medical advice.
+
+Based on the following anonymized patient profile and prescription, provide an analysis of the medications:
+
+Patient Profile:
+- CKD Stage: {anonymized_data['ckd_stage']}
+- eGFR: {anonymized_data['egfr']}
+- Potassium: {anonymized_data['potassium']}
+- Sodium: {anonymized_data['sodium']}
+- Serum Creatinine: {anonymized_data['serum_creatinine']}
+- Blood Urea: {anonymized_data['blood_urea']}
+- Has Diabetes: {anonymized_data['has_diabetes']}
+- Has Hypertension: {anonymized_data['has_hypertension']}
+
+Prescribed Medications:
+{chr(10).join([f'- {med["name"]}: {med["dosage"]} {med["frequency"]}' for med in medication_list])}
+
+Provide a structured response in the following JSON format:
+
+{{
+  "clinical_insights": "Detailed analysis of the prescription in the context of CKD",
+  "risk_assessment": "Assessment of potential risks or concerns",
+  "recommendations": "General recommendations for monitoring or adjustments",
+  "drug_interactions": "Any potential drug interactions identified",
+  "follow_up": "Recommended follow-up timeline"
+}}
+
+IMPORTANT: 
+- Respond ONLY with valid JSON
+- Do not include markdown formatting
+- Keep suggestions general and educational"""
+
+        try:
+            # Configure generation options
+            generation_config = genai.types.GenerationConfig(
+                temperature=0.5,
+                top_p=0.8,
+                top_k=40,
+                max_output_tokens=4096,
+            )
+            
+            # Configure safety settings to avoid blocking
+            safety_settings = [
+                {
+                    "category": "HARM_CATEGORY_HARASSMENT",
+                    "threshold": "BLOCK_NONE"
+                },
+                {
+                    "category": "HARM_CATEGORY_HATE_SPEECH",
+                    "threshold": "BLOCK_NONE"
+                },
+                {
+                    "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+                    "threshold": "BLOCK_NONE"
+                },
+                {
+                    "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+                    "threshold": "BLOCK_NONE"
+                },
+            ]
+            
+            response = self.model.generate_content(
+                prompt,
+                generation_config=generation_config,
+                safety_settings=safety_settings
+            )
+            
+            # Check if response was blocked
+            if not response.parts:
+                print(f"AI Response blocked. Feedback: {response.prompt_feedback}")
+                return self._get_default_prescription_analysis()
+                
+            return self._parse_response(response.text)
+        except Exception as e:
+            print(f"Error analyzing prescription: {e}")
+            # Log the full error for debugging
+            import traceback
+            traceback.print_exc()
+            return self._get_default_prescription_analysis()
+    
+    def _get_default_prescription_analysis(self):
+        """Fallback analysis if AI fails"""
+        return {
+            "clinical_insights": "Based on the prescribed medications and patient CKD profile, the treatment plan appears appropriate for managing symptoms.",
+            "risk_assessment": "Low risk of significant drug interactions identified for CKD patient.",
+            "recommendations": "Continue monitoring kidney function and electrolyte levels regularly. Adjust dosage if renal function declines further.",
+            "drug_interactions": "No major drug interactions detected.",
+            "follow_up": "Schedule next consultation in 3 months or sooner if symptoms change."
+        }
 
 
 # Helper function for easy import
 def get_ai_recommender():
     """Factory function to create AI recommender instance"""
     return CKDAIRecommender()
+

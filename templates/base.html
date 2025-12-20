@@ -37,6 +37,33 @@
         {% block content %}{% endblock %}
     </main>
 
+    <!-- Patient Education Chatbot (only for patients) -->
+    {% if current_user.is_authenticated and current_user.role == 'patient' %}
+    <div id="chatbot-container" class="chatbot-container">
+        <div id="chatbot-toggle" class="chatbot-toggle">
+            <span>🤖</span>
+        </div>
+        <div id="chatbot-window" class="chatbot-window">
+            <div class="chatbot-header">
+                <h3>KidneyCompanion Assistant</h3>
+                <button id="chatbot-close" class="chatbot-close">×</button>
+            </div>
+            <div id="chatbot-messages" class="chatbot-messages">
+                <div class="chatbot-message bot">
+                    <div class="chatbot-message-content">
+                        Loading assistant...
+                    </div>
+                </div>
+            </div>
+            <div class="chatbot-input-container">
+                <input type="text" id="chatbot-input" class="chatbot-input" placeholder="Ask about CKD stages, symptoms, or medical terms...">
+                <button id="chatbot-send" class="chatbot-send">Send</button>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    <!-- End Patient Education Chatbot -->
+
     <footer>
         <p>&copy; 2025 KidneyCompanion - AI-Powered Healthcare</p>
     </footer>
@@ -59,5 +86,125 @@
             });
         });
     </script>
+    
+    <!-- Patient Education Chatbot JavaScript -->
+    {% if current_user.is_authenticated and current_user.role == 'patient' %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Chatbot elements
+            const chatbotContainer = document.getElementById('chatbot-container');
+            const chatbotToggle = document.getElementById('chatbot-toggle');
+            const chatbotWindow = document.getElementById('chatbot-window');
+            const chatbotClose = document.getElementById('chatbot-close');
+            const chatbotMessages = document.getElementById('chatbot-messages');
+            const chatbotInput = document.getElementById('chatbot-input');
+            const chatbotSend = document.getElementById('chatbot-send');
+            
+            // Toggle chatbot visibility
+            chatbotToggle.addEventListener('click', function() {
+                chatbotContainer.classList.toggle('active');
+            });
+            
+            // Close chatbot
+            chatbotClose.addEventListener('click', function() {
+                chatbotContainer.classList.remove('active');
+            });
+            
+            // Send message on button click
+            chatbotSend.addEventListener('click', sendMessage);
+            
+            // Send message on Enter key
+            chatbotInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+            
+            // Function to send message
+            function sendMessage() {
+                const message = chatbotInput.value.trim();
+                if (message) {
+                    // Add user message to chat
+                    addMessage(message, 'user');
+                    chatbotInput.value = '';
+                    
+                    // Send to backend
+                    fetch('/chatbot/message', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ message: message }),
+                        credentials: 'same-origin'
+                    })
+                    .then(response => {
+                        console.log('Response status:', response.status);
+                        console.log('Response headers:', [...response.headers.entries()]);
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            addMessage(data.response, 'bot');
+                        } else {
+                            addMessage('Sorry, I encountered an error. Please try again.', 'bot');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error sending message:', error);
+                        addMessage('Sorry, I encountered an error. Please try again. Check browser console for details.', 'bot');
+                    });
+                }
+            }
+            
+            // Function to add message to chat
+            function addMessage(content, sender) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `chatbot-message ${sender}`;
+                messageDiv.innerHTML = `
+                    <div class="chatbot-message-content">
+                        ${content}
+                    </div>
+                `;
+                chatbotMessages.appendChild(messageDiv);
+                
+                // Scroll to bottom
+                chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+            }
+            
+            // Load welcome message
+            fetch('/chatbot/welcome', {
+                credentials: 'same-origin'
+            })
+                .then(response => {
+                    console.log('Welcome response status:', response.status);
+                    console.log('Welcome response headers:', [...response.headers.entries()]);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        const welcomeMessage = chatbotMessages.querySelector('.chatbot-message.bot');
+                        if (welcomeMessage) {
+                            welcomeMessage.querySelector('.chatbot-message-content').textContent = data.message;
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading welcome message:', error);
+                    // Add error message to chat
+                    const welcomeMessage = chatbotMessages.querySelector('.chatbot-message.bot');
+                    if (welcomeMessage) {
+                        welcomeMessage.querySelector('.chatbot-message-content').textContent = 'Failed to load assistant. Check browser console for details.';
+                    }
+                });
+        });
+    </script>
+    {% endif %}
+    <!-- End Patient Education Chatbot JavaScript -->
 </body>
 </html>

@@ -546,7 +546,8 @@
                         <td style="padding: 12px; color: #333;">{{ record.date if record.date else 'Unknown
                             Date' }}
                         </td>
-                        <td style="padding: 12px; color: #666;">Lab Report Analysis</td>
+                        <td style="padding: 12px; color: #666;">{{ record.test_type if record.test_type else 'Lab Report
+                            Analysis' }}</td>
                         <td style="padding: 12px;">
                             {% if record.prediction %}
                             <span
