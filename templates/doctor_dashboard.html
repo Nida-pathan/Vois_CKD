@@ -1021,9 +1021,7 @@
                     <tr>
                         <th data-sort="patient_id">Patient ID <span class="sort-indicator"></span></th>
                         <th data-sort="name">Name <span class="sort-indicator"></span></th>
-                        <th data-sort="age">Age <span class="sort-indicator"></span></th>
                         <th data-sort="risk_level">Risk Level <span class="sort-indicator"></span></th>
-                        <th data-sort="risk_percentage">Risk % <span class="sort-indicator"></span></th>
                         <th data-sort="stage">CKD Stage <span class="sort-indicator"></span></th>
                         <th data-sort="egfr">eGFR <span class="sort-indicator"></span></th>
                         <th>Last Updated</th>
@@ -1038,13 +1036,11 @@
                         onclick="viewPatientDetails('{{ patient.patient_id }}')" style="cursor: pointer;">
                         <td><strong>{{ patient.patient_id }}</strong></td>
                         <td>{{ patient.name }}</td>
-                        <td>{{ patient.age if patient.age else 'N/A' }}</td>
                         <td>
                             <span class="badge badge-{{ patient.risk_level.lower() }}">
                                 {{ patient.risk_level }}
                             </span>
                         </td>
-                        <td><strong>{{ patient.risk_percentage }}%</strong></td>
                         <td>Stage {{ patient.stage }}</td>
                         <td>{{ "%.1f"|format(patient.egfr) if patient.egfr else 'N/A' }} mL/min</td>
                         <td>{{ patient.last_updated }}</td>
@@ -1052,14 +1048,6 @@
                             <button class="btn-sm"
                                 onclick="event.stopPropagation(); viewPatientDetails('{{ patient.patient_id }}')">
                                 <i class="fas fa-eye"></i> View
-                            </button>
-                            <button class="btn-sm"
-                                onclick="event.stopPropagation(); showHealthTrends('{{ patient.patient_id }}')">
-                                <i class="fas fa-chart-line"></i> Trends
-                            </button>
-                            <button class="btn-sm"
-                                onclick="console.log('Edit button clicked for patient:', '{{ patient.patient_id }}'); event.stopPropagation(); editPatient('{{ patient.patient_id }}')">
-                                <i class="fas fa-edit"></i> Edit
                             </button>
                             <a href="{{ url_for('prescriptions', patient=patient.username if patient.username else patient.name) }}"
                                 class="btn-sm"
@@ -1138,18 +1126,30 @@
                         <td>{{ apt.preferred_date }}</td>
                         <td>{{ apt.preferred_time }}</td>
                         <td>
-                            <span class="badge badge-{{ 'low' if apt.status == 'confirmed' else 'moderate' }}">
+                            <span
+                                class="badge badge-{{ 'low' if apt.status in ['confirmed', 'completed'] else 'moderate' }}">
                                 {{ apt.status }}
                             </span>
                         </td>
                         <td>
-                            {% if apt.meet_link %}
-                            <a href="{{ apt.meet_link }}" target="_blank" class="join-meeting-btn">
-                                <i class="fas fa-video"></i> Join
-                            </a>
-                            {% else %}
-                            <span style="color: var(--text-secondary); font-size: 12px;">No Link</span>
-                            {% endif %}
+                            <div style="display: flex; gap: 5px; align-items: center;">
+                                {% if apt.status != 'completed' %}
+                                {% if apt.meet_link %}
+                                <a href="{{ apt.meet_link }}" target="_blank" class="join-meeting-btn">
+                                    <i class="fas fa-video"></i> Join
+                                </a>
+                                {% else %}
+                                <span style="color: var(--text-secondary); font-size: 12px;">No Link</span>
+                                {% endif %}
+                                {% endif %}
+
+                                {% if apt.status != 'completed' %}
+                                <button onclick="completeAppointment('{{ apt._id }}')" class="join-meeting-btn"
+                                    style="background: linear-gradient(135deg, #22c55e, #16a34a);">
+                                    <i class="fas fa-check"></i> Complete
+                                </button>
+                                {% endif %}
+                            </div>
                         </td>
                     </tr>
                     {% endfor %}
@@ -1167,6 +1167,46 @@
 </div>
 
 <script>
+    function completeAppointment(appointmentId) {
+        if (!confirm('Are you sure you want to mark this appointment as complete?')) {
+            return;
+        }
+
+        fetch(`/doctor/appointment/complete/${appointmentId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show success notification and reload
+                    const notification = document.createElement('div');
+                    notification.style.position = 'fixed';
+                    notification.style.top = '20px';
+                    notification.style.right = '20px';
+                    notification.style.background = '#22c55e';
+                    notification.style.color = 'white';
+                    notification.style.padding = '15px 25px';
+                    notification.style.borderRadius = '8px';
+                    notification.style.zIndex = '9999';
+                    notification.textContent = 'Appointment marked as complete!';
+                    document.body.appendChild(notification);
+
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1000);
+                } else {
+                    alert('Error: ' + (data.error || 'Failed to complete appointment'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while completing the appointment');
+            });
+    }
+
     // Close modal when Escape key is pressed or when clicking outside the content
     document.addEventListener('keydown', function (event) {
         if (event.key === 'Escape') {
@@ -1839,38 +1879,39 @@
         row.setAttribute('data-stage', patient.stage);
 
         // Update cells individually for better real-time updates
+        // Update cells individually for better real-time updates
         const cells = row.querySelectorAll('td');
-        if (cells.length >= 9) { // Ensure we have enough cells
+        if (cells.length >= 7) { // Ensure we have enough cells (reduced count)
             cells[0].innerHTML = `<strong>${patient.patient_id}</strong>`;
             cells[1].textContent = patient.name;
-            cells[2].textContent = patient.age || 'N/A';
 
-            // Update risk level badge
-            const riskBadge = cells[3].querySelector('.badge');
+            // Age removed (index 2)
+
+            // Update risk level badge (now index 2)
+            const riskBadge = cells[2].querySelector('.badge');
             if (riskBadge) {
                 // Remove existing classes and add new ones
                 riskBadge.className = 'badge';
-                riskBadge.classList.add(`badge-${patient.risk_level.toLowerCase()}`);
+                riskBadge.classList.add(`badge-${patient.risk_level.toLowerCase().replace(/\s+/g, '-')}`);
                 riskBadge.textContent = patient.risk_level;
             }
 
-            cells[4].innerHTML = `<strong>${patient.risk_percentage}%</strong>`;
-            cells[5].textContent = `Stage ${patient.stage}`;
-            cells[6].textContent = patient.egfr ? `${patient.egfr.toFixed(1)} mL/min` : 'N/A';
-            cells[7].textContent = patient.last_updated || 'N/A';
-            // cells[8] contains the action buttons, so we don't update it
+            // Risk % removed (old index 4)
+
+            cells[3].textContent = `Stage ${patient.stage}`;
+            cells[4].textContent = patient.egfr ? `${patient.egfr.toFixed(1)} mL/min` : 'N/A';
+            cells[5].textContent = patient.last_updated || 'N/A';
+            // cells[6] contains the action buttons
         } else {
             // Fallback to innerHTML if cell count is unexpected
             row.innerHTML = `
                 <td><strong>${patient.patient_id}</strong></td>
                 <td>${patient.name}</td>
-                <td>${patient.age || 'N/A'}</td>
                 <td>
-                    <span class="badge badge-${patient.risk_level.toLowerCase()}">
+                    <span class="badge badge-${patient.risk_level.toLowerCase().replace(/\s+/g, '-')}">
                         ${patient.risk_level}
                     </span>
                 </td>
-                <td><strong>${patient.risk_percentage}%</strong></td>
                 <td>Stage ${patient.stage}</td>
                 <td>${patient.egfr ? patient.egfr.toFixed(1) : 'N/A'} mL/min</td>
                 <td>${patient.last_updated || 'N/A'}</td>
@@ -1878,12 +1919,12 @@
                     <button class="btn-sm" onclick="event.stopPropagation(); viewPatientDetails('${patient.patient_id}')">
                         <i class="fas fa-eye"></i> View
                     </button>
-                    <button class="btn-sm" onclick="event.stopPropagation(); showHealthTrends('${patient.patient_id}')">
-                        <i class="fas fa-chart-line"></i> Trends
-                    </button>
-                    <button class="btn-sm" onclick="event.stopPropagation(); editPatient('${patient.patient_id}')">
-                        <i class="fas fa-edit"></i> Edit
-                    </button>
+                    <a href="/prescriptions?patient=${encodeURIComponent(patient.username || patient.name)}" 
+                       class="btn-sm"
+                       style="text-decoration: none; color: inherit; display: inline-flex; align-items: center;"
+                       onclick="event.stopPropagation()">
+                        <i class="fas fa-prescription-bottle-alt"></i> Rx
+                    </a>
                 </td>
             `;
         }

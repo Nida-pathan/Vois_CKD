@@ -513,8 +513,9 @@
         <div class="section-title">
             <i class="fas fa-history"></i> Historical Lab Results
         </div>
-        {% for result in lab_results %}
-        <div class="lab-result-item">
+        {% for result in lab_results|reverse %}
+        <div class="lab-result-item {% if loop.index > 2 %}hidden-lab-result{% endif %}" {% if loop.index> 2
+            %}style="display: none;"{% endif %}>
             <div class="lab-result-header">
                 <div class="lab-result-date">{{ result.test_date }}</div>
                 <div>{{ result.test_type }}</div>
@@ -531,7 +532,7 @@
                 <!-- Handle flat structure by iterating and excluding metadata -->
                 {% for key, value in result.items() %}
                 {% if key not in ['_id', 'patient_id', 'patient_username', 'test_date', 'test_type', 'notes',
-                'created_at'] %}
+                'created_at', 'pdf_path'] %}
                 <div class="lab-item">
                     <span class="lab-label">{{ key|replace('_', ' ')|title }}</span>
                     <span class="lab-value">{{ value }}</span>
@@ -547,6 +548,15 @@
             {% endif %}
         </div>
         {% endfor %}
+
+        {% if lab_results|length > 2 %}
+        <div style="text-align: center; margin-top: 15px;">
+            <button id="toggleLabBtn" onclick="toggleLabHistory()" class="btn-upload"
+                style="background: white; color: #0d9488; border: 1px solid #0d9488; font-size: 14px; padding: 8px 20px;">
+                View More
+            </button>
+        </div>
+        {% endif %}
     </div>
     {% endif %}
 
@@ -568,8 +578,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for record in patient.history %}
-                    <tr style="border-bottom: 1px solid #e5e7eb;">
+                    {% for record in patient.history|reverse %}
+                    <tr class="{% if loop.index > 2 %}hidden-doc-history{% endif %}" {% if loop.index> 2
+                        %}style="display: none;"{% endif %} style="border-bottom: 1px solid #e5e7eb;">
                         <td style="padding: 12px; color: #333;">{{ record.date if record.date else 'Unknown
                             Date' }}
                         </td>
@@ -602,71 +613,127 @@
             </table>
         </div>
     </div>
-    {% endif %}
-
-    <!-- Prescriptions -->
-    <div class="section">
-        <div class="section-title">
-            <i class="fas fa-prescription"></i> Medications & Prescriptions
-        </div>
-        {% if prescriptions and prescriptions|length > 0 %}
-        {% for prescription in prescriptions %}
-        <div class="prescription-item">
-            <div class="prescription-header">
-                <div class="prescription-date">{{ prescription.date }}</div>
-                <div>Prescribed by: Dr. {{ prescription.doctor }}</div>
-            </div>
-            <div style="margin-bottom: 15px;">
-                <strong>Medications:</strong>
-                {% for med in prescription.medications %}
-                <div class="medication-item">
-                    <div class="medication-name">{{ med.name }}</div>
-                    <div class="medication-details">
-                        Dosage: {{ med.dosage }} | Frequency: {{ med.frequency }}
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-            {% if prescription.notes %}
-            <div style="padding: 10px; background: #fffbeb; border-radius: 8px;">
-                <strong>Notes:</strong> {{ prescription.notes }}
-            </div>
-            {% endif %}
-        </div>
-        {% endfor %}
-        {% else %}
-        <p><strong>NOTE : Previously prescriped medication included</strong></p>
-        {% endif %}
-
-        <!-- Prescription Upload Button -->
-        <div class="upload-section">
-            <h3><i class="fas fa-file-upload"></i> Upload New Prescription</h3>
-            <p>Upload a new prescription for this patient</p>
-            <button class="btn-upload"
-                onclick="window.location.href=&quot;{{ url_for('prescriptions', patient=patient.username if patient.username else patient.name) }}&quot;">
-                <i class="fas fa-plus"></i> Create New Prescription
-            </button>
-        </div>
-    </div>
-
-    {% else %}
-    <div class="section">
-        <div style="text-align: center; padding: 60px 20px;">
-            <i class="fas fa-user-times" style="font-size: 48px; margin-bottom: 20px; color: #ef4444;"></i>
-            <h3>Patient Not Found</h3>
-            <p>The requested patient information could not be found.</p>
-            {% if current_user.is_doctor() %}
-            <a href="{{ url_for('doctor_dashboard') }}" class="back-btn"
-                style="display: inline-flex; margin-top: 20px;">
-                <i class="fas fa-arrow-left"></i> Back to Dashboard
-            </a>
-            {% else %}
-            <a href="{{ url_for('patient_portal') }}" class="back-btn" style="display: inline-flex; margin-top: 20px;">
-                <i class="fas fa-arrow-left"></i> Back to Portal
-            </a>
-            {% endif %}
-        </div>
+    {% if patient.history and patient.history|length > 2 %}
+    <div style="text-align: center; margin-top: 15px;">
+        <button id="toggleDocBtn" onclick="toggleDocHistory()" class="btn-upload"
+            style="background: white; color: #0d9488; border: 1px solid #0d9488; font-size: 14px; padding: 8px 20px;">
+            View More
+        </button>
     </div>
     {% endif %}
 </div>
+{% endif %}
+
+<!-- Prescriptions -->
+<div class="section">
+    <div class="section-title">
+        <i class="fas fa-prescription"></i> Medications & Prescriptions
+    </div>
+    {% if prescriptions and prescriptions|length > 0 %}
+    {% for prescription in prescriptions %}
+    <div class="prescription-item">
+        <div class="prescription-header">
+            <div class="prescription-date">{{ prescription.date }}</div>
+            <div>Prescribed by: Dr. {{ prescription.doctor }}</div>
+        </div>
+        <div style="margin-bottom: 15px;">
+            <strong>Medications:</strong>
+            {% for med in prescription.medications %}
+            <div class="medication-item">
+                <div class="medication-name">{{ med.name }}</div>
+                <div class="medication-details">
+                    Dosage: {{ med.dosage }} | Frequency: {{ med.frequency }}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% if prescription.notes %}
+        <div style="padding: 10px; background: #fffbeb; border-radius: 8px;">
+            <strong>Notes:</strong> {{ prescription.notes }}
+        </div>
+        {% endif %}
+    </div>
+    {% endfor %}
+    {% else %}
+    <p><strong>NOTE : Previously prescriped medication included</strong></p>
+    {% endif %}
+
+    <!-- Prescription Upload Button -->
+    <div class="upload-section">
+        <h3><i class="fas fa-file-upload"></i> Upload New Prescription</h3>
+        <p>Upload a new prescription for this patient</p>
+        <button class="btn-upload"
+            onclick="window.location.href=&quot;{{ url_for('prescriptions', patient=patient.username if patient.username else patient.name) }}&quot;">
+            <i class="fas fa-plus"></i> Create New Prescription
+        </button>
+    </div>
+</div>
+
+{% else %}
+<div class="section">
+    <div style="text-align: center; padding: 60px 20px;">
+        <i class="fas fa-user-times" style="font-size: 48px; margin-bottom: 20px; color: #ef4444;"></i>
+        <h3>Patient Not Found</h3>
+        <p>The requested patient information could not be found.</p>
+        {% if current_user.is_doctor() %}
+        <a href="{{ url_for('doctor_dashboard') }}" class="back-btn" style="display: inline-flex; margin-top: 20px;">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+        {% else %}
+        <a href="{{ url_for('patient_portal') }}" class="back-btn" style="display: inline-flex; margin-top: 20px;">
+            <i class="fas fa-arrow-left"></i> Back to Portal
+        </a>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+</div>
+
+<script>
+    function toggleLabHistory() {
+        const hiddenItems = document.querySelectorAll('.hidden-lab-result');
+        const btn = document.getElementById('toggleLabBtn');
+        let isHidden = false;
+
+        hiddenItems.forEach(item => {
+            if (item.style.display === 'none') {
+                item.style.display = 'block';
+                isHidden = true; // Was hidden, now shown
+            } else {
+                item.style.display = 'none';
+                isHidden = false; // Was shown, now hidden
+            }
+        });
+
+        // If we just showed them (was hidden is true for at least one iteration where we switched), 
+        // OR better logic: check current state of first item
+        const firstHidden = document.querySelector('.hidden-lab-result');
+        if (firstHidden && firstHidden.style.display !== 'none') {
+            btn.textContent = 'View Less';
+        } else {
+            btn.textContent = 'View More';
+        }
+    }
+
+    function toggleDocHistory() {
+        const hiddenRows = document.querySelectorAll('.hidden-doc-history');
+        const btn = document.getElementById('toggleDocBtn');
+
+        hiddenRows.forEach(row => {
+            const originalDisplay = row.tagName === 'TR' ? 'table-row' : 'block';
+            if (row.style.display === 'none') {
+                row.style.display = originalDisplay;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        const firstHidden = document.querySelector('.hidden-doc-history');
+        if (firstHidden && firstHidden.style.display !== 'none') {
+            btn.textContent = 'View Less';
+        } else {
+            btn.textContent = 'View More';
+        }
+    }
+</script>
 {% endblock %}

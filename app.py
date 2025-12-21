@@ -404,6 +404,20 @@ def doctor_dashboard():
     
     return render_template('doctor_dashboard.html', patients=filtered_patients, appointments=appointments)
 
+@app.route('/doctor/appointment/complete/<appointment_id>', methods=['POST'])
+@login_required
+def complete_appointment_route(appointment_id):
+    if not current_user.is_doctor():
+        return jsonify({'error': 'Access denied'}), 403
+    
+    from models.user import complete_appointment
+    success = complete_appointment(appointment_id)
+    
+    if success:
+        return jsonify({'success': True})
+    else:
+        return jsonify({'error': 'Failed to complete appointment'}), 500
+
 @app.route('/test_buttons')
 @login_required
 def test_buttons():
