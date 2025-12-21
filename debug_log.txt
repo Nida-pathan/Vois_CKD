@@ -414,3 +414,54 @@ Appointment created successfully: {'patient': 'RAJE02', 'doctor': 'doc2', 'prefe
 User: RAJE02
 Appointments found: 1
 Apt: Doctor=doc2, Link=https://meet.jit.si/ckd-appointment-2c985d72-dbcb-4798-bdb0-5f9c4acc3eef
+
+--- Patient Dashboard Debug (2025-12-20 20:03:35.642843) ---
+User: JOHN
+Appointments found: 1
+Apt: Doctor=doc2, Link=https://meet.jit.si/ckd-appointment-8c9fb605-ec1e-42b6-a280-d41fa9c18f8d
+
+--- Patient Dashboard Debug (2025-12-20 20:26:25.744871) ---
+User: JOHN
+Appointments found: 1
+Apt: Doctor=doc2, Link=https://meet.jit.si/ckd-appointment-8c9fb605-ec1e-42b6-a280-d41fa9c18f8d
+
+--- Patient Dashboard Debug (2025-12-21 12:39:22.118534) ---
+User: JOHN
+Appointments found: 0
+
+--- Patient Dashboard Debug (2025-12-21 12:39:37.920551) ---
+User: RAJE01
+Appointments found: 0
+
+--- Patient Dashboard Debug (2025-12-21 12:39:46.653454) ---
+User: RAJE01
+Appointments found: 0
+
+--- Patient Dashboard Debug (2025-12-21 12:39:55.961602) ---
+User: RAJE02
+Appointments found: 1
+Apt: Doctor=doc2, Link=https://meet.jit.si/ckd-appointment-2c985d72-dbcb-4798-bdb0-5f9c4acc3eef
+
+--- Patient Dashboard Debug (2025-12-21 12:40:09.664421) ---
+User: RAJE02
+Appointments found: 1
+Apt: Doctor=doc2, Link=https://meet.jit.si/ckd-appointment-2c985d72-dbcb-4798-bdb0-5f9c4acc3eef
+
+--- Patient Dashboard Debug (2025-12-21 12:40:24.299492) ---
+User: RAJE02
+Appointments found: 1
+Apt: Doctor=doc2, Link=https://meet.jit.si/ckd-appointment-2c985d72-dbcb-4798-bdb0-5f9c4acc3eef
+
+--- Patient Dashboard Debug (2025-12-21 12:41:04.375618) ---
+User: RAJE02
+Appointments found: 1
+Apt: Doctor=doc2, Link=https://meet.jit.si/ckd-appointment-2c985d72-dbcb-4798-bdb0-5f9c4acc3eef
+
+--- Patient Dashboard Debug (2025-12-21 12:41:44.280367) ---
+User: RAJE02
+Appointments found: 1
+Apt: Doctor=doc2, Link=https://meet.jit.si/ckd-appointment-2c985d72-dbcb-4798-bdb0-5f9c4acc3eef
+
+--- Patient Dashboard Debug (2025-12-21 12:41:58.293964) ---
+User: JOHN
+Appointments found: 0

@@ -1,155 +1,155 @@
 {
-  "name": "Prescription Analysis and Report Generation",
-  "description": "AI-powered prescription analysis for CKD patients with PDF report generation",
-  "nodes": [
-    {
-      "id": "chat_input",
-      "type": "ChatInput",
-      "position": {
-        "x": 300,
-        "y": 200
-      },
-      "data": {
-        "node": {
-          "id": "chat_input",
-          "type": "ChatInput",
-          "data": {
-            "type": "ChatInput",
-            "node": {
-              "template": {
-                "input_value": {
-                  "type": "str",
-                  "required": true,
-                  "placeholder": "Enter prescription details...",
-                  "display_name": "Prescription Input"
-                }
+  "name": "Prescription Analysis",
+  "description": "AI-powered prescription analysis for CKD patients",
+  "data": {
+    "nodes": [
+      {
+        "id": "TextInput-1",
+        "type": "TextInput",
+        "position": {
+          "x": 250,
+          "y": 250
+        },
+        "data": {
+          "type": "TextInput",
+          "node": {
+            "template": {
+              "value": {
+                "type": "str",
+                "required": false,
+                "placeholder": "Enter prescription details",
+                "list": false,
+                "show": true,
+                "multiline": true,
+                "value": "",
+                "fileTypes": [],
+                "file_path": "",
+                "password": false,
+                "name": "value",
+                "display_name": "Text",
+                "advanced": false,
+                "dynamic": false,
+                "info": "",
+                "title_case": false
               }
-            }
+            },
+            "description": "Get text inputs from the Playground.",
+            "base_classes": [
+              "Data",
+              "TextInput"
+            ],
+            "display_name": "Text Input",
+            "documentation": "",
+            "custom_fields": {},
+            "output_types": [
+              "Data"
+            ],
+            "pinned": false,
+            "conditional_paths": [],
+            "frozen": false,
+            "outputs": [
+              {
+                "types": [
+                  "Data"
+                ],
+                "selected": "Data",
+                "name": "data",
+                "display_name": "Data",
+                "method": "text_response"
+              }
+            ],
+            "field_order": [
+              "value"
+            ]
+          }
+        }
+      },
+      {
+        "id": "TextOutput-1",
+        "type": "TextOutput",
+        "position": {
+          "x": 650,
+          "y": 250
+        },
+        "data": {
+          "type": "TextOutput",
+          "node": {
+            "template": {
+              "input_value": {
+                "type": "str",
+                "required": false,
+                "placeholder": "",
+                "list": false,
+                "show": true,
+                "multiline": true,
+                "value": "",
+                "fileTypes": [],
+                "file_path": "",
+                "password": false,
+                "name": "input_value",
+                "display_name": "Text",
+                "advanced": false,
+                "input_types": [
+                  "Data"
+                ],
+                "dynamic": false,
+                "info": "",
+                "title_case": false
+              }
+            },
+            "description": "Display a text output in the Playground.",
+            "base_classes": [
+              "TextOutput"
+            ],
+            "display_name": "Text Output",
+            "documentation": "",
+            "custom_fields": {},
+            "output_types": [],
+            "pinned": false,
+            "conditional_paths": [],
+            "frozen": false,
+            "outputs": [],
+            "field_order": [
+              "input_value"
+            ]
           }
         }
       }
-    },
-    {
-      "id": "data_processor",
-      "type": "PythonFunction",
-      "position": {
-        "x": 500,
-        "y": 200
-      },
-      "data": {
-        "node": {
-          "id": "data_processor",
-          "type": "PythonFunction",
-          "data": {
-            "type": "PythonFunction",
-            "node": {
-              "template": {
-                "code": {
-                  "type": "str",
-                  "required": true,
-                  "value": "def process_prescription_data(inputs):\n    \"\"\"\n    Process prescription data and prepare for AI analysis\n    \"\"\"\n    # Extract prescription data from inputs\n    prescription_text = inputs.get('input_value', '')\n    \n    # In a real implementation, you would parse the text to extract structured data\n    # For now, we'll simulate with sample data\n    patient_data = {\n        'name': 'John Doe',\n        'age': 65,\n        'gender': 'Male',\n        'ckd_stage': 'Stage 3b',\n        'egfr': 45,\n        'potassium': 4.2,\n        'sodium': 138\n    }\n    \n    prescription_data = {\n        'medications': [\n            {\n                'name': 'Lisinopril',\n                'dosage': '10mg',\n                'frequency': 'Once daily',\n                'notes': 'For blood pressure control'\n            },\n            {\n                'name': 'Furosemide',\n                'dosage': '40mg',\n                'frequency': 'Once daily',\n                'notes': 'Diuretic for fluid management'\n            }\n        ],\n        'date': '2025-12-19',\n        'doctor': 'Dr. Smith'\n    }\n    \n    return {\n        'patient_data': patient_data,\n        'prescription_data': prescription_data\n    }"
-                }
-              }
-            }
+    ],
+    "edges": [
+      {
+        "source": "TextInput-1",
+        "sourceHandle": "{œbaseClassesœ:[œDataœ],œdataTypeœ:œDataœ,œidœ:œTextInput-1œ,œnameœ:œdataœ,œoutput_typesœ:[œDataœ]}",
+        "target": "TextOutput-1",
+        "targetHandle": "{œfieldNameœ:œinput_valueœ,œidœ:œTextOutput-1œ,œinputTypesœ:[œDataœ],œtypeœ:œstrœ}",
+        "data": {
+          "targetHandle": {
+            "fieldName": "input_value",
+            "id": "TextOutput-1",
+            "inputTypes": [
+              "Data"
+            ],
+            "type": "str"
+          },
+          "sourceHandle": {
+            "baseClasses": [
+              "Data"
+            ],
+            "dataType": "Data",
+            "id": "TextInput-1",
+            "name": "data",
+            "output_types": [
+              "Data"
+            ]
           }
-        }
+        },
+        "id": "reactflow__edge-TextInput-1{œbaseClassesœ:[œDataœ],œdataTypeœ:œDataœ,œidœ:œTextInput-1œ,œnameœ:œdataœ,œoutput_typesœ:[œDataœ]}-TextOutput-1{œfieldNameœ:œinput_valueœ,œidœ:œTextOutput-1œ,œinputTypesœ:[œDataœ],œtypeœ:œstrœ}"
       }
-    },
-    {
-      "id": "ai_analyzer",
-      "type": "PythonFunction",
-      "position": {
-        "x": 700,
-        "y": 200
-      },
-      "data": {
-        "node": {
-          "id": "ai_analyzer",
-          "type": "PythonFunction",
-          "data": {
-            "type": "PythonFunction",
-            "node": {
-              "template": {
-                "code": {
-                  "type": "str",
-                  "required": true,
-                  "value": "def analyze_prescription(inputs):\n    \"\"\"\n    Analyze prescription using AI recommender\n    \"\"\"\n    from models.ai_recommender import CKDAIRecommender\n    \n    patient_data = inputs.get('patient_data', {})\n    prescription_data = inputs.get('prescription_data', {})\n    \n    # Initialize AI recommender\n    recommender = CKDAIRecommender()\n    \n    # Analyze prescription\n    analysis_results = recommender.analyze_prescription(prescription_data, patient_data)\n    \n    return {\n        'patient_data': patient_data,\n        'prescription_data': prescription_data,\n        'analysis_results': analysis_results\n    }"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    {
-      "id": "pdf_generator",
-      "type": "PythonFunction",
-      "position": {
-        "x": 900,
-        "y": 200
-      },
-      "data": {
-        "node": {
-          "id": "pdf_generator",
-          "type": "PythonFunction",
-          "data": {
-            "type": "PythonFunction",
-            "node": {
-              "template": {
-                "code": {
-                  "type": "str",
-                  "required": true,
-                  "value": "def generate_pdf_report(inputs):\n    \"\"\"\n    Generate PDF report from analysis results\n    \"\"\"\n    from models.prescription_report_generator import generate_prescription_report\n    \n    patient_data = inputs.get('patient_data', {})\n    prescription_data = inputs.get('prescription_data', {})\n    analysis_results = inputs.get('analysis_results', {})\n    \n    # Generate PDF report\n    pdf_path = generate_prescription_report(patient_data, prescription_data, analysis_results)\n    \n    return {\n        'pdf_path': pdf_path,\n        'message': 'Report generated successfully'\n    }"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    {
-      "id": "file_output",
-      "type": "FileOutput",
-      "position": {
-        "x": 1100,
-        "y": 200
-      },
-      "data": {
-        "node": {
-          "id": "file_output",
-          "type": "FileOutput",
-          "data": {
-            "type": "FileOutput",
-            "node": {
-              "template": {
-                "path": {
-                  "type": "str",
-                  "required": true,
-                  "value": "{pdf_path}"
-                }
-              }
-            }
-          }
-        }
-      }
+    ],
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "zoom": 1
     }
-  ],
-  "edges": [
-    {
-      "source": "chat_input",
-      "target": "data_processor"
-    },
-    {
-      "source": "data_processor",
-      "target": "ai_analyzer"
-    },
-    {
-      "source": "ai_analyzer",
-      "target": "pdf_generator"
-    },
-    {
-      "source": "pdf_generator",
-      "target": "file_output"
-    }
-  ]
+  }
 }

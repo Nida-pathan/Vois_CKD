@@ -282,6 +282,18 @@ def login():
         username = request.form.get('username') or ''
         password = request.form.get('password') or ''
         
+        # Check for Admin Login
+        # Hardcoded admin credentials (should be moved to env vars in production)
+        ADMIN_ID = "admin"
+        ADMIN_PASSWORD = "admin123"
+        
+        if username == ADMIN_ID and password == ADMIN_PASSWORD:
+            session['admin_logged_in'] = True
+            session['admin_id'] = username
+            flash('Admin login successful!', 'success')
+            return redirect(url_for('admin_dashboard'))
+            
+        # Check for Regular User Login
         user = User.get_by_username(username)
         
         if user and password and check_password_hash(user.password_hash, password):
@@ -1098,6 +1110,22 @@ def patient_dashboard():
             
             dashboard_data['latest_ai_report'] = latest_ai_report
             dashboard_data['latest_lab_report'] = latest_lab_report
+            
+            # Update Dashboard Stats from Latest Lab Report
+            if latest_lab_report:
+                prediction = latest_lab_report.get('prediction', {})
+                if isinstance(prediction, dict):
+                    dashboard_data['ckd_stage'] = prediction.get('stage', 'N/A')
+                    dashboard_data['risk_level'] = prediction.get('risk_level', 'Unknown')
+                    
+                    # Set stage class for styling
+                    stage_str = str(dashboard_data['ckd_stage']).lower()
+                    if '1' in stage_str: dashboard_data['stage_class'] = 'stage-1'
+                    elif '2' in stage_str: dashboard_data['stage_class'] = 'stage-2'
+                    elif '3' in stage_str: dashboard_data['stage_class'] = 'stage-3'
+                    elif '4' in stage_str: dashboard_data['stage_class'] = 'stage-4'
+                    elif '5' in stage_str: dashboard_data['stage_class'] = 'stage-5'
+            
             dashboard_data['current_metrics'] = {
                 'bp_systolic': current_metrics.get('bp_systolic', 'N/A'),
                 'bp_diastolic': current_metrics.get('bp_diastolic', 'N/A'),

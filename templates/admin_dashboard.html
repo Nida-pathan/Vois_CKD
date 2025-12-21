@@ -37,21 +37,15 @@
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="password">Password</label>
-                            <input type="password" id="password" name="password" required>
+                            <label for="specialization">Specialization</label>
+                            <input type="text" id="specialization" name="specialization" required>
                         </div>
                         <div class="form-group">
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="specialization">Specialization</label>
-                                    <input type="text" id="specialization" name="specialization" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="city">City</label>
-                                    <input type="text" id="city" name="city" required placeholder="e.g. Mumbai">
-                                </div>
-                            </div>
-                            <button type="submit" class="btn btn-primary">Add Doctor</button>
+                            <label for="city">City</label>
+                            <input type="text" id="city" name="city" required placeholder="e.g. Mumbai">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Doctor</button>
                 </form>
             </div>
         </div>
@@ -69,10 +63,13 @@
                         <div class="doctor-info">
                             <h4>Dr. {{ doctor.username }}</h4>
                             {% if doctor.specialization %}
-                            <p>{{ doctor.specialization }}</p>
+                            <p><i class="fas fa-stethoscope"></i> {{ doctor.specialization }}</p>
                             {% endif %}
                             {% if doctor.email %}
-                            <p>{{ doctor.email }}</p>
+                            <p><i class="fas fa-envelope"></i> {{ doctor.email }}</p>
+                            {% endif %}
+                            {% if doctor.city %}
+                            <p><i class="fas fa-map-marker-alt"></i> {{ doctor.city }}</p>
                             {% endif %}
                         </div>
                         <div class="patients-info">
@@ -91,7 +88,10 @@
                     {% endfor %}
                 </div>
                 {% else %}
-                <p class="no-data">No doctors found in the system.</p>
+                <div class="empty-state">
+                    <i class="fas fa-user-md"></i>
+                    <p>No doctors found in the system.</p>
+                </div>
                 {% endif %}
             </div>
         </div>
@@ -126,14 +126,19 @@
                     {% endfor %}
                 </div>
                 {% else %}
-                <p class="no-data">No patient feedback available.</p>
+                <div class="empty-state">
+                    <i class="far fa-comments"></i>
+                    <p>No patient feedback available.</p>
+                </div>
                 {% endif %}
             </div>
         </div>
     </div>
 
     <div class="login-footer">
-        <a href="{{ url_for('admin_logout') }}" class="btn btn-secondary">Logout</a>
+        <a href="{{ url_for('admin_logout') }}" class="btn btn-secondary logout-btn">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
     </div>
 </div>
 
@@ -154,8 +159,14 @@
     .dashboard-card {
         background: white;
         border-radius: 16px;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         overflow: hidden;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .dashboard-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
     }
 
     @media (min-width: 1024px) {
@@ -169,9 +180,10 @@
     }
 
     .card-header {
-        background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+        background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
         color: white;
-        padding: 1.5rem;
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .card-header h3 {
@@ -179,43 +191,53 @@
         display: flex;
         align-items: center;
         gap: 10px;
-        font-size: 1.3rem;
+        font-size: 1.25rem;
+        font-weight: 600;
     }
 
     .card-body {
-        padding: 2rem;
+        padding: 1.5rem;
     }
 
     .form-row {
         display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 15px;
-        margin-bottom: 15px;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    @media (min-width: 640px) {
+        .form-row {
+            grid-template-columns: 1fr 1fr;
+        }
     }
 
     .form-group {
-        margin-bottom: 1.5rem;
+        margin-bottom: 1rem;
     }
 
     .form-group label {
         display: block;
         margin-bottom: 0.5rem;
-        color: #334155;
+        color: #475569;
         font-weight: 500;
+        font-size: 0.95rem;
     }
 
     .form-group input {
         width: 100%;
         padding: 0.75rem;
-        border: 2px solid #e2e8f0;
+        border: 1px solid #e2e8f0;
         border-radius: 8px;
-        font-size: 1rem;
-        transition: border-color 0.3s;
+        font-size: 0.95rem;
+        transition: all 0.2s;
+        color: #1e293b;
     }
 
     .form-group input:focus {
         outline: none;
         border-color: #dc2626;
+        box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
     }
 
     .btn {
@@ -223,152 +245,101 @@
         border: none;
         border-radius: 8px;
         font-size: 1rem;
+        font-weight: 500;
         cursor: pointer;
-        transition: all 0.3s;
+        transition: all 0.2s;
         text-decoration: none;
-        display: inline-block;
-        text-align: center;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
     }
 
     .btn-primary {
-        background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+        background: #dc2626;
         color: white;
+        width: 100%;
+    }
+
+    @media (min-width: 640px) {
+        .btn-primary {
+            width: auto;
+        }
     }
 
     .btn-primary:hover {
-        background: linear-gradient(135deg, #b91c1c 0%, #dc2626 100%);
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(220, 38, 38, 0.4);
+        background: #b91c1c;
+        transform: translateY(-1px);
     }
 
-    .btn-secondary {
-        background: #64748b;
+    .login-footer {
+        margin-top: 3rem;
+        text-align: center;
+        padding-bottom: 2rem;
+        border-top: 1px solid #e2e8f0;
+        padding-top: 2rem;
+    }
+
+    .logout-btn {
+        background-color: #64748b;
         color: white;
+        padding: 0.75rem 2rem;
     }
 
-    .btn-secondary:hover {
-        background: #475569;
+    .logout-btn:hover {
+        background-color: #475569;
+        transform: translateY(-1px);
     }
 
-    .doctors-list {
-        max-height: 400px;
-        overflow-y: auto;
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: #94a3b8;
     }
 
-    .doctor-item {
-        border: 1px solid #e2e8f0;
+    .empty-state i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+
+    .empty-state p {
+        font-size: 1.1rem;
+        margin: 0;
+    }
+
+    .doctor-item,
+    .feedback-item {
+        border: 1px solid #f1f5f9;
         border-radius: 12px;
         padding: 1.5rem;
-        margin-bottom: 1.5rem;
+        margin-bottom: 1rem;
         background: #f8fafc;
+        transition: background-color 0.2s;
     }
 
-    .doctor-info h4 {
-        color: #0d9488;
-        margin: 0 0 0.5rem 0;
+    .doctor-item:hover,
+    .feedback-item:hover {
+        background: #f1f5f9;
     }
 
-    .doctor-info p {
-        color: #64748b;
-        margin: 0 0 0.5rem 0;
-        font-size: 0.9rem;
-    }
-
-    .patients-info h5 {
-        color: #334155;
-        margin: 1rem 0 0.5rem 0;
-    }
-
-    .patients-list {
-        margin: 0;
-        padding-left: 1.5rem;
-    }
-
-    .patients-list li {
-        color: #64748b;
-        margin-bottom: 0.25rem;
-        font-size: 0.9rem;
-    }
-
-    .no-patients,
-    .no-data {
-        color: #94a3b8;
-        font-style: italic;
-        text-align: center;
-        padding: 2rem;
-    }
-
+    /* Scrollbar styling */
+    .doctors-list,
     .feedback-list {
         max-height: 400px;
         overflow-y: auto;
+        padding-right: 5px;
     }
 
-    .feedback-item {
-        border: 1px solid #e2e8f0;
-        border-radius: 12px;
-        padding: 1.5rem;
-        margin-bottom: 1.5rem;
-        background: #f8fafc;
+    .doctors-list::-webkit-scrollbar,
+    .feedback-list::-webkit-scrollbar {
+        width: 6px;
     }
 
-    .feedback-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1rem;
-    }
-
-    .feedback-header h4 {
-        color: #0d9488;
-        margin: 0;
-    }
-
-    .feedback-date {
-        color: #94a3b8;
-        font-size: 0.875rem;
-    }
-
-    .feedback-rating {
-        color: #fbbf24;
-        margin-bottom: 1rem;
-    }
-
-    .feedback-text {
-        color: #64748b;
-        margin: 0 0 0.5rem 0;
-        line-height: 1.5;
-    }
-
-    .feedback-doctor {
-        color: #334155;
-        font-size: 0.875rem;
-        margin: 0;
-        font-weight: 500;
-    }
-
-    .alert {
-        padding: 1rem;
-        margin-bottom: 2rem;
-        border-radius: 8px;
-        text-align: center;
-    }
-
-    .alert-success {
-        background: #dcfce7;
-        color: #166534;
-        border: 1px solid #bbf7d0;
-    }
-
-    .alert-danger {
-        background: #fef2f2;
-        color: #991b1b;
-        border: 1px solid #fecaca;
-    }
-
-    .alert-warning {
-        background: #fefce8;
-        color: #854d0e;
-        border: 1px solid #fde047;
+    .doctors-list::-webkit-scrollbar-thumb,
+    .feedback-list::-webkit-scrollbar-thumb {
+        background-color: #cbd5e1;
+        border-radius: 3px;
     }
 </style>
 {% endblock %}

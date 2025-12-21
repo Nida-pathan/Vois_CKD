@@ -874,7 +874,13 @@
             <div class="stat-card">
                 <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
                 <div class="stat-label">Next Checkup</div>
-                <div class="stat-number">{{ patient_data.next_checkup }}</div>
+                <div class="stat-number">
+                    {% if upcoming_appointments %}
+                    {{ upcoming_appointments[0].preferred_date }}
+                    {% else %}
+                    Not scheduled
+                    {% endif %}
+                </div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon"><i class="fas fa-file-medical"></i></div>
