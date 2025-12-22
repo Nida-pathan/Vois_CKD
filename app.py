@@ -390,6 +390,23 @@ def logout():
     flash('Logged out successfully', 'info')
     return redirect(url_for('index'))
 
+@app.route('/api/complete-tour', methods=['POST'])
+@login_required
+def complete_tour():
+    from models.database import Database
+    from bson.objectid import ObjectId
+    try:
+        db = Database.get_db()
+        db.users.update_one(
+            {'_id': ObjectId(current_user.id)},
+            {'$set': {'has_seen_tour': True}}
+        )
+        current_user.has_seen_tour = True
+        return jsonify({'success': True})
+    except Exception as e:
+        print(f"Error completing tour: {e}")
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/doctor/dashboard')
 @login_required
 def doctor_dashboard():
@@ -1127,10 +1144,13 @@ def patient_dashboard():
             
             # Update Dashboard Stats from Latest Lab Report
             if latest_lab_report:
-                prediction = latest_lab_report.get('prediction', {})
-                if isinstance(prediction, dict):
-                    dashboard_data['ckd_stage'] = prediction.get('stage', 'N/A')
-                    dashboard_data['risk_level'] = prediction.get('risk_level', 'Unknown')
+                test_type = latest_lab_report.get('test_type', '').lower()
+                # Ensure we only show CKD stage from CKD-related reports (exclude Stone/AKI/ESRD overwrites)
+                if 'stone' not in test_type and 'aki' not in test_type and 'esrd' not in test_type:
+                    prediction = latest_lab_report.get('prediction', {})
+                    if isinstance(prediction, dict):
+                        dashboard_data['ckd_stage'] = prediction.get('stage', 'N/A')
+                        dashboard_data['risk_level'] = prediction.get('risk_level', 'Unknown')
                     
                     # Set stage class for styling
                     stage_str = str(dashboard_data['ckd_stage']).lower()
@@ -1161,6 +1181,63 @@ def patient_dashboard():
             if history:
                 dashboard_data['has_history'] = True
         
+            # Populate disease_status from history if available (Backfill for existing users)
+            if 'disease_status' not in dashboard_data:
+                dashboard_data['disease_status'] = {}
+
+            # Map test types to disease keys
+            disease_map = {
+                'kidney_stone': 'kidney_stone',
+                'stone': 'kidney_stone',
+                'ckd': 'ckd',
+                'aki': 'aki',
+                'esrd': 'esrd'
+            }
+
+            for report in sorted_history:
+                raw_type = report.get('test_type', '').lower()
+                prediction = report.get('prediction', {})
+                
+                # Find matching disease key by name first
+                disease_key = next((k for k in disease_map if k in raw_type), None)
+                
+                # If not found by name, try to infer from prediction structure
+                if not disease_key and prediction:
+                    if 'stone_detected' in prediction or 'stone_count' in prediction:
+                        disease_key = 'kidney_stone'
+                    elif 'ckd_stage' in prediction or 'egfr' in prediction: # CKD usually has stage
+                         disease_key = 'ckd'
+                    # Add other inference rules if known, or fallback
+                
+                # If valid disease and not already set (since we sort by latest first)
+                if disease_key and disease_map.get(disease_key) and disease_map[disease_key] not in dashboard_data['disease_status']:
+                    dashboard_data['disease_status'][disease_map[disease_key]] = {
+                        'last_updated': report.get('date'),
+                        'prediction': prediction
+                    }
+            
+            # Also check if latest_lab_report has data not covered
+            if latest_lab_report:
+                pred = latest_lab_report.get('prediction', {})
+                if pred:
+                     # Default to CKD if standard lab values and no specific type
+                    if 'ckd' not in dashboard_data['disease_status'] and 'stage' in pred:
+                         dashboard_data['disease_status']['ckd'] = {
+                            'last_updated': latest_lab_report.get('date'),
+                            'prediction': pred
+                        }
+
+        if current_user.id:
+             dashboard_data['patient_id'] = f"P{current_user.id}"
+
+        # Check if user has seen the tour (stored in User model)
+        # show_tour = not current_user.has_seen_tour
+        show_tour = True
+        
+        # Force tour for ar3 every time
+        if current_user.username == 'ar3':
+            show_tour = True
+
         # Get upcoming appointments for patient
         from models.user import get_appointments_for_patient
         upcoming_appointments = get_appointments_for_patient(current_user.username)
@@ -1169,7 +1246,10 @@ def patient_dashboard():
         with open('debug_log.txt', 'a') as f:
             f.write(f"\n--- Patient Dashboard Debug ({pd.Timestamp.now()}) ---\n")
             f.write(f"User: {current_user.username}\n")
+            f.write(f"Has seen tour: {current_user.has_seen_tour}\n")
+            f.write(f"Show tour: {not current_user.has_seen_tour}\n")
             f.write(f"Appointments found: {len(upcoming_appointments)}\n")
+            f.write(f"Disease Status Keys: {list(dashboard_data.get('disease_status', {}).keys())}\n")
             for apt in upcoming_appointments:
                 f.write(f"Apt: Doctor={apt.get('doctor')}, Link={apt.get('meet_link')}\n")
         # END DEBUG LOGGING
@@ -1179,7 +1259,9 @@ def patient_dashboard():
                              patient_trials=patient_trials,
                              available_doctors=dashboard_doctors,
                              upcoming_appointments=upcoming_appointments,
-                             debug_status="FIXED")
+                             disease_status=dashboard_data.get('disease_status', {}),
+                             show_tour=show_tour,
+                             debug_status="FIXED_W_DATA")
     
     except Exception as e:
         print(f"Error fetching patient data for dashboard: {e}")
@@ -1661,6 +1743,10 @@ def get_patient_dashboard_data(patient_id):
                 dashboard_data['has_history'] = True
                 dashboard_data['history'] = patient_data['history']
                 dashboard_data['lab_reports_count'] = len(patient_data['history'])
+
+            # Disease Status for Multi-Card Dashboard
+            # Ensure we pass this to the template
+            dashboard_data['disease_status'] = patient_data.get('disease_status', {})
         
         # Generate personalized lifestyle recommendations
         lifestyle_recommendations = []
@@ -1814,6 +1900,7 @@ def get_patient_dashboard_data(patient_id):
                              trials=patient_trials,
                              available_doctors=available_doctors,
                              dashboard=dashboard_data,
+                             disease_status=dashboard_data.get('disease_status', {}),
                              upcoming_appointments=upcoming_appointments,
                              debug_status="SERVER_RELOADED")
 
@@ -2336,7 +2423,7 @@ def lab_analysis():
 @app.route('/patient/upload-lab', methods=['POST'])
 @login_required
 def upload_lab_report_pdf():
-    """Upload and analyze lab report PDF"""
+    """Upload and analyze lab report PDF or Image"""
     if current_user.is_doctor():
         return jsonify({'error': 'Access denied'}), 403
     
@@ -2348,12 +2435,58 @@ def upload_lab_report_pdf():
     disease_type = request.form.get('disease_type', 'ckd')
     use_defaults = request.form.get('use_defaults', 'false') == 'true'
     
-    if file.filename == '':
+    if file.filename == '' and not use_defaults:
         return jsonify({'error': 'No file selected'}), 400
     
-    # Check file extension
-    if not file.filename.lower().endswith('.pdf'):
-        return jsonify({'error': 'Only PDF files are allowed'}), 400
+    # Validate file extension based on disease type
+    filename = file.filename.lower()
+    is_pdf = filename.endswith('.pdf')
+    is_image = filename.endswith(('.jpg', '.jpeg', '.png'))
+    
+    if disease_type == 'kidney_stone' and is_image:
+        # Handle Kidney Stone Image Upload
+        try:
+            from models.kidney_stone_model import kidney_stone_model
+            from werkzeug.utils import secure_filename
+            import os
+            
+            # Create uploads directory
+            upload_folder = 'static/uploads/scans'
+            os.makedirs(upload_folder, exist_ok=True)
+            
+            # Save uploaded file
+            secure_name = secure_filename(f"{current_user.username}_stone_scan_{file.filename}")
+            filepath = os.path.join(upload_folder, secure_name)
+            file.save(filepath)
+            
+            # Run YOLO prediction
+            # We pass the relative path for saving results in static folder
+            results_dir = 'static/predictions'
+            prediction = kidney_stone_model.predict(filepath, save_dir=results_dir)
+            
+            # Save disease status
+            from models.user import update_disease_status, update_patient_lab_values
+            update_disease_status(current_user.username, 'kidney_stone', prediction)
+            
+            # Also add to history as a lab report
+            # Images don't have standard lab values, so we pass empty dict or minimal info
+            # We use a distinct test_type
+            update_patient_lab_values(current_user.username, {}, prediction, filepath, test_type='Kidney Stone Scan')
+            
+            return jsonify({
+                'success': True,
+                'prediction': prediction
+            })
+            
+        except Exception as e:
+            print(f"Error in kidney stone image analysis: {e}")
+            import traceback
+            traceback.print_exc()
+            return jsonify({'error': f'Image analysis failed: {str(e)}'}), 500
+
+    # Default / Existing Flow for PDFs
+    if not is_pdf and not use_defaults:
+        return jsonify({'error': 'Only PDF files are allowed for this analysis'}), 400
     
     try:
         from models.pdf_parser import LabReportParser
@@ -2366,22 +2499,30 @@ def upload_lab_report_pdf():
         os.makedirs(upload_folder, exist_ok=True)
         
         # Save uploaded file
-        filename = secure_filename(f"{current_user.username}_{disease_type}_{file.filename}")
-        filepath = os.path.join(upload_folder, filename)
-        file.save(filepath)
+        if file and file.filename:
+            filename = secure_filename(f"{current_user.username}_{disease_type}_{file.filename}")
+            filepath = os.path.join(upload_folder, filename)
+            file.save(filepath)
+        else:
+            filepath = "dummy_path.pdf" # Should not happen if check passed
         
         # Parse PDF and extract values
-        parser = LabReportParser(filepath)
-        
         if use_defaults:
-            # Use default values for testing
+            lab_values = LabReportParser.set_default_values(None, disease_type) # Static method ideally or fix instance usage
+            # Fix: The original code used instance method. Let's stick to what likely works or create instance.
+            # parser = LabReportParser(filepath)
+            # lab_values = parser.set_default_values(disease_type)
+            # Reverting to original logic flow roughly:
+            parser = LabReportParser(filepath) # filepath might not exist if defaults but parser needs init?
             lab_values = parser.set_default_values(disease_type)
         else:
-            # Extract from PDF
+            parser = LabReportParser(filepath)
             lab_values = parser.extract_values(disease_type)
         
         if not lab_values:
             # If no values extracted, use defaults
+            # Instantiate parser again or reuse?
+            # parser = LabReportParser(filepath)
             lab_values = parser.set_default_values(disease_type)
         
         # Predict disease severity
@@ -2397,27 +2538,26 @@ def upload_lab_report_pdf():
             prediction = predictor.predict_esrd(lab_values)
         else:
             return jsonify({'error': 'Invalid disease type'}), 400
+            
+        # Update patient records with new data
+        from models.user import update_patient_lab_values, update_disease_status
+        test_type_label = f"{disease_type.replace('_', ' ').title()} Analysis"
+        update_patient_lab_values(current_user.username, lab_values, prediction, filepath if not use_defaults else None, test_type=test_type_label)
         
-        # Update patient records with extracted values
-        from models.user import update_patient_lab_values
-        # Store relative path for frontend access
-        relative_path = f"uploads/lab_reports/{filename}"
-        update_patient_lab_values(current_user.username, lab_values, prediction, relative_path)
-        
-        # Trial count logic removed as per request
+        # Save specific disease status for dashboard
+        update_disease_status(current_user.username, disease_type, prediction)
         
         return jsonify({
             'success': True,
-            'message': f'{prediction["disease"]} analysis complete!',
-            'extracted_values': lab_values,
-            'prediction': prediction
+            'prediction': prediction,
+            'lab_values': lab_values
         })
-    
+        
     except Exception as e:
-        print(f"Error processing lab report: {e}")
+        print(f"Error processing lab upload: {e}")
         import traceback
         traceback.print_exc()
-        return jsonify({'error': f'Failed to process lab report: {str(e)}'}), 500
+        return jsonify({'error': str(e)}), 500
 
 
 

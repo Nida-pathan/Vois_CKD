@@ -1,0 +1,414 @@
+
+--- Patient Dashboard Debug (2025-12-21 21:34:18.243089) ---
+User: JOHN
+Appointments found: 0
+
+--- Patient Dashboard Debug (2025-12-21 21:39:26.373741) ---
+User: JOHN
+Appointments found: 0
+
+--- Patient Dashboard Debug (2025-12-21 21:40:50.672353) ---
+User: JOHN
+Appointments found: 0
+
+--- Patient Dashboard Debug (2025-12-21 21:53:01.945896) ---
+User: test_yolo_user
+Appointments found: 0
+
+--- Patient Dashboard Debug (2025-12-21 21:53:02.085639) ---
+User: test_yolo_user
+Appointments found: 0
+
+--- Patient Dashboard Debug (2025-12-21 21:54:50.965636) ---
+User: test_yolo_user
+Appointments found: 0
+
+--- Patient Dashboard Debug (2025-12-21 21:56:47.487467) ---
+User: test_yolo_user
+Appointments found: 0
+
+--- Patient Dashboard Debug (2025-12-21 21:58:02.232919) ---
+User: test_yolo_user
+Appointments found: 0
+
+--- Patient Dashboard Debug (2025-12-21 22:20:59.451387) ---
+User: JOHN
+Appointments found: 0
+
+--- Patient Dashboard Debug (2025-12-21 22:21:33.758782) ---
+User: JOHN
+Appointments found: 0
+
+--- Patient Dashboard Debug (2025-12-21 22:47:11.725512) ---
+User: JOHN
+Appointments found: 0
+
+--- Patient Dashboard Debug (2025-12-21 22:47:14.663500) ---
+User: JOHN
+Appointments found: 0
+
+--- Patient Dashboard Debug (2025-12-21 22:49:00.701628) ---
+User: JOHN
+Appointments found: 0
+
+--- Patient Dashboard Debug (2025-12-21 22:52:29.966936) ---
+User: JOHN
+Appointments found: 0
+
+--- Patient Dashboard Debug (2025-12-21 22:54:47.552537) ---
+User: JOHN
+Appointments found: 0
+Disease Status Keys: ['ckd']
+
+--- Patient Dashboard Debug (2025-12-21 22:59:11.792297) ---
+User: JOHN
+Appointments found: 0
+Disease Status Keys: ['ckd']
+
+--- Patient Dashboard Debug (2025-12-21 23:06:14.675146) ---
+User: JOHN
+Appointments found: 0
+Disease Status Keys: ['ckd']
+
+--- Patient Dashboard Debug (2025-12-21 23:06:50.172901) ---
+User: JOHN
+Appointments found: 0
+Disease Status Keys: ['kidney_stone', 'ckd']
+
+--- Patient Dashboard Debug (2025-12-21 23:08:52.497719) ---
+User: JOHN
+Appointments found: 0
+Disease Status Keys: ['kidney_stone', 'ckd']
+
+--- Patient Dashboard Debug (2025-12-21 23:11:59.372062) ---
+User: JOHN
+Appointments found: 0
+Disease Status Keys: ['kidney_stone', 'ckd']
+
+--- Patient Dashboard Debug (2025-12-21 23:32:36.982124) ---
+User: ar1
+Appointments found: 0
+Disease Status Keys: []
+
+--- Patient Dashboard Debug (2025-12-21 23:42:36.938432) ---
+User: ar3
+Appointments found: 0
+Disease Status Keys: []
+
+--- Patient Dashboard Debug (2025-12-21 23:43:10.628909) ---
+User: ar3
+Appointments found: 0
+Disease Status Keys: []
+
+--- Patient Dashboard Debug (2025-12-21 23:43:13.349817) ---
+User: ar3
+Appointments found: 0
+Disease Status Keys: []
+
+--- Patient Dashboard Debug (2025-12-21 23:43:47.884396) ---
+User: ar3
+Has seen tour: False
+Show tour: True
+Appointments found: 0
+Disease Status Keys: []
+
+--- Patient Dashboard Debug (2025-12-21 23:44:46.529562) ---
+User: ar3
+Has seen tour: False
+Show tour: True
+Appointments found: 0
+Disease Status Keys: []
+
+--- Patient Dashboard Debug (2025-12-21 23:45:07.180389) ---
+User: ar3
+Has seen tour: False
+Show tour: True
+Appointments found: 0
+Disease Status Keys: []
+
+--- Patient Dashboard Debug (2025-12-21 23:45:59.629544) ---
+User: ar3
+Has seen tour: False
+Show tour: True
+Appointments found: 0
+Disease Status Keys: []
+
+--- Patient Dashboard Debug (2025-12-21 23:46:27.532226) ---
+User: ar3
+Has seen tour: False
+Show tour: True
+Appointments found: 0
+Disease Status Keys: []
+
+--- Patient Dashboard Debug (2025-12-21 23:47:16.580747) ---
+User: ar3
+Has seen tour: False
+Show tour: True
+Appointments found: 0
+Disease Status Keys: []
+
+--- Patient Dashboard Debug (2025-12-21 23:48:05.748091) ---
+User: ar3
+Has seen tour: False
+Show tour: True
+Appointments found: 0
+Disease Status Keys: []
+
+--- Patient Dashboard Debug (2025-12-21 23:48:47.208968) ---
+User: ar3
+Has seen tour: False
+Show tour: True
+Appointments found: 0
+Disease Status Keys: []
+
+--- Patient Dashboard Debug (2025-12-21 23:49:18.036813) ---
+User: ar3
+Has seen tour: False
+Show tour: True
+Appointments found: 0
+Disease Status Keys: []
+
+--- Patient Dashboard Debug (2025-12-21 23:50:09.458041) ---
+User: ar3
+Has seen tour: False
+Show tour: True
+Appointments found: 0
+Disease Status Keys: []
+
+--- Patient Dashboard Debug (2025-12-21 23:50:14.249078) ---
+User: ar3
+Has seen tour: False
+Show tour: True
+Appointments found: 0
+Disease Status Keys: []
+
+--- Patient Dashboard Debug (2025-12-21 23:50:30.719393) ---
+User: ar3
+Has seen tour: False
+Show tour: True
+Appointments found: 0
+Disease Status Keys: []
+
+--- Patient Dashboard Debug (2025-12-21 23:53:11.519265) ---
+User: ar3
+Has seen tour: False
+Show tour: True
+Appointments found: 0
+Disease Status Keys: []
+
+--- Patient Dashboard Debug (2025-12-21 23:53:27.005159) ---
+User: ar3
+Has seen tour: False
+Show tour: True
+Appointments found: 0
+Disease Status Keys: []
+
+--- Patient Dashboard Debug (2025-12-21 23:54:44.831258) ---
+User: ar3
+Has seen tour: False
+Show tour: True
+Appointments found: 0
+Disease Status Keys: []
+
+--- Patient Dashboard Debug (2025-12-21 23:54:47.849797) ---
+User: ar3
+Has seen tour: False
+Show tour: True
+Appointments found: 0
+Disease Status Keys: []
+
+--- Patient Dashboard Debug (2025-12-21 23:57:19.263298) ---
+User: ar3
+Has seen tour: False
+Show tour: True
+Appointments found: 0
+Disease Status Keys: []
+
+--- Patient Dashboard Debug (2025-12-21 23:57:21.468411) ---
+User: ar3
+Has seen tour: False
+Show tour: True
+Appointments found: 0
+Disease Status Keys: []
+
+--- Patient Dashboard Debug (2025-12-21 23:57:38.371039) ---
+User: ar3
+Has seen tour: False
+Show tour: True
+Appointments found: 0
+Disease Status Keys: []
+
+--- Patient Dashboard Debug (2025-12-21 23:58:51.432379) ---
+User: ar3
+Has seen tour: False
+Show tour: True
+Appointments found: 0
+Disease Status Keys: []
+
+--- Patient Dashboard Debug (2025-12-22 12:03:44.548358) ---
+User: ar3
+Has seen tour: False
+Show tour: True
+Appointments found: 0
+Disease Status Keys: []
+
+--- Patient Dashboard Debug (2025-12-22 12:22:41.376633) ---
+User: ar3
+Has seen tour: False
+Show tour: True
+Appointments found: 0
+Disease Status Keys: []
+
+--- Patient Dashboard Debug (2025-12-22 12:24:48.847047) ---
+User: ar3
+Has seen tour: False
+Show tour: True
+Appointments found: 0
+Disease Status Keys: []
+
+--- Patient Dashboard Debug (2025-12-22 12:25:02.751422) ---
+User: ar3
+Has seen tour: False
+Show tour: True
+Appointments found: 0
+Disease Status Keys: []
+
+--- Patient Dashboard Debug (2025-12-22 12:26:50.826657) ---
+User: ar3
+Has seen tour: False
+Show tour: True
+Appointments found: 0
+Disease Status Keys: []
+
+--- Patient Dashboard Debug (2025-12-22 12:27:05.997359) ---
+User: ar3
+Has seen tour: False
+Show tour: True
+Appointments found: 0
+Disease Status Keys: []
+
+--- Patient Dashboard Debug (2025-12-22 12:30:22.987575) ---
+User: ar3
+Has seen tour: False
+Show tour: True
+Appointments found: 0
+Disease Status Keys: []
+
+--- Patient Dashboard Debug (2025-12-22 12:32:14.006691) ---
+User: ar3
+Has seen tour: True
+Show tour: False
+Appointments found: 0
+Disease Status Keys: []
+
+--- Patient Dashboard Debug (2025-12-22 12:34:51.673246) ---
+User: ar3
+Has seen tour: True
+Show tour: False
+Appointments found: 0
+Disease Status Keys: []
+
+--- Patient Dashboard Debug (2025-12-22 12:35:03.620912) ---
+User: ar3
+Has seen tour: True
+Show tour: False
+Appointments found: 0
+Disease Status Keys: []
+
+--- Patient Dashboard Debug (2025-12-22 12:39:40.043826) ---
+User: ar3
+Has seen tour: True
+Show tour: False
+Appointments found: 0
+Disease Status Keys: []
+
+--- Patient Dashboard Debug (2025-12-22 12:43:13.915426) ---
+User: ar3
+Has seen tour: True
+Show tour: False
+Appointments found: 0
+Disease Status Keys: []
+
+--- Patient Dashboard Debug (2025-12-22 12:45:45.846746) ---
+User: ar3
+Has seen tour: True
+Show tour: False
+Appointments found: 0
+Disease Status Keys: []
+
+--- Patient Dashboard Debug (2025-12-22 12:47:53.124809) ---
+User: ar3
+Has seen tour: True
+Show tour: False
+Appointments found: 0
+Disease Status Keys: []
+
+--- Patient Dashboard Debug (2025-12-22 12:48:03.157358) ---
+User: ar3
+Has seen tour: True
+Show tour: False
+Appointments found: 0
+Disease Status Keys: []
+
+--- Patient Dashboard Debug (2025-12-22 12:51:49.775611) ---
+User: ar3
+Has seen tour: True
+Show tour: False
+Appointments found: 0
+Disease Status Keys: []
+
+--- Patient Dashboard Debug (2025-12-22 12:53:55.371587) ---
+User: ar3
+Has seen tour: True
+Show tour: False
+Appointments found: 0
+Disease Status Keys: []
+
+--- Patient Dashboard Debug (2025-12-22 12:55:15.006366) ---
+User: ar3
+Has seen tour: True
+Show tour: False
+Appointments found: 0
+Disease Status Keys: []
+
+--- Patient Dashboard Debug (2025-12-22 12:57:18.615227) ---
+User: ar3
+Has seen tour: True
+Show tour: False
+Appointments found: 0
+Disease Status Keys: []
+
+--- Patient Dashboard Debug (2025-12-22 12:57:42.485204) ---
+User: ar3
+Has seen tour: True
+Show tour: False
+Appointments found: 0
+Disease Status Keys: []
+
+--- Patient Dashboard Debug (2025-12-22 13:00:16.615580) ---
+User: ar3
+Has seen tour: True
+Show tour: False
+Appointments found: 0
+Disease Status Keys: []
+
+--- Patient Dashboard Debug (2025-12-22 13:01:30.913835) ---
+User: ar3
+Has seen tour: True
+Show tour: False
+Appointments found: 0
+Disease Status Keys: []
+
+--- Patient Dashboard Debug (2025-12-22 13:01:39.327183) ---
+User: ar3
+Has seen tour: True
+Show tour: False
+Appointments found: 0
+Disease Status Keys: []
+
+--- Patient Dashboard Debug (2025-12-22 13:02:11.526562) ---
+User: ar3
+Has seen tour: True
+Show tour: False
+Appointments found: 0
+Disease Status Keys: []

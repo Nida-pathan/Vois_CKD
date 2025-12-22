@@ -860,7 +860,7 @@
         </div>
 
         <!-- Stats Overview -->
-        <div class="stats-grid">
+        <div class="stats-grid" id="stats-overview">
             <div class="stat-card {{ patient_data.stage_class }}">
                 <div class="stat-icon"><i class="fas fa-kidney"></i></div>
                 <div class="stat-label">CKD Stage</div>
@@ -894,7 +894,7 @@
             <!-- Left Column -->
             <div class="main-content">
                 <!-- Free Trial Lab Upload Section -->
-                <div class="trial-section">
+                <div class="trial-section" id="upload-section">
                     <div class="trial-header">
                         <div class="trial-title">
                             <i class="fas fa-flask"></i> Lab Report Analysis
@@ -1038,7 +1038,10 @@
                     </div>
 
                     {% if patient_data.history %}
-                    {% for report in patient_data.history | reverse %}
+                    {% set history_list = patient_data.history | reverse | list %}
+
+                    {# Show first 3 items #}
+                    {% for report in history_list[:3] %}
                     <div class="metric-item">
                         <div style="flex: 1;">
                             <div style="font-weight: 600; color: var(--text-primary);">{{ report.date }} - {{
@@ -1059,6 +1062,54 @@
                         {% endif %}
                     </div>
                     {% endfor %}
+
+                    {# Hidden items for the rest #}
+                    {% if history_list|length > 3 %}
+                    <div id="more-history" style="display: none;">
+                        {% for report in history_list[3:] %}
+                        <div class="metric-item">
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600; color: var(--text-primary);">{{ report.date }} - {{
+                                    report.test_type if report.test_type else 'Lab Analysis' }}</div>
+                                <div style="font-size: 12px; color: var(--text-secondary);">
+                                    {% if report.metrics.egfr %}eGFR: {{ report.metrics.egfr }}{% endif %}
+                                    {% if report.metrics.serum_creatinine %} | Creatinine: {{
+                                    report.metrics.serum_creatinine }}{% endif %}
+                                </div>
+                            </div>
+                            {% if report.pdf_path %}
+                            <a href="{{ url_for('static', filename=report.pdf_path) }}" target="_blank"
+                                class="card-action" style="font-size: 14px;">
+                                <i class="fas fa-file-pdf"></i> View
+                            </a>
+                            {% else %}
+                            <span style="font-size: 12px; color: var(--text-secondary);">No PDF</span>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <div style="text-align: center; margin-top: 10px;">
+                        <button onclick="toggleHistory()" id="view-more-btn"
+                            style="background: none; border: none; color: #0d9488; font-weight: 600; cursor: pointer;">
+                            View More <i class="fas fa-chevron-down"></i>
+                        </button>
+                    </div>
+                    <script>
+                        function toggleHistory() {
+                            var moreHistory = document.getElementById("more-history");
+                            var btn = document.getElementById("view-more-btn");
+                            if (moreHistory.style.display === "none") {
+                                moreHistory.style.display = "block";
+                                btn.innerHTML = 'View Less <i class="fas fa-chevron-up"></i>';
+                            } else {
+                                moreHistory.style.display = "none";
+                                btn.innerHTML = 'View More <i class="fas fa-chevron-down"></i>';
+                            }
+                        }
+                    </script>
+                    {% endif %}
+
                     {% else %}
                     <div style="text-align: center; padding: 20px; color: var(--text-secondary);">
                         No history available
@@ -1069,16 +1120,106 @@
 
             <!-- Right Column -->
             <div class="sidebar">
-                <!-- Risk Level Indicator -->
+                <!-- Disease Status Overview -->
                 <div class="card">
                     <div class="card-header">
                         <div class="card-title">
-                            <i class="fas fa-exclamation-triangle"></i> Risk Assessment
+                            <i class="fas fa-notes-medical"></i> Disease Analyis Status
                         </div>
                     </div>
-                    <div class="risk-indicator {{ patient_data.risk_class }}">
-                        <div class="risk-level">{{ patient_data.risk_level }}</div>
-                        <div class="risk-description">Based on your latest lab results and medical history</div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px;">
+                        <!-- CKD Status -->
+                        <div
+                            style="background: {{ 'rgba(239, 68, 68, 0.1)' if disease_status.ckd and disease_status.ckd.prediction.risk_level == 'High' else ('rgba(245, 158, 11, 0.1)' if disease_status.ckd and disease_status.ckd.prediction.risk_level == 'Moderate' else ('rgba(16, 185, 129, 0.1)' if disease_status.ckd else '#f3f4f6')) }}; 
+                                    border: 1px solid {{ '#ef4444' if disease_status.ckd and disease_status.ckd.prediction.risk_level == 'High' else ('#f59e0b' if disease_status.ckd and disease_status.ckd.prediction.risk_level == 'Moderate' else ('#10b981' if disease_status.ckd else '#e5e7eb')) }};
+                                    border-radius: 8px; padding: 15px; display: flex; flex-direction: column; align-items: center; text-align: center;">
+                            <div
+                                style="font-weight: 600; margin-bottom: 5px; color: var(--text-primary); font-size: 14px;">
+                                CKD</div>
+                            {% if disease_status.ckd %}
+                            <div
+                                style="font-size: 13px; font-weight: 700; color: {{ '#dc2626' if disease_status.ckd.prediction.risk_level == 'High' else ('#d97706' if disease_status.ckd.prediction.risk_level == 'Moderate' else '#059669') }}; margin-bottom: 4px;">
+                                {{ disease_status.ckd.prediction.risk_level }} Risk
+                            </div>
+                            <div style="font-size: 11px; color: var(--text-secondary);">
+                                Stage: {{ disease_status.ckd.prediction.stage }}
+                            </div>
+                            {% else %}
+                            <div style="font-size: 12px; color: var(--text-secondary); margin-top: 5px;">
+                                Report not uploaded yet
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Kidney Stone Status -->
+                        <div
+                            style="background: {{ 'rgba(239, 68, 68, 0.1)' if disease_status.kidney_stone and disease_status.kidney_stone.prediction.risk_level == 'High' else ('rgba(245, 158, 11, 0.1)' if disease_status.kidney_stone and disease_status.kidney_stone.prediction.risk_level == 'Moderate' else ('rgba(16, 185, 129, 0.1)' if disease_status.kidney_stone else '#f3f4f6')) }}; 
+                                    border: 1px solid {{ '#ef4444' if disease_status.kidney_stone and disease_status.kidney_stone.prediction.risk_level == 'High' else ('#f59e0b' if disease_status.kidney_stone and disease_status.kidney_stone.prediction.risk_level == 'Moderate' else ('#10b981' if disease_status.kidney_stone else '#e5e7eb')) }};
+                                    border-radius: 8px; padding: 15px; display: flex; flex-direction: column; align-items: center; text-align: center;">
+                            <div
+                                style="font-weight: 600; margin-bottom: 5px; color: var(--text-primary); font-size: 14px;">
+                                Kidney Stone</div>
+                            {% if disease_status.kidney_stone %}
+                            <div
+                                style="font-size: 13px; font-weight: 700; color: {{ '#dc2626' if disease_status.kidney_stone.prediction.risk_level == 'High' else ('#d97706' if disease_status.kidney_stone.prediction.risk_level == 'Moderate' else '#059669') }}; margin-bottom: 4px;">
+                                {{ disease_status.kidney_stone.prediction.stage }}
+                            </div>
+                            <div style="font-size: 11px; color: var(--text-secondary);">
+                                {{ disease_status.kidney_stone.prediction.severity }}
+                            </div>
+                            {% else %}
+                            <div style="font-size: 12px; color: var(--text-secondary); margin-top: 5px;">
+                                Report not uploaded yet
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- AKI Status -->
+                        <div
+                            style="background: {{ 'rgba(239, 68, 68, 0.1)' if disease_status.aki and disease_status.aki.prediction.risk_level == 'High' else ('rgba(245, 158, 11, 0.1)' if disease_status.aki and disease_status.aki.prediction.risk_level == 'Moderate' else ('rgba(16, 185, 129, 0.1)' if disease_status.aki else '#f3f4f6')) }}; 
+                                    border: 1px solid {{ '#ef4444' if disease_status.aki and disease_status.aki.prediction.risk_level == 'High' else ('#f59e0b' if disease_status.aki and disease_status.aki.prediction.risk_level == 'Moderate' else ('#10b981' if disease_status.aki else '#e5e7eb')) }};
+                                    border-radius: 8px; padding: 15px; display: flex; flex-direction: column; align-items: center; text-align: center;">
+                            <div
+                                style="font-weight: 600; margin-bottom: 5px; color: var(--text-primary); font-size: 14px;">
+                                AKI</div>
+                            {% if disease_status.aki %}
+                            <div
+                                style="font-size: 13px; font-weight: 700; color: {{ '#dc2626' if disease_status.aki.prediction.risk_level == 'High' else ('#d97706' if disease_status.aki.prediction.risk_level == 'Moderate' else '#059669') }}; margin-bottom: 4px;">
+                                {{ disease_status.aki.prediction.risk_level }} Risk
+                            </div>
+                            <div style="font-size: 11px; color: var(--text-secondary);">
+                                Stage: {{ disease_status.aki.prediction.stage }}
+                            </div>
+                            {% else %}
+                            <div style="font-size: 12px; color: var(--text-secondary); margin-top: 5px;">
+                                Report not uploaded yet
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- ESRD Status -->
+                        <div
+                            style="background: {{ 'rgba(239, 68, 68, 0.1)' if disease_status.esrd and disease_status.esrd.prediction.risk_level == 'High' else ('rgba(245, 158, 11, 0.1)' if disease_status.esrd and disease_status.esrd.prediction.risk_level == 'Moderate' else ('rgba(16, 185, 129, 0.1)' if disease_status.esrd else '#f3f4f6')) }}; 
+                                    border: 1px solid {{ '#ef4444' if disease_status.esrd and disease_status.esrd.prediction.risk_level == 'High' else ('#f59e0b' if disease_status.esrd and disease_status.esrd.prediction.risk_level == 'Moderate' else ('#10b981' if disease_status.esrd else '#e5e7eb')) }};
+                                    border-radius: 8px; padding: 15px; display: flex; flex-direction: column; align-items: center; text-align: center;">
+                            <div
+                                style="font-weight: 600; margin-bottom: 5px; color: var(--text-primary); font-size: 14px;">
+                                ESRD</div>
+                            {% if disease_status.esrd %}
+                            <div
+                                style="font-size: 13px; font-weight: 700; color: {{ '#dc2626' if disease_status.esrd.prediction.risk_level == 'High' else ('#d97706' if disease_status.esrd.prediction.risk_level == 'Moderate' else '#059669') }}; margin-bottom: 4px;">
+                                {{ disease_status.esrd.prediction.risk_level }} Risk
+                            </div>
+                            <div style="font-size: 11px; color: var(--text-secondary);">
+                                Stage: {{ disease_status.esrd.prediction.stage }}
+                            </div>
+                            {% else %}
+                            <div style="font-size: 12px; color: var(--text-secondary); margin-top: 5px;">
+                                Report not uploaded yet
+                            </div>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
 
@@ -1167,8 +1308,7 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="card-title">
-                            <i class="fas fa-video"></i> Upcoming Checkup (DEBUG: {{ upcoming_appointments|length }} |
-                            User: '{{ current_user.username }}' | Status: {{ debug_status }})
+                            <i class="fas fa-video"></i> Upcoming Checkup
                         </div>
                     </div>
 
@@ -1309,8 +1449,8 @@
 
     <!-- Patient Education Chatbot -->
     <div id="chatbot-container" class="chatbot-container">
-        <div id="chatbot-toggle" class="chatbot-toggle">
-            <span>🤖</span>
+        <div class="chatbot-toggle" id="chatbot-trigger">
+            <i class="fas fa-robot"></i>
         </div>
         <div id="chatbot-window" class="chatbot-window">
             <div class="chatbot-header">
@@ -1336,7 +1476,7 @@
         document.addEventListener('DOMContentLoaded', function () {
             // Chatbot elements
             const chatbotContainer = document.getElementById('chatbot-container');
-            const chatbotToggle = document.getElementById('chatbot-toggle');
+            const chatbotToggle = document.getElementById('chatbot-trigger');
             const chatbotWindow = document.getElementById('chatbot-window');
             const chatbotClose = document.getElementById('chatbot-close');
             const chatbotMessages = document.getElementById('chatbot-messages');
@@ -1344,24 +1484,32 @@
             const chatbotSend = document.getElementById('chatbot-send');
 
             // Toggle chatbot visibility
-            chatbotToggle.addEventListener('click', function () {
-                chatbotContainer.classList.toggle('active');
-            });
+            if (chatbotToggle) {
+                chatbotToggle.addEventListener('click', function () {
+                    chatbotContainer.classList.toggle('active');
+                });
+            }
 
             // Close chatbot
-            chatbotClose.addEventListener('click', function () {
-                chatbotContainer.classList.remove('active');
-            });
+            if (chatbotClose) {
+                chatbotClose.addEventListener('click', function () {
+                    chatbotContainer.classList.remove('active');
+                });
+            }
 
             // Send message on button click
-            chatbotSend.addEventListener('click', sendMessage);
+            if (chatbotSend) {
+                chatbotSend.addEventListener('click', sendMessage);
+            }
 
             // Send message on Enter key
-            chatbotInput.addEventListener('keypress', function (e) {
-                if (e.key === 'Enter') {
-                    sendMessage();
-                }
-            });
+            if (chatbotInput) {
+                chatbotInput.addEventListener('keypress', function (e) {
+                    if (e.key === 'Enter') {
+                        sendMessage();
+                    }
+                });
+            }
 
             // Function to send message
             function sendMessage() {
@@ -1445,6 +1593,131 @@
                         welcomeMessage.querySelector('.chatbot-message-content').textContent = 'Failed to load assistant. Check browser console for details.';
                     }
                 });
+        });
+
+        function markTourComplete() {
+            fetch('/api/complete-tour', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then(response => {
+                if (!response.ok) console.error('Failed to mark tour as complete');
+            }).catch(error => {
+                console.error('Error marking tour as complete:', error);
+            });
+        }
+    </script>
+
+    <!-- Driver.js for Tour -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.css" />
+    <script src="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.js.iife.js"></script>
+
+    <script>
+        // Tour Logic
+        document.addEventListener('DOMContentLoaded', function () {
+            // Check if we should show the tour
+            const showTour = {{ 'true' if show_tour else 'false' }};
+
+            console.log('Tour check - showTour:', showTour);
+
+            if (showTour) {
+                console.log('Initializing tour...');
+
+                // Wait for driver.js to load
+                setTimeout(() => {
+                    if (!window.driver || !window.driver.js) {
+                        console.error('Driver.js not loaded!');
+                        return;
+                    }
+
+                    // Initialize driver
+                    const driver = window.driver.js.driver;
+                    const avatarUrl = "{{ url_for('static', filename='images/ai_avatar.png') }}";
+
+                    const driverObj = driver({
+                        showProgress: true,
+                        animate: true,
+                        allowClose: true,
+                        overlayColor: 'rgba(0, 0, 0, 0.6)',
+                        popoverClass: 'tour-popover',
+                        // onPopoverRendered removed for debugging
+                        onDestroyStarted: () => {
+                            // Mark tour as complete when finished or closed
+                            markTourComplete();
+                            driverObj.destroy();
+                        },
+                        steps: [
+                            {
+                                element: '.welcome-message',
+                                popover: {
+                                    title: 'Welcome!',
+                                    description: "Hi! I'm your Personal Health Assistant. I'll quickly show you around your dashboard.",
+                                    side: "bottom",
+                                    align: 'start'
+                                }
+                            },
+                            {
+                                element: '#stats-overview',
+                                popover: {
+                                    title: 'Health Overview',
+                                    description: 'See your key metrics like CKD Stage and Risk Level at a glance right here.',
+                                    side: "bottom",
+                                    align: 'start'
+                                }
+                            },
+                            {
+                                element: '#upload-section',
+                                popover: {
+                                    title: 'Analysis Tool',
+                                    description: "Upload your lab reports here. I'll analyze them to track your progress automatically.",
+                                    side: "top",
+                                    align: 'start'
+                                }
+                            },
+                            {
+                                element: '#chatbot-trigger',
+                                popover: {
+                                    title: 'Chat with Me',
+                                    description: "I'm always here! Click this button to ask me anything about your health.",
+                                    side: "left",
+                                    align: 'start'
+                                }
+                            }
+                        ]
+                    });
+
+                    // Custom styling for the popover
+                    const style = document.createElement('style');
+                    style.innerHTML = `
+                        .tour-popover {
+                            max-width: 400px !important;
+                            border-radius: 16px !important;
+                            box-shadow: 0 10px 30px rgba(0,0,0,0.2) !important;
+                        }
+                        .driver-popover-title {
+                            font-size: 18px !important;
+                            font-weight: 700 !important;
+                            color: #0d9488 !important;
+                            margin-bottom: 8px !important;
+                        }
+                        .driver-popover-description {
+                            font-size: 14px !important;
+                            color: #4b5563 !important;
+                            line-height: 1.5 !important;
+                        }
+                    `;
+                    document.head.appendChild(style);
+
+                    // Start tour after a short delay
+                    setTimeout(() => {
+                        console.log('Starting tour...');
+                        driverObj.drive();
+                    }, 1000);
+                }, 500);
+            } else {
+                console.log('Tour already seen or not applicable');
+            }
         });
     </script>
 </body>

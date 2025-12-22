@@ -16,6 +16,7 @@ class User(UserMixin):
         self.city = user_data.get('city')
         # For doctors: list of patient IDs they manage
         self.patients = user_data.get('patients', []) 
+        self.has_seen_tour = user_data.get('has_seen_tour', False)
 
     def is_doctor(self):
         return self.role == 'doctor'
@@ -70,7 +71,8 @@ class User(UserMixin):
                 'specialization': specialization,
                 'city': city,
                 'created_at': pd.Timestamp.now().isoformat(),
-                'patients': [] # Initialize empty patient list
+                'patients': [], # Initialize empty patient list
+                'has_seen_tour': False
             }
             
             result = db.users.insert_one(user_data)
@@ -453,6 +455,30 @@ def update_patient_lab_values(username, lab_values, prediction, pdf_path=None, t
         print(f"Updated patients_data for {username} with new lab values")
     except Exception as e:
         print(f"Error updating patients_data: {e}")
+
+def update_disease_status(username, disease_type, prediction):
+    """
+    Update the status for a specific disease type in patient records.
+    Stores the latest result for dashboard display.
+    """
+    try:
+        db = Database.get_db()
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+        
+        status_entry = {
+            'last_updated': timestamp,
+            'prediction': prediction
+        }
+        
+        # Update specifically the disease_status dictionary
+        db.patient_records.update_one(
+            {'username': username},
+            {'$set': {f'disease_status.{disease_type}': status_entry}},
+            upsert=True
+        )
+        print(f"Updated disease status for {username} - {disease_type}")
+    except Exception as e:
+        print(f"Error updating disease status: {e}")
 
     # Sync with lab_results collection for Doctor Dashboard
     try:

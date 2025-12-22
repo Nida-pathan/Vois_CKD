@@ -320,203 +320,209 @@
                 color: #667eea;
             }
 
-            .card-stone .disease-icon {
-                color: #f5576c;
+            100% {
+                transform: rotate(360deg);
+                color: #667eea;
+            }
+        }
+
+        .card-stone .disease-icon {
+            color: #f5576c;
+        }
+
+        .card-aki .disease-icon {
+            color: #fa709a;
+        }
+
+        .card-esrd .disease-icon {
+            color: #30cfd0;
+        }
+
+        .upload-section {
+            background: var(--white);
+            padding: 40px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            text-align: center;
+            display: none;
+            /* Hidden initially */
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
             }
 
-            .card-aki .disease-icon {
-                color: #fa709a;
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .upload-box {
+            border: 2px dashed #cbd5e1;
+            border-radius: var(--border-radius);
+            padding: 40px;
+            margin: 20px 0;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+
+        .upload-box:hover {
+            border-color: var(--primary-color);
+            background: var(--accent-color);
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            color: #94a3b8;
+            margin-bottom: 15px;
+        }
+
+        .btn-upload {
+            background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-top: 20px;
+        }
+
+        .btn-upload:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-upload:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        /* Results Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
             }
 
-            .card-esrd .disease-icon {
-                color: #30cfd0;
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #9ca3af;
+        }
+
+        .result-header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .severity-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .severity-low {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .severity-moderate {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .severity-high {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .severity-critical {
+            background: #7f1d1d;
+            color: #fef2f2;
+        }
+
+        .recommendations-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .recommendations-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid #f3f4f6;
+            display: flex;
+            gap: 10px;
+        }
+
+        .recommendations-list li:before {
+            content: "•";
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .loading-spinner {
+            display: none;
+            margin: 20px auto;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
             }
 
-            .upload-section {
-                background: var(--white);
-                padding: 40px;
-                border-radius: var(--border-radius);
-                box-shadow: var(--shadow-md);
-                text-align: center;
-                display: none;
-                /* Hidden initially */
-                animation: fadeIn 0.5s ease;
+            100% {
+                transform: rotate(360deg);
             }
-
-            @keyframes fadeIn {
-                from {
-                    opacity: 0;
-                    transform: translateY(10px);
-                }
-
-                to {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
-            }
-
-            .upload-box {
-                border: 2px dashed #cbd5e1;
-                border-radius: var(--border-radius);
-                padding: 40px;
-                margin: 20px 0;
-                cursor: pointer;
-                transition: border-color 0.3s;
-            }
-
-            .upload-box:hover {
-                border-color: var(--primary-color);
-                background: var(--accent-color);
-            }
-
-            .upload-icon {
-                font-size: 48px;
-                color: #94a3b8;
-                margin-bottom: 15px;
-            }
-
-            .btn-upload {
-                background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
-                color: white;
-                border: none;
-                padding: 12px 30px;
-                border-radius: 50px;
-                font-size: 16px;
-                font-weight: 600;
-                cursor: pointer;
-                transition: transform 0.2s;
-                margin-top: 20px;
-            }
-
-            .btn-upload:hover {
-                transform: translateY(-2px);
-            }
-
-            .btn-upload:disabled {
-                opacity: 0.7;
-                cursor: not-allowed;
-            }
-
-            /* Results Modal */
-            .modal {
-                display: none;
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0, 0, 0, 0.5);
-                z-index: 1000;
-                justify-content: center;
-                align-items: center;
-            }
-
-            .modal-content {
-                background: white;
-                padding: 30px;
-                border-radius: var(--border-radius);
-                width: 90%;
-                max-width: 600px;
-                max-height: 90vh;
-                overflow-y: auto;
-                position: relative;
-                animation: slideUp 0.3s ease;
-            }
-
-            @keyframes slideUp {
-                from {
-                    opacity: 0;
-                    transform: translateY(20px);
-                }
-
-                to {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
-            }
-
-            .close-modal {
-                position: absolute;
-                top: 20px;
-                right: 20px;
-                font-size: 24px;
-                cursor: pointer;
-                color: #9ca3af;
-            }
-
-            .result-header {
-                text-align: center;
-                margin-bottom: 25px;
-                padding-bottom: 15px;
-                border-bottom: 1px solid #e5e7eb;
-            }
-
-            .severity-badge {
-                display: inline-block;
-                padding: 6px 12px;
-                border-radius: 20px;
-                font-size: 14px;
-                font-weight: 600;
-                margin-top: 10px;
-            }
-
-            .severity-low {
-                background: #d1fae5;
-                color: #065f46;
-            }
-
-            .severity-moderate {
-                background: #fef3c7;
-                color: #92400e;
-            }
-
-            .severity-high {
-                background: #fee2e2;
-                color: #991b1b;
-            }
-
-            .severity-critical {
-                background: #7f1d1d;
-                color: #fef2f2;
-            }
-
-            .recommendations-list {
-                list-style: none;
-                padding: 0;
-            }
-
-            .recommendations-list li {
-                padding: 10px 0;
-                border-bottom: 1px solid #f3f4f6;
-                display: flex;
-                gap: 10px;
-            }
-
-            .recommendations-list li:before {
-                content: "•";
-                color: var(--primary-color);
-                font-weight: bold;
-            }
-
-            .loading-spinner {
-                display: none;
-                margin: 20px auto;
-                border: 4px solid #f3f3f3;
-                border-top: 4px solid var(--primary-color);
-                border-radius: 50%;
-                width: 40px;
-                height: 40px;
-                animation: spin 1s linear infinite;
-            }
-
-            @keyframes spin {
-                0% {
-                    transform: rotate(0deg);
-                }
-
-                100% {
-                    transform: rotate(360deg);
-                }
     </style>
 </head>
 
@@ -626,7 +632,7 @@
             // Scroll to upload section
             uploadSection.scrollIntoView({ behavior: 'smooth' });
 
-            // Update title
+            // Update title and input accept type
             const titles = {
                 'ckd': 'Chronic Kidney Disease Analysis',
                 'kidney_stone': 'Kidney Stone Risk Analysis',
@@ -634,6 +640,17 @@
                 'esrd': 'End-Stage Renal Disease Analysis'
             };
             document.getElementById('selectedDiseaseTitle').textContent = titles[type];
+
+            const fileInput = document.getElementById('fileInput');
+            const uploadText = document.querySelector('.upload-box p:nth-child(2)');
+
+            if (type === 'kidney_stone') {
+                fileInput.accept = ".pdf,.jpg,.jpeg,.png";
+                uploadText.textContent = "Click to browse or drag & drop PDF (Report) or Image (Scan)";
+            } else {
+                fileInput.accept = ".pdf";
+                uploadText.textContent = "Click to browse or drag & drop PDF here";
+            }
         }
 
         function handleFileSelect(input) {
@@ -653,7 +670,7 @@
             }
 
             if (!fileInput.files[0] && !useDefaults) {
-                alert('Please select a PDF file or check "Use default values".');
+                alert('Please select a file or check "Use default values".');
                 return;
             }
 
@@ -705,17 +722,42 @@
             document.getElementById('resultStage').textContent = prediction.stage;
 
             const severityEl = document.getElementById('resultSeverity');
-            severityEl.textContent = prediction.severity + ' Severity';
+            severityEl.textContent = prediction.severity + (prediction.risk_level ? '' : ' Severity');
 
             // Reset classes
             severityEl.className = 'severity-badge';
-            if (prediction.severity.toLowerCase().includes('low')) severityEl.classList.add('severity-low');
-            else if (prediction.severity.toLowerCase().includes('moderate')) severityEl.classList.add('severity-moderate');
-            else if (prediction.severity.toLowerCase().includes('high')) severityEl.classList.add('severity-high');
+            const sev = (prediction.severity || '').toLowerCase(); // Fallback if undefined
+            const risk = (prediction.risk_level || '').toLowerCase();
+
+            if (sev.includes('low') || risk === 'low') severityEl.classList.add('severity-low');
+            else if (sev.includes('moderate') || risk === 'moderate') severityEl.classList.add('severity-moderate');
+            else if (sev.includes('high') || risk === 'high') severityEl.classList.add('severity-high');
             else severityEl.classList.add('severity-critical');
 
             const recList = document.getElementById('resultRecommendations');
             recList.innerHTML = '';
+
+            // Check for image result
+            let imageContainer = document.getElementById('resultImageContainer');
+            if (!imageContainer) {
+                imageContainer = document.createElement('div');
+                imageContainer.id = 'resultImageContainer';
+                imageContainer.style.marginBottom = '20px';
+                imageContainer.style.textAlign = 'center';
+                // Insert after stage
+                document.getElementById('resultStage').parentNode.after(imageContainer);
+            }
+
+            if (prediction.image_path) {
+                imageContainer.innerHTML = `
+                    <h4 style="margin-bottom: 10px;">Detection Result</h4>
+                    <img src="${prediction.image_path}" style="max-width: 100%; border-radius: 8px; border: 1px solid #ddd;" alt="Detection Result">
+                `;
+                imageContainer.style.display = 'block';
+            } else {
+                imageContainer.style.display = 'none';
+            }
+
             if (prediction.recommendations) {
                 prediction.recommendations.forEach(rec => {
                     const li = document.createElement('li');
