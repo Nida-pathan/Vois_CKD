@@ -213,10 +213,11 @@
             position: fixed;
             bottom: 20px;
             right: 20px;
-            z-index: 9999;
+            z-index: 99999;
         }
 
         .chatbot-toggle {
+            z-index: 99999;
             width: 60px;
             height: 60px;
             background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
@@ -848,6 +849,10 @@
             <div class="welcome-message">
                 <h1>Welcome back, {{ current_user.username }}!</h1>
                 <p>Your kidney health companion dashboard</p>
+                <!-- Manual tour trigger for debugging -->
+                <button id="start-tour-btn"
+                    style="margin-top: 10px; padding: 5px 10px; background: #0d9488; color: white; border: none; border-radius: 4px; cursor: pointer; display: none;"
+                    onclick="startTourManually()">Start Tour</button>
             </div>
             <div class="top-bar-right">
                 <div class="user-menu">
@@ -1347,6 +1352,8 @@
         </div>
     </div>
 
+
+
     <script>
         function bookAppointment(doctorUsername) {
             const modalHtml = `
@@ -1595,24 +1602,15 @@
                 });
         });
 
-        function markTourComplete() {
-            fetch('/api/complete-tour', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            }).then(response => {
-                if (!response.ok) console.error('Failed to mark tour as complete');
-            }).catch(error => {
-                console.error('Error marking tour as complete:', error);
-            });
-        }
+
     </script>
 
     <!-- Driver.js for Tour -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.css" />
     <script src="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.js.iife.js"></script>
 
+
+    <!-- Tour using Driver.js -->
     <script>
         // Tour Logic
         document.addEventListener('DOMContentLoaded', function () {
@@ -1641,10 +1639,12 @@
                         allowClose: true,
                         overlayColor: 'rgba(0, 0, 0, 0.6)',
                         popoverClass: 'tour-popover',
-                        // onPopoverRendered removed for debugging
                         onDestroyStarted: () => {
                             // Mark tour as complete when finished or closed
-                            markTourComplete();
+                            fetch('/api/complete-tour', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' }
+                            }).then(() => console.log('Tour marked complete'));
                             driverObj.destroy();
                         },
                         steps: [

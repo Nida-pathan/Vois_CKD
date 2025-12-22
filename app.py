@@ -1234,9 +1234,11 @@ def patient_dashboard():
         # show_tour = not current_user.has_seen_tour
         show_tour = True
         
-        # Force tour for ar3 every time
+        # Force tour for ar3 every time (FOR DEBUGGING - REMOVE IN PRODUCTION)
         if current_user.username == 'ar3':
             show_tour = True
+            # Also override the user's has_seen_tour property for immediate effect
+            current_user.has_seen_tour = False
 
         # Get upcoming appointments for patient
         from models.user import get_appointments_for_patient
