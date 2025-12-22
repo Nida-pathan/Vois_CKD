@@ -53,28 +53,80 @@ class MedicalReportPDF(FPDF):
         self.add_section_title("Patient Information")
         self.set_font("Arial", size=11)
         
-        # Filter fields - Whitelist only specific fields
-        allowed_fields = {
-            'patient_name': 'Name',
-            'name': 'Name',
-            'age': 'Age',
-            'address': 'Address',
-            'blood_type': 'Blood Type',
-            'phone': 'Phone Number'
-        }
+        # Define Layout Constants
+        col_width = 95
+        label_width = 30
+        value_width = 65
+        line_height = 8
         
-        cols = []
-        for key, label in allowed_fields.items():
-            if key in patient_data and patient_data[key]:
-                cols.append(f"{label}: {patient_data[key]}")
+        # Filter fields
+        # Structure: (Key, Label)
+        # We process them in order to create a nice grid
+        grid_fields = [
+            ('name', 'Name'),
+            ('age', 'Age'),
+            ('phone', 'Phone'),
+            ('blood_type', 'Blood Type'),
+            ('patient_id', 'Patient ID')
+        ]
         
-        # Draw in pairs
-        for i in range(0, len(cols), 2):
-            self.cell(95, 8, cols[i])
-            if i + 1 < len(cols):
-                self.cell(95, 8, cols[i+1])
-            self.ln()
-        self.ln(2)
+        full_width_fields = [
+            ('address', 'Address'),
+            ('email', 'Email')
+        ]
+        
+        # Prepare data for grid matching
+        # We want to pair items: Item 1 | Item 2
+        active_grid_items = []
+        for key, label in grid_fields:
+            # Check various key possibilities (patient_data might use 'patient_name' or 'name')
+            val = None
+            if key == 'name':
+                val = patient_data.get('name') or patient_data.get('patient_name')
+            else:
+                val = patient_data.get(key)
+                
+            if val:
+                active_grid_items.append((label, str(val)))
+                
+        # Render Grid (2 items per row)
+        for i in range(0, len(active_grid_items), 2):
+            # Left Column
+            l1, v1 = active_grid_items[i]
+            self.set_font("Arial", "B", 11)
+            self.cell(label_width, line_height, f"{l1}:", 0, 0, 'L')
+            self.set_font("Arial", "", 11)
+            self.cell(value_width, line_height, v1, 0, 0, 'L')
+            
+            # Right Column
+            if i + 1 < len(active_grid_items):
+                l2, v2 = active_grid_items[i+1]
+                self.set_font("Arial", "B", 11)
+                self.cell(label_width, line_height, f"{l2}:", 0, 0, 'L')
+                self.set_font("Arial", "", 11)
+                self.cell(value_width, line_height, v2, 0, 0, 'L')
+            
+            self.ln(line_height)
+            
+        # Render Full Width Fields (Address, etc)
+        self.ln(2) # Little gap
+        for key, label in full_width_fields:
+            val = patient_data.get(key)
+            if val:
+                # Explicitly reset X to left margin (10mm is default) to ensure alignment
+                self.set_x(10)
+                
+                self.set_font("Arial", "B", 11)
+                self.cell(label_width, line_height, f"{label}:", 0, 0, 'L')
+                
+                self.set_font("Arial", "", 11)
+                # Use MultiCell for value to handle wrapping
+                # Calculate remaining width (210 - 10 left - 10 right - label_width)
+                remaining_width = 190 - label_width
+                
+                self.multi_cell(remaining_width, line_height, str(val))
+        
+        self.ln(4)
         
     def add_medication_table(self, medications):
         if not medications:

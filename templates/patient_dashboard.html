@@ -1617,79 +1617,79 @@
             // Check if we should show the tour
             const showTour = {{ 'true' if show_tour else 'false' }};
 
-            console.log('Tour check - showTour:', showTour);
+        console.log('Tour check - showTour:', showTour);
 
-            if (showTour) {
-                console.log('Initializing tour...');
+        if (showTour) {
+            console.log('Initializing tour...');
 
-                // Wait for driver.js to load
-                setTimeout(() => {
-                    if (!window.driver || !window.driver.js) {
-                        console.error('Driver.js not loaded!');
-                        return;
-                    }
+            // Wait for driver.js to load
+            setTimeout(() => {
+                if (!window.driver || !window.driver.js) {
+                    console.error('Driver.js not loaded!');
+                    return;
+                }
 
-                    // Initialize driver
-                    const driver = window.driver.js.driver;
-                    const avatarUrl = "{{ url_for('static', filename='images/ai_avatar.png') }}";
+                // Initialize driver
+                const driver = window.driver.js.driver;
+                const avatarUrl = "{{ url_for('static', filename='images/ai_avatar.png') }}";
 
-                    const driverObj = driver({
-                        showProgress: true,
-                        animate: true,
-                        allowClose: true,
-                        overlayColor: 'rgba(0, 0, 0, 0.6)',
-                        popoverClass: 'tour-popover',
-                        onDestroyStarted: () => {
-                            // Mark tour as complete when finished or closed
-                            fetch('/api/complete-tour', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' }
-                            }).then(() => console.log('Tour marked complete'));
-                            driverObj.destroy();
-                        },
-                        steps: [
-                            {
-                                element: '.welcome-message',
-                                popover: {
-                                    title: 'Welcome!',
-                                    description: "Hi! I'm your Personal Health Assistant. I'll quickly show you around your dashboard.",
-                                    side: "bottom",
-                                    align: 'start'
-                                }
-                            },
-                            {
-                                element: '#stats-overview',
-                                popover: {
-                                    title: 'Health Overview',
-                                    description: 'See your key metrics like CKD Stage and Risk Level at a glance right here.',
-                                    side: "bottom",
-                                    align: 'start'
-                                }
-                            },
-                            {
-                                element: '#upload-section',
-                                popover: {
-                                    title: 'Analysis Tool',
-                                    description: "Upload your lab reports here. I'll analyze them to track your progress automatically.",
-                                    side: "top",
-                                    align: 'start'
-                                }
-                            },
-                            {
-                                element: '#chatbot-trigger',
-                                popover: {
-                                    title: 'Chat with Me',
-                                    description: "I'm always here! Click this button to ask me anything about your health.",
-                                    side: "left",
-                                    align: 'start'
-                                }
+                const driverObj = driver({
+                    showProgress: true,
+                    animate: true,
+                    allowClose: true,
+                    overlayColor: 'rgba(0, 0, 0, 0.6)',
+                    popoverClass: 'tour-popover',
+                    onDestroyStarted: () => {
+                        // Mark tour as complete when finished or closed
+                        fetch('/api/complete-tour', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' }
+                        }).then(() => console.log('Tour marked complete'));
+                        driverObj.destroy();
+                    },
+                    steps: [
+                        {
+                            element: '.welcome-message',
+                            popover: {
+                                title: 'Welcome!',
+                                description: "Hi! I'm your Personal Health Assistant. I'll quickly show you around your dashboard.",
+                                side: "bottom",
+                                align: 'start'
                             }
-                        ]
-                    });
+                        },
+                        {
+                            element: '#stats-overview',
+                            popover: {
+                                title: 'Health Overview',
+                                description: 'See your key metrics like CKD Stage and Risk Level at a glance right here.',
+                                side: "bottom",
+                                align: 'start'
+                            }
+                        },
+                        {
+                            element: '#upload-section',
+                            popover: {
+                                title: 'Analysis Tool',
+                                description: "Upload your lab reports here. I'll analyze them to track your progress automatically.",
+                                side: "top",
+                                align: 'start'
+                            }
+                        },
+                        {
+                            element: '#chatbot-trigger',
+                            popover: {
+                                title: 'Chat with Me',
+                                description: "I'm always here! Click this button to ask me anything about your health.",
+                                side: "left",
+                                align: 'start'
+                            }
+                        }
+                    ]
+                });
 
-                    // Custom styling for the popover
-                    const style = document.createElement('style');
-                    style.innerHTML = `
+                // Custom styling for the popover
+                const style = document.createElement('style');
+                style.innerHTML = `
                         .tour-popover {
                             max-width: 400px !important;
                             border-radius: 16px !important;
@@ -1707,17 +1707,17 @@
                             line-height: 1.5 !important;
                         }
                     `;
-                    document.head.appendChild(style);
+                document.head.appendChild(style);
 
-                    // Start tour after a short delay
-                    setTimeout(() => {
-                        console.log('Starting tour...');
-                        driverObj.drive();
-                    }, 1000);
-                }, 500);
-            } else {
-                console.log('Tour already seen or not applicable');
-            }
+                // Start tour after a short delay
+                setTimeout(() => {
+                    console.log('Starting tour...');
+                    driverObj.drive();
+                }, 1000);
+            }, 500);
+        } else {
+            console.log('Tour already seen or not applicable');
+        }
         });
     </script>
 </body>

@@ -397,15 +397,27 @@ def complete_tour():
     from bson.objectid import ObjectId
     try:
         db = Database.get_db()
-        db.users.update_one(
+        # Update by ID
+        result = db.users.update_one(
             {'_id': ObjectId(current_user.id)},
             {'$set': {'has_seen_tour': True}}
         )
+        
+        # Fallback: Update by username if ID didn't match (shouldn't happen but playing safe)
+        if result.matched_count == 0:
+            print(f"Warning: complete_tour failed by ID {current_user.id}, trying username {current_user.username}")
+            db.users.update_one(
+                {'username': current_user.username},
+                {'$set': {'has_seen_tour': True}}
+            )
+            
         current_user.has_seen_tour = True
         return jsonify({'success': True})
     except Exception as e:
         print(f"Error completing tour: {e}")
         return jsonify({'error': str(e)}), 500
+    finally:
+        print(f"DEBUG: complete_tour end - User: {current_user.id}, has_seen_tour: {current_user.has_seen_tour}")
 
 @app.route('/doctor/dashboard')
 @login_required
@@ -1231,14 +1243,7 @@ def patient_dashboard():
              dashboard_data['patient_id'] = f"P{current_user.id}"
 
         # Check if user has seen the tour (stored in User model)
-        # show_tour = not current_user.has_seen_tour
-        show_tour = True
-        
-        # Force tour for ar3 every time (FOR DEBUGGING - REMOVE IN PRODUCTION)
-        if current_user.username == 'ar3':
-            show_tour = True
-            # Also override the user's has_seen_tour property for immediate effect
-            current_user.has_seen_tour = False
+        show_tour = not current_user.has_seen_tour
 
         # Get upcoming appointments for patient
         from models.user import get_appointments_for_patient
