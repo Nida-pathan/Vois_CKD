@@ -62,6 +62,26 @@ Our solution addresses these challenges through a multi-faceted approach:
 - Medication guidance
 - Weekly meal plans
 
+### 🌟 Unique Selling Propositions (USP)
+
+1.  **Hybrid Intelligence**: Combines **Traditional ML** (for precise risk scoring) with **Generative AI** (for empathetic, explanatory support), creating a system that is both accurate and approachable.
+2.  **Privacy-First AI Architecture**: Implements a strict **Anonymization Layer** that strips all PII before any data touches the AI cloud, ensuring HIPAA compliance while leveraging powerful LLMs.
+3.  **Closed-Loop RAG System**: Unlike generic chatbots, our "Medical Assistant" retrieves answers *only* from a curated, medical-grade knowledge base (PDFs), reducing hallucinations and ensuring clinically relevant advice.
+4.  **Hyper-Personalization**: Moves beyond generic advice by cross-referencing specific lab values (e.g., Potassium 5.5) against clinical guidelines to offer tailored diet and lifestyle coaching.
+
+### 🚀 Minimum Viable Product (MVP) vs. Future Vision
+
+**Current MVP Scope:**
+-   **Diagnostic Core**: Functional ML models for CKD, AKI, and ESRD detection based on tabular lab data.
+-   **AI Integration**: RAG-powered chatbot with local vector storage and PDF lab report analysis.
+-   **User Roles**: Complete flow for Patients (Dashboard, Uploads) and Doctors (Review, Prescribe).
+-   **Infrastructure**: Local deployment using FastEmbed and on-premise SQLite vector store (ChromaDB) to demonstrate capability without cloud costs.
+
+**MVP Constraints (to be addressed in Production):**
+-   **Local Embeddings**: Currently runs on the host machine; production would use a scalable vector cloud service.
+-   **Single-Tenant Database**: Uses a local MongoDB instance; production would require a sharded atlas cluster.
+-   **Manual Knowledge Updates**: Documents are manually placed in folders; production would need a CMS for medical content management.
+
 ---
 
 ## 🛠️ Technology Stack

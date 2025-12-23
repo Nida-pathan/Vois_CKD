@@ -309,23 +309,7 @@
         </div>
     </div>
 
-    <!-- Risk Assessment -->
-    <div class="section">
-        <div class="section-title">
-            <i class="fas fa-exclamation-triangle"></i> Risk Assessment
-        </div>
-        <div class="risk-card">
-            <div class="risk-percentage-large">{{ patient.risk_percentage }}%</div>
-            <div class="risk-level-badge">
-                <span class="badge badge-{{ patient.risk_level.lower() }}">{{ patient.risk_level }} Risk</span>
-            </div>
-            <div class="risk-bar">
-                <div class="risk-fill"
-                    style="width: {{ patient.risk_percentage }}%; background: {% if patient.risk_level == 'Low' %}#10b981{% elif patient.risk_level == 'Moderate' %}#f59e0b{% elif patient.risk_level == 'High' %}#ef4444{% else %}#7f1d1d{% endif %};">
-                </div>
-            </div>
-        </div>
-    </div>
+
 
     <!-- Disease Status Grid -->
     <div class="section">
@@ -533,9 +517,36 @@
                 {% for key, value in result.items() %}
                 {% if key not in ['_id', 'patient_id', 'patient_username', 'test_date', 'test_type', 'notes',
                 'created_at', 'pdf_path'] %}
-                <div class="lab-item">
-                    <span class="lab-label">{{ key|replace('_', ' ')|title }}</span>
-                    <span class="lab-value">{{ value }}</span>
+                <div class="lab-item" style="display: block;">
+                    <span class="lab-label" style="display: block; margin-bottom: 5px;">{{ key|replace('_', ' ')|title
+                        }}</span>
+                    <span class="lab-value">
+                        {% if value is mapping %}
+                        <div style="background: rgba(0,0,0,0.02); padding: 10px; border-radius: 6px; font-size: 0.9em;">
+                            {% for k, v in value.items() %}
+                            {% if k != 'image_path' and k != 'recommendations' %}
+                            <div style="margin-bottom: 4px;">
+                                <span style="font-weight: 600; color: #555;">{{ k|replace('_', ' ')|title }}:</span>
+                                <span>{{ v }}</span>
+                            </div>
+                            {% endif %}
+                            {% endfor %}
+
+                            {% if 'recommendations' in value %}
+                            <div style="margin-top: 8px;">
+                                <span style="font-weight: 600; color: #555;">Recommendations:</span>
+                                <ul style="margin: 5px 0 0 0; padding-left: 20px;">
+                                    {% for rec in value['recommendations'] %}
+                                    <li>{{ rec }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% else %}
+                        {{ value }}
+                        {% endif %}
+                    </span>
                 </div>
                 {% endif %}
                 {% endfor %}
