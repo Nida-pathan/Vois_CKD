@@ -2552,7 +2552,7 @@ def upload_lab_report_pdf():
         update_patient_lab_values(current_user.username, lab_values, prediction, filepath if not use_defaults else None, test_type=test_type_label)
         
         # Save specific disease status for dashboard
-        update_disease_status(current_user.username, disease_type, prediction)
+        update_disease_status(current_user.username, disease_type, prediction, lab_values)
         
         return jsonify({
             'success': True,

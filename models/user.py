@@ -456,7 +456,7 @@ def update_patient_lab_values(username, lab_values, prediction, pdf_path=None, t
     except Exception as e:
         print(f"Error updating patients_data: {e}")
 
-def update_disease_status(username, disease_type, prediction):
+def update_disease_status(username, disease_type, prediction, lab_values=None):
     """
     Update the status for a specific disease type in patient records.
     Stores the latest result for dashboard display.
@@ -647,6 +647,19 @@ def get_doctor_patients_with_details(doctor_username):
                     except (ValueError, TypeError):
                         pass
             
+            # Normalize stage to integer if possible for dashboard charts
+            try:
+                if patient_info['stage'] and str(patient_info['stage']).lower() != 'new':
+                    # Extract numbers from string if needed (e.g. "Stage 3a" -> 3)
+                    import re
+                    stage_str = str(patient_info['stage'])
+                    match = re.search(r'\d+', stage_str)
+                    if match:
+                        patient_info['stage'] = int(match.group())
+            except Exception as e:
+                # Keep original value if parsing fails
+                pass
+
             filtered_patients.append(patient_info)
         
         return filtered_patients

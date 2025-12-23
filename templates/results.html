@@ -502,7 +502,15 @@
             %}style="display: none;"{% endif %}>
             <div class="lab-result-header">
                 <div class="lab-result-date">{{ result.test_date }}</div>
-                <div>{{ result.test_type }}</div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span>{{ result.test_type }}</span>
+                    {% if result.pdf_path %}
+                    <a href="{{ url_for('static', filename=result.pdf_path) }}" target="_blank"
+                        style="font-size: 0.8em; padding: 4px 8px; background: #0d9488; color: white; border-radius: 4px; text-decoration: none;">
+                        <i class="fas fa-file-pdf"></i> View Report
+                    </a>
+                    {% endif %}
+                </div>
             </div>
             <div class="lab-results-grid">
                 {% if result.results %}
@@ -516,7 +524,7 @@
                 <!-- Handle flat structure by iterating and excluding metadata -->
                 {% for key, value in result.items() %}
                 {% if key not in ['_id', 'patient_id', 'patient_username', 'test_date', 'test_type', 'notes',
-                'created_at', 'pdf_path'] %}
+                'created_at', 'pdf_path'] and value %}
                 <div class="lab-item" style="display: block;">
                     <span class="lab-label" style="display: block; margin-bottom: 5px;">{{ key|replace('_', ' ')|title
                         }}</span>
@@ -674,7 +682,7 @@
         <h3><i class="fas fa-file-upload"></i> Upload New Prescription</h3>
         <p>Upload a new prescription for this patient</p>
         <button class="btn-upload"
-            onclick="window.location.href=&quot;{{ url_for('prescriptions', patient=patient.username if patient.username else patient.name) }}&quot;">
+            onclick="window.location.href='{{ url_for('prescriptions', patient=patient.username if patient.username else patient.name) }}'">
             <i class="fas fa-plus"></i> Create New Prescription
         </button>
     </div>
