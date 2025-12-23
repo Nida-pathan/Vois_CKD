@@ -12,10 +12,28 @@ class PatientEducationChatbot:
     def __init__(self):
         self.recommender = CKDAIRecommender()
         self.conversation_history = []
-        self.knowledge_base = self._load_knowledge_base()
+        
+        # Initialize RAG Engine
+        try:
+            from models.rag_engine import get_rag_engine
+            self.rag_engine = get_rag_engine()
+            
+            # Initial ingestion if needed (checking if collection is empty)
+            # This is a simplified check; in prod you might want a more robust one
+            # or an admin trigger for ingestion.
+            # For this demo, we'll try to ingest if we can't find anything.
+            if self.rag_engine.vector_store._collection.count() == 0:
+                print("Retrieval database empty. Ingesting documents...")
+                self.rag_engine.ingest_documents()
+                
+            self.rag_enabled = True
+        except Exception as e:
+            print(f"Failed to initialize RAG engine: {e}")
+            self.rag_enabled = False
+            self.knowledge_base = self._load_knowledge_base() # Fallback
     
     def _load_knowledge_base(self):
-        """Load the knowledge base for common CKD questions"""
+        """Load the knowledge base for common CKD questions (Fallback)"""
         return {
             "ckd_stages": {
                 "stage_1": "Stage 1 CKD means you have mild kidney damage with normal or high kidney function (eGFR > 90). At this stage, you may not have any symptoms.",
@@ -53,7 +71,7 @@ class PatientEducationChatbot:
     def get_welcome_message(self, patient_name=None):
         """Generate a personalized welcome message for the patient"""
         name = patient_name if patient_name else "Patient"
-        return f"Hello {name}! 👋 I'm your KidneyCompanion assistant, here to help answer your questions about Chronic Kidney Disease. You can ask me about CKD stages, symptoms, medical terms, or lifestyle tips. How can I help you today?"
+        return f"Hello {name}! 👋 I'm your KidneyCompanion assistant, now powered by AI. I can answer your questions about CKD based on the latest medical guidelines and your specific health data. How can I help you today?"
     
     def process_message(self, message, patient_data=None):
         """Process a patient message and generate an appropriate response"""
@@ -64,12 +82,17 @@ class PatientEducationChatbot:
             "timestamp": datetime.now().isoformat()
         })
         
-        # Convert message to lowercase for easier matching
-        msg_lower = message.lower()
-        
-        # Check for specific keywords and provide appropriate responses
-        response = self._generate_response(msg_lower, patient_data)
-        
+        # Generate response
+        try:
+            if self.rag_enabled:
+                response = self._generate_rag_response(message, patient_data)
+            else:
+                # Fallback to rule-based if RAG is broken
+                response = self._generate_fallback_response(message.lower(), patient_data)
+        except Exception as e:
+            print(f"Error generating response: {e}")
+            response = "I apologize, but I'm having trouble retrieving information right now. Please try again later."
+            
         # Add response to conversation history
         self.conversation_history.append({
             "role": "assistant",
@@ -79,8 +102,67 @@ class PatientEducationChatbot:
         
         return response
     
-    def _generate_response(self, message, patient_data=None):
-        """Generate a response based on the message content"""
+    def _generate_rag_response(self, message, patient_data=None):
+        """Generate a response using RAG and Gemini"""
+        
+        # 1. Retrieve Context
+        context = "No specific medical documents found."
+        try:
+            retrieved_docs = self.rag_engine.search(message, k=3)
+            if retrieved_docs:
+                context = "\n\n".join(retrieved_docs)
+        except Exception as e:
+            print(f"RAG Search failed: {e}")
+            
+        # 2. Format Patient Data
+        patient_context = "Patient Data: Not available."
+        if patient_data:
+            # Anonymize/simplify for the prompt
+            p = patient_data
+            patient_context = f"""
+            Patient Profile:
+            - Age: {p.get('age', 'Unknown')}
+            - CKD Stage: {p.get('stage', 'Unknown')}
+            - eGFR: {p.get('egfr', 'Unknown')}
+            - Creatinine: {p.get('serum_creatinine', 'Unknown')}
+            - Potassium: {p.get('potassium', 'Unknown')}
+            - Symptoms: {', '.join([k for k,v in p.get('symptoms', {}).items() if v]) or 'None reported'}
+            """
+            
+        # 3. Construct Prompt
+        prompt = f"""
+You are KidneyCompanion, a helpful and empathetic medical assistant for CKD patients.
+Use the following context and patient data to answer the user's question.
+
+CONTEXT FROM KNOWLEDGE BASE:
+{context}
+
+{patient_context}
+
+USER QUESTION:
+{message}
+
+INSTRUCTIONS:
+1. Answer the question directly using the Context provided.
+2. If the Patient Data is relevant (e.g., they ask about diet and their potassium is high), personalize the advice.
+3. If the answer is not in the context, use your general medical knowledge but mention you are providing general advice.
+4. Keep the tone supportive and easy to understand (grade 8 reading level).
+5. Always advise consulting a doctor for specific medical decisions.
+6. Keep the response concise (under 150 words).
+
+ANSWER:
+"""
+        
+        # 4. Generate with Gemini
+        try:
+            response = self.recommender.model.generate_content(prompt)
+            return response.text
+        except Exception as e:
+            print(f"Gemini generation failed: {e}")
+            return "I'm having trouble connecting to my AI brain right now. Please try again in a moment."
+
+    def _generate_fallback_response(self, message, patient_data=None):
+        """Generate a response based on keywords (Legacy/Fallback)"""
         # Check for greetings
         if any(greeting in message for greeting in ["hello", "hi", "hey", "good morning", "good afternoon", "good evening"]):
             return "Hello! How can I help you with your kidney health today?"
@@ -124,7 +206,7 @@ class PatientEducationChatbot:
         if any(keyword in message for keyword in escalation_keywords):
             return "I understand you may need assistance from a healthcare provider. Please contact your doctor directly for medical advice regarding prescriptions, appointments, or urgent concerns. Would you like me to help with anything else about CKD in the meantime?"
         
-        # Default response with common topics
+        # Default response
         return "I can help you understand more about Chronic Kidney Disease. You can ask me about:\n\n" + \
                "• CKD stages and what they mean\n" + \
                "• Common symptoms to watch for\n" + \

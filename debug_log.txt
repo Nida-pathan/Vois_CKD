@@ -1,0 +1,74 @@
+
+--- Patient Dashboard Debug (2025-12-23 10:47:15.923772) ---
+User: JOHN
+Has seen tour: False
+Show tour: True
+Appointments found: 0
+Disease Status Keys: ['kidney_stone', 'ckd']
+Booking request received: {'doctor_name': 'doc2', 'preferred_date': '2025-12-23', 'preferred_time': '10:49'}
+Doctor name: doc2
+Appointment created successfully: {'patient': 'JOHN', 'doctor': 'doc2', 'preferred_date': '2025-12-23', 'preferred_time': '10:49', 'meet_link': 'https://meet.jit.si/ckd-appointment-2e58577e-7a4d-4fe6-8d2e-1f3170b3df7a', 'status': 'pending', 'created_at': '2025-12-23T10:48:45.294367', '_id': '694a2635f25bc4494d4a260b'}
+
+--- Patient Dashboard Debug (2025-12-23 10:48:48.457224) ---
+User: JOHN
+Has seen tour: True
+Show tour: False
+Appointments found: 1
+Disease Status Keys: ['kidney_stone', 'ckd']
+Apt: Doctor=doc2, Link=https://meet.jit.si/ckd-appointment-2e58577e-7a4d-4fe6-8d2e-1f3170b3df7a
+
+--- Patient Dashboard Debug (2025-12-23 10:49:18.527098) ---
+User: JOHN
+Has seen tour: True
+Show tour: False
+Appointments found: 0
+Disease Status Keys: ['kidney_stone', 'ckd']
+
+--- Patient Dashboard Debug (2025-12-23 10:58:25.659191) ---
+User: JOHN
+Has seen tour: True
+Show tour: False
+Appointments found: 0
+Disease Status Keys: ['kidney_stone', 'ckd']
+
+--- Patient Dashboard Debug (2025-12-23 10:58:43.490989) ---
+User: JOHN
+Has seen tour: True
+Show tour: False
+Appointments found: 0
+Disease Status Keys: ['kidney_stone', 'ckd']
+
+--- Patient Dashboard Debug (2025-12-23 10:58:46.332388) ---
+User: JOHN
+Has seen tour: True
+Show tour: False
+Appointments found: 0
+Disease Status Keys: ['kidney_stone', 'ckd']
+
+--- Patient Dashboard Debug (2025-12-23 10:59:55.738769) ---
+User: JOHN
+Has seen tour: True
+Show tour: False
+Appointments found: 0
+Disease Status Keys: ['kidney_stone', 'ckd']
+
+--- Patient Dashboard Debug (2025-12-23 11:00:00.261684) ---
+User: JOHN
+Has seen tour: True
+Show tour: False
+Appointments found: 0
+Disease Status Keys: ['kidney_stone', 'ckd']
+
+--- Patient Dashboard Debug (2025-12-23 11:00:42.350333) ---
+User: JOHN
+Has seen tour: True
+Show tour: False
+Appointments found: 0
+Disease Status Keys: ['kidney_stone', 'ckd']
+
+--- Patient Dashboard Debug (2025-12-23 11:09:48.310804) ---
+User: JOHN
+Has seen tour: True
+Show tour: False
+Appointments found: 0
+Disease Status Keys: ['kidney_stone', 'ckd']
